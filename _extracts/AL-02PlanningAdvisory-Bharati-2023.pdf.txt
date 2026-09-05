@@ -1,0 +1,193 @@
+--- PAGE 1 ---
+AL/02 - Advisory for Bharati Station , Thursday,11 August 2016  
+                                                                                                                                                
+Page 1 of 4  
+  National Centre for Polar & Ocean Research  
+Indian Scientific Expedition to Antarctica (ISEA)   
+BHARATI – Indian Research Station at Larsemann Hills, Antarctica   
+Bharati  research base, located between Thala Fjord and Quilty bay at North Grovnes Island 
+(coordinates -69.40680, 76.19525 , elevation ~35 m), is operational since March 2012. The station is 
+equipped with modern facilities and provides opportunity for year ‐round s cientific research at and 
+around Bharati. The station can support 47 personnel on twin sharing basis in the main building during 
+summer as well as winter with an additional 25 in emergency shelters / summer camps during summers 
+and thus making the total ca pacity as 72. The station consists of one main building, fuel farm, fuel 
+station, sea water pump house, a summer camp and a number of smaller containerized modules.  
+ 
+  
+The main building offers regulated power supply, automated heat and air conditioning w ith hot and cold 
+running water, flush toilets, sauna, cold storage, PA system, aesthetically designed living, dining, lounge 
+and laboratory space, etc.  
+ 
+Bharati during austral summers  Bharati during austral winters  
+  
+Bharati  is approachable by sea route between November and March of the succeeding calendar year 
+(Austral Summer season) and can be reached from Cape Town in about 10 to16 days time depending 
+upon sea -ice conditions. The voyage plan varies annually depending on th e operational requirement.  
+
+--- PAGE 2 ---
+AL/02 - Advisory for Bharati Station , Thursday,11 August 2016  
+                                                                                                                                                
+Page 2 of 4  
+  Alternately, Bharati is also approachable by chartered flights under the aegis of Dronning Maud Land 
+Air Network (DROMLAN) between November and February of the succeeding calendar year. 
+Approaching Bharati by air is a tedious jo urney as there is no direct flight from Cape Town. All flights  
+(IL-76 aircrafts) are operated via Novolazarevskaya (Novo) air strip (near Maitri). Flight from Cape Town 
+to Novo takes about 5.5 hours and from Novo to Progress airstrip (near Bharati) throug h Baslar aircraft 
+(feeder flight) in about 10 -12 hours. Flights from Cape Town to Novo and Feeder flights between Novo 
+and Progress require intricate planning and are not available as a matter of choice, but based on 
+operational requirements.  
+  
+1. MODES OF T RANSPORT AROUND BHARATI  
+To provide logistical support and smooth transportation for carrying out field work and for collecting 
+samples from far off locations, transport / earth movers /load hauling vehicles are available at the 
+station. These can be used with the prior permission from the Leader at the station. Two helicopters 
+remain onboard ship and provide a convenient and quick way for field work.   
+  
+S. No.  Vehicles  Number  
+1.1.   Pisten Bully  4  
+1.2.   Snow Scooter  2  
+1.3.   Tata Xenon – XT  1  
+1.4.   Excavator (BE -71)  1  
+1.5.   Bulldozer (BD -50)  1  
+1.6.   Mantis Crane 50 MT  1  
+  
+2. DISTRIBUTION OF AREA IN AND AROUND BHARATI  
+Inside the main building there are four designated Laboratories with appropriate storage space:  
+2.1. Laboratories within the main building   
+2.1.1.    Electrical & Electronics Lab,  
+2.1.2.    Life Sciences Lab,  
+2.1.3.  Chemical Sciences,  
+2.1.4.  Earth Sciences Lab.  
+  
+2.2. Bharati Master Plan (BMP) – 2012   
+For deployment of instruments and experimental set up, area around Bharat i station is being developed 
+in a systematic way through an approved master plan. The North Grovnes Island is divided into five 
+major zones:  
+ 2.2.1.  Zone – 1 for infrastructural development,  
+ 2.2.2.  Zone – 2 Magnetic silence zone for atmospheric and upper atmospheric sciences,  
+ 2.2.3.     Zone – 3 reserved for future development,  
+ 2.2.4.      Zone–  4  Pristine zone, 
+ 
+2.2.5.  
+  
+Zone  
+– 
+  
+5 
+ Antenna zone  
+  
+  
+  
+
+--- PAGE 3 ---
+AL/02 - Advisory for Bharati Station , Thursday,11 August 2016  
+                                                                                                                                                
+Page 3 of 4  
+   
+3. OPERATIONAL EXPERIMENTS  
+Apart from experiments conducted in earlier expeditions, current list of experiments/equipment running 
+at Bharati are as follows:  
+  
+3.1. Ground stations for Earth Observation Satellites and Communication   
+Electronics Corporation of India Limited (ECIL), Hyderabad designed, developed and commissioned a 
+Data Reception Station operating in X and S bands for multi -mission remote sensing satellites and Data 
+Communication Station operating in C band linking Bhart i station and NRSC, Shadnagar, Hyderabad. 
+The link also provides a two way communication service between NCPOR and Bharati.  
+  
+3.2. Magnetometers   
+Digital Fluxgate magnetometer (DFM) and Proton Precision magnetometer (PPM) are continuously 
+monitoring terrestria l magnetic field. Magnetic observations are vital for understanding the 
+electromagnetic changes in the near -Earth environment due to internal or external origin.  [P. I. - Prof. 
+S. Gurubaran; E -mail - gurubara@iigs.iigm.res.in]  
+  
+3.3. Global Atmospheric E lectricity:   
+Extremely weak return current is observed in the fair -weather regions, which is driven by thunderclouds 
+in the troposphere. Long -wire antenna and electric field mill monitor atmospheric current and electric 
+field, which in turn provides global  pattern of thunderclouds.  [P. I. - Prof. S. Gurubaran; E -mail - 
+gurubara@iigs.iigm.res.in]  
+  
+3.4. Ionospheric Scintillation and TEC Monitoring:   
+For the ionospheric scintillation and total electron content monitoring GSV -4004B GISTM receiver is 
+operatio nal. It is a dual -frequency 12 channel GPS receiver and specifically configured to measure 
+amplitude and phase scintillation from L1 frequency along with Ionospheric Total Electron Content 
+(ITEC) from the L1 & L2 frequencies.   
+[P.I. - Dr S. Saini; E -mail- shailendra.saini@gmail.com]  
+  
+4. UTILITY EQUIPMENTS, INSTRUMENTS AND CONSUMABLES  
+  
+S. No.  Instrument  Description  Remark  
+4.1.   Drilling Platform    Available  
+4.2.   Ice Auger  Upto 2 meter  Available  
+4.3.   Petrological Microscope  Nikon LV100N Pol Polarizing  Available  
+4.4.   Thin sectioning Unit  
+  Petro -thin  Available  
+4.5.   Vibratory sieve shaker    Available  
+4.6.   Weighing Precision Balance  
+  Weighing range – 220 g (max)  
+Readout (d) – 0.001 g  
+Reproducibility – 0.001 g  Available  
+4.7.   Ultrasonic Cleaner (Rivotek)  Tank capacity – 5.5 lt  
+Tank clear size (mm) – 250x150x150  Available  
+4.8.   Millipore filtration unit  Sureproin  Available  
+4.9.   pH/Conductivity benchtop 
+Multiparameter  kit (Thermo  
+Orion)  
+  pH range – 0 to 14  
+Temperature range – 0 to 100oC  Available  
+--- PAGE 4 ---
+AL/02 - Advisory for Bharati Station , Thursday,11 August 2016  
+                                                                                                                                                
+Page 4 of 4  
+  4.10.  Acid resistant hot plate  
+  Heated area (mm) – 200x200 
+Maximum temperature – 400oC   Available  
+4.11.  Air stream vertical laminar  Enternal work zone (wxdxh ) – 660 x  Available  
+ flow cabinet  700 x 720 mm  Available  
+4.12.  Trim saw  Petrological saw  Available   
+4.13.  Centrifuge  
+  Speed range – 100 to 18,000 rmp  Available  
+4.14.  Oven  Operating temperature –50o to 250oC  
+Heating area (WxHxD ) – 
+544x1335x545 mm  Available  
+4.15.  Deep Freezer  
+  Temperature -30oC  
+Dimension (WxHxD) –  
+508x1331x533 mm  Available  
+4.16.  Table Top Muffle furnace   Temperature range – 100o to 1093oCl  
+capacity 45L;  
+Dimension (WxHxD) – 360x360x360 
+mm  Available  
+4.17.  UV visible spectrophotometer  
+  Up to 100 Hz data acquisition for 
+single cell kinetics  Available  
+4.18.  Auto clave  
+  Capacity – 69 liters, Temperature – 
+135oC  Available  
+  
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-  
+Please feel free to get in touch for clarifications with our team,  
+Useful Contacts   
+1.  Ms. Reena Naik                                                                 2.  Dr. Anand Kumar Singh  
+     (HR/ Team / Travel/ Medical / Training)                                   Scien tist-D | Scientist In -Charge                                                                                                                                  
+      Phone: +91 -832-2525 520, 523                                              (Space weather Sciences ) 
+      Email: reena.log@ncpor.res.in                                                Phone: +91 -832-2525524, 523  
+                   logistics@ncpor.res.in                                               Email: aks@ncpor.res.in  
+                                                                                                                aksncaor@gmail.com  
+ 
+  3. Dr. Ravi Mishra                                                                  4. Dr. Yogesh Ray  
+       Scientist -E |Scientist In -Charge                                               Scient ist-E | Scientist In -Charge  
+       (Supply Chain Logistics)                                                          (Antarctic operations) ) 
+       Phone: +91 -832-2525 609                                                        Phone:+91 -832-2525 530, 523  
+       Email: ravimishra@ncpor.res.in                                         Email: yogesh@ncpor.res.in  
+                                                                                                                  yogeshray@gmail.com  
+           
+     5. Dr. Shailendra Saini    
+         Scientist -E |Group Director                                                 
+         (Antarctic Operations)                                                          
+         Phone: +91 -832-2525 568, 523                                            
+         Email: shailendra@ncpor.res.in                                     
+                     shailendra.saini@gmail.com                                               
+ 
+ 
+Prepared by: Dr Anand Kumar Singh, Dr Yogesh Ray, Dr Shailendra Saini & Shri Mirza Javed B eg                                         
+Version Updated on 11 May 2023  

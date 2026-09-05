@@ -1,0 +1,288 @@
+--- PAGE 1 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 1 Geomorphometric modeling and mapping of Antarctic oases  
+ 
+I.V. Florinsky 
+ 
+Institute of Mathematical Problems of Biology, Keldysh Institute of Applied Mathematics, 
+Russian  Academy of Sciences, Pushchino, Moscow Region, 142290, Russia  
+ 
+Abstract  
+Geomorphometr ic modeling is widely used in geosciences. However, geomorphometric 
+modeling and mapping of Antarctic oases has not been performed so far.  This article presents the first 
+results of our work on geomorphometric modeling and mapping of several Antarctic oase s including 
+the Larsemann Hills, Thala Hills, Schirmacher Oasis, and Fildes Peninsula. As input data, we used 
+fragments of the Reference Elevation Model of Antarctica. For each territory, we derived digital 
+models of the follo wing 17 morphometric variables  from the extracted and edited digital elevation 
+models: slope , aspect, horizontal curv ature, vertical curvature, mean curvature, Gaussian curvature, 
+minimal curvature, maximal curvature, unsphericity curvature, difference curvature, vertical excess 
+curvature, horizontal excess curvature, ring curvature, accumulation curvature, catchment area, 
+topographic index, and stream power index . Derived geomorphometric maps can be useful for 
+structural geological and process -oriented hydrological studies. The ultimat e goal of the ongoing work 
+is to create a digital large -scale geomorphometric atlas of Antarctic oases and other ice -free Antarctic 
+territories.  
+ 
+Keywords:  topography, digital elevation model, geomorphometry, surface.  
+ 
+1. Introduction  
+Antarctic oases are c ommonly referred to glacier -free areas of the Antarctic coastal zone 
+with an area of several tens to several thousands square kilometers, which are characterized 
+by: (1)  a local climate largely determined by the surrounding ice sheet; (2) the presence of 
+unfrozen water in the form of a system of seasonal streams and unfrozen lakes; and (3) the 
+presence of primitive soils and biota (Simonov, 1971; Sokratova, 2010).  
+Despite their relatively small size, Antarctic oases are of scientific and practical 
+importanc e for Antarctic research. Because of their relative accessibility, these territories are 
+convenient for construction of year -round polar stations and seasonal bases, and also attract 
+scientists by the possibility of obtaining a significant amount of scient ific field material in a 
+short period of austral summer (Sokratova, 2010).  
+Geomorphometry is a scientific discipline lying at the intersection of geoinformatics, 
+remote sensing, photogrammetry, and computational mathematics, dealing with mathematical 
+model ing and analysis of topography, as well as the relationships between topography and 
+other components of geosystems (Evans, 1972; Shary, 1995; Shary et al., 2002; Hengl and 
+Reuter, 2009; Florinsky, 2016, 2017). Modern geomorphometry has a developed physical  and 
+mathematical theory and a powerful toolkit of computational methods. The initial data for 
+modeling are digital elevation models (DEMs) ( Guth et al., 2021 ). The objects of modeling 
+are usually land surface, submarine topography, glacier surface, subgla cial topography, and 
+surfaces of extraterrestrial territories (Florinsky, 2017). These non -smooth objects are usually 
+approximated by a topographic surface – a closed oriented infinitely differentiable two -
+dimensional manifold in the three -dimensional Eucl idean space (Shary, 1995; Florinsky, 
+2016).  
+                                                 
+ Correspondence to: iflor@mail.ru  
+ 
+arXiv:2305.07523  [physics.geo -ph] 
+--- PAGE 2 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 2 Geomorphometric methods are widely used to solve various multi -scale problems of 
+geomorphology, hydrology, soil science, geobotany, forestry, geology, oceanology, 
+climatology, planetology, and other geosciences. DEM spatial resolution may lie in a wide 
+range: from centimeters and decimeters to tens and hundreds of meters and tens of kilometers. 
+International experience of research in the field of geomorphometry is summarized in a series 
+of analytical reviews and b ooks (Moore et al., 1991; Wilson and Gallant, 2000; Li et al., 
+2005; Hengl and Reuter, 2009; Wilson, 2018; Minár et al., 2016; Lv et al., 2017; Florinsky, 
+2016, 2017, 2021).  
+Prospects of geomorphometric modeling and mapping of Antarctic oases are quite 
+obvious both for obtaining new knowledge about quantitative characteristics of the 
+topography of these unique natural objects, and for further use of the obtained 
+geomorphometric information for solving fundamental and applied problems of 
+geomorphology, geolo gy, geophysics, glaciology, climatology, etc. Nevertheless, 
+geomorphometric modeling and mapping of Antarctic oases has not been performed so far.  
+This article presents the first results of our works on geomorphometric modeling and 
+mapping of several Antar ctic oases including the Larsemann Hills, Thala Hills, Schirmacher 
+Oasis, and Fildes Peninsula. The ultimate goal of the ongoing work under this multiyear 
+program is to create a digital large -scale geomorphometric atlas of Antarctic oases and other 
+ice-free Antarctic territories.  
+ 
+2. Study areas  
+2.1. Larsemann Hills  
+The Larsemann Hills, East Antarctica (Figure 1) is an Antarctic coastal oasis including 
+ice-free, low rounded hills with an area of about 40 km2 located on the south -eastern shore of 
+the Prydz B ay of the Commonwealth Sea, Ingrid Christensen Coast, Princess Elizabeth Land. 
+The oasis consists of two large peninsulas, Stornes and Broknes, three small peninsulas, 
+Grovnes, Brattnevet, and Stinear, and about 130 islands including three relatively large , 
+Fisher, Manning, and McLeod Islands (Figure 1). The peninsulas and islands are separated by 
+a system of fjords and bays, such as, Thala, Nella, and Clemence Fjords , as well as Dålkoy , 
+Wilcock , and Quilty Bays. The oasis is bounded by the Dålk outlet glac ier in the east, by the 
+glacial plateau in the south, and by the Polararboken  outlet glacier in the west.  
+The Larsemann Hills are composed mainly of the Proterozoic garnet -biotite gneisses 
+and garnet -sillimanite schists; intrusions of pegmatites and granit es are also present ( Stüwe et 
+al., 1989; Carson and Grew, 2007; ATCM, 2021 ). Unique borosilicate and phosphate 
+complexes are developed on the Stornes Peninsula (ATCM, 2014).  
+The Larsemann Hills were deglaciated between 20,000 and 10,000 years ago ( Burgess 
+et al., 1994 ; Hodgson et al., 2001 ; Verleyen et al., 2004 ; Kiernan et al., 2009 ). The oasis 
+topography is a structurally controlled, exarated rocky hill terrain ( Bolshiyanov, 2011 ). The 
+elongated shape of the large landform elements of the Larsemann Hills is generally related to 
+compositional layering and the presence of folds and faults in the metamorphic bedrock 
+(ATCM, 2021). Nivation dominates among exogenous topography -forming processes. The 
+landscape is rugged with large, structurally controlled fjords  and valleys with steep slopes, 
+which are rarely deeper than 100 m on land and have a maximum length of 3 km. Elevations 
+range from 30 m to 120 m. The maximum elevation above sea level is 158 m (Blundell Peak 
+on the Stornes Peninsula).  
+There are about 150 lakes in the oasis. Drainage network is not developed. Snowfields 
+are widespread. There is a small passive glacial dome on the Stornes Peninsula.  
+The Larsemann Hills is the Antarctic Specially Managed Area No. 6 (ATCM, 2021), 
+while its largest portion, the  Stornes Peninsula, is the Antarctic Specially Protected Area 
+(ASPA) No. 174, 
+--- PAGE 3 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 3 
+ 
+ 
+Figure 1. The geographic location and elevations of the Larsemann Hills extracted from the REMA 
+DEM (Howat et  al., 2019; REMA, 2018 –2022). Peninsulas: BP – Broknes, BtP – Brattnevet, GP – 
+Grovnes, SP – Stornes, SrP – Stinear; islands: FI – Fisher, MI – Manning, McI – McLeod; fjords: CF 
+– Clemence, NF – Nella, TF – Thala; bays: DB – Dålkoy, WB – Wilcock, QB – Quilty; stations: PS – 
+Progress (Russia), ZS – Zhogshan (China), BS – Bharati (India).  
+ 
+There are three year -round operated polar stations in the oasis: Progress (Russia), 
+Zhongshan (China), and Bharati (India) (Figure 1). There is the snow -ice airfield Zenith  
+(Russia) on the glacial plateau, to the south of the Progress Station.  
+ 
+2.2. Thala Hills  
+The Thala Hills (Figure 2) include two ice -separated coastal oases, Molodezhny and 
+Vecherny. These are ice -free hills with an area of about 20 km2 located on the shor e of the 
+Alasheev Gulf of the Cosmonauts Sea (Enderby Land, East Antarctica). The Thala Hills are 
+bounded by the Hays outlet glacier in the east, by the glacial plateau in the south, and by the 
+sea in the west.  
+The Thala Hills are predominantly composed of  the Proterozoic charnockite series 
+(amphibole -pyroxene -plagioclase -quartz feldspar charnockitized enderbites, amphibole -
+feldspar -quartz -plagioclase charnockites, and ultrametamorphic feldspar -quartz -plagioclase -
+amphibole -biotite gneissic -rapakivite -like c harnockites) and Archean biotite -duroxene 
+plagiogneisses ( Grew, 1978 ; Myasnikov, 2011; Myasnikov et al., 2021).  
+Topographically, the Thala Hills is exarctic rocky hummocky terrain consisting of 
+several ridges stretched parallel to the coast and separated b y snow -covered terraced valleys 
+with glaciers, lakes, and channels of temporary watercourses ( Kakareka et al., 2015 ). The 
+elevations range from 0 m to 103 m in the Molodezhny oasis, and from 0 m to 272 m (Mount 
+--- PAGE 4 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 4 Vechernyaya) in the Vecherny oasis.  
+There are  two seasonal bases, Molodezhnaya (Russia) and Gora Vechernyaya (Belarus) 
+at a distance of 12 km from each other, in the oases Molodezhny and Vecherny, respectively. 
+There are two snow -ice airfields (Russia and Belarus) on the glacial plateau, to the south  of 
+the Molodezhnaya and Gora Vechernyaya Bases.  
+ 
+2.3. Schirmacher Oasis  
+The Schirmacher Oasis (Figure 3) is located on the Princess Astrid Coast (Queen Maud 
+Land, East Antarctica). This is an ice -free area 1.5 –3.5 km wide stretched for about 20 km in 
+the sublatitudinal direction. In the north, the Lazarev Ice Shelf with a width of about 80 km 
+separates the oasis from the Lazarev Sea. In the south, the ice plateau, separated from the 
+inland ice sheet by the Wohlthat Mountains, bound the oasis. In the east a nd west the oasis is 
+bounded by the lateral branches of outlet glaciers enveloping those mountains (Bormann and 
+Fritzsche, 1995; Dharwadkar et al, 2018; Shrivastava et al., 2019).  
+The Schirmacher Oasis is composed of metamorphosed rocks of the Precambrian 
+crystalline basement including banded, augen, and garnet -biotite gneisses, alaskite, 
+chondalites with migmatites; which in places are intersected by basalt, lamprophyre, 
+pegmatite, dolerite, and apatite dikes (Bormann and Fritzsche, 1995; Dharwadkar et al. , 2018; 
+Shrivastava et al., 2019).  
+The topography of the Schirmacher oasis is an exarctic rocky hummocky terrain 
+including roche moutonees and glacial valleys, with elevations ranging from 0 to 228 m and 
+average elevations of about 100 m. There are up to 1 80 lakes within the oasis.  
+There are two year -round operated polar stations in the oasis: Novolazarevskaya 
+(Russia) and Maitri (India) (Figure 3). There is the snow -ice airfield (Russia) on the glacial 
+plateau, to the south of the Novolazarevskaya Station.  
+There is a glaciological ASPA No. 163 ‘Dakshin Gangotri Glacier’ in the region.  
+ 
+2.4. Fildes Peninsula  
+The Fildes Peninsula is the ice -free southwestern tip of the King George Island, part of 
+the South Shetland Islands (West Antarctica) (Figure 4). The pe ninsula measures about 15  km 
+ 5 km, extends from southwest to northeast, and is bounded by the Maxwell Bay of the 
+Bransfield Strait in the southeast, by the Fildes Strait in the southwest, by the Drake Passage 
+in the northwest, and by the Arctowski Icefie ld in the northeast.  
+The Fildes Peninsula is composed of the late Cretaceous volcanogenic rocks (mainly 
+basalts, andesites, and tuffs), including interlayers of volcaniclastic deposits between the 
+andesite rocks with overlying layers of limestone, tuff con glomerates, sandstone, and clay of 
+the early and middle Eocene ( ATCM, 2009a; Schmid et al., 2017).  
+The topography of the peninsula is mainly an exarctic rocky hummocky terrain with 
+elevations from 0 m to ~160 m and includes a rocky coastline and bays, an e xarctic -
+denudation plateau, ancient and modern abrasion surfaces, denudation -accumulative marine 
+terraces, rocky lowlands, and valleys ( ATCM, 2009a; Schmid et al., 2017). The northeastern 
+part of the peninsula, between the ice -free area and the Arctowsky I cefield, is occupied by the 
+Bellingshausen Glacial Dome with elevations ranging from 0 m to 250 m.  
+At the Fildes Peninsula, there are small snowfields and small lakes. The territory is 
+drained by dozens of minor streams. There are relatively small areas of  marshy ground 
+everywhere. The free of ice and snow territory of the peninsula is subantarctic tundra.  
+The Fildes Peninsula is one of the most densely populated areas of Antarctica. Four year -
+round stations are located there (Figure 4): Bellingshausen (Rus sia), Presidente Eduardo 
+Montalva (Chile; territorially coinciding with the village of Villa las Estrellas), Artigas 
+(Uruguay), and Chancheng (China). Also, there are the Chilean Rodolfo Marsh airport.  
+--- PAGE 5 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 5  
+ 
+ 
+ 
+ 
+Figure 2. The geographic location and elevation s of the Thala Hills extracted from the REMA DEM (Howat et al., 2019; REMA, 2018 –2022).  
+Oases: MO – Molodezhny, VO – Vecherny; AG – Alasheev Gulf; VM – Mount Vechernyaya; MMI – McMahon Islands; HG – Hays Glacier; bays: GB – 
+Groznaya, LB – Lazurnaya, OB – Opasnaya, TB – Terpeniya, VB – Voskhod, VcB – Vechernyaya, VzB – Vozrozhdeniya, ZB – Zarya, ZrB – Zerkalnaya; 
+capes: BP – Bliznetsov, DP – Dostupny, GP – Gaudisa, GnP – Gnezdovoi, GrP – Granat, KP – Kogot, NFP – Nikolay Feoktistov,  RP – Rog, SP – 
+Steregush chy, VP – Vyvodnoy; LG – Lake Glubokoe; seasonal bases : MS – Molodezhnaya, VS – Gora Vechernyaya.  
+--- PAGE 6 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 6  
+ 
+ 
+ 
+ 
+Figure 3. The geographic location and elevations of the Schirmacher Oasis  extracted from the REMA DEM (Howat et al., 2019; REMA, 2018 –2022).  
+CIS – continental ice sheet; ISL – the Lazarev ice shelf; polar stations: NS – Novolazarevskaya (Russia), MS – Maitri (India); lakes: OL – Ozhidaniya, ZL – 
+Zigzag; mountains: PM – Primetnaya, RM – Rebristaya, RsM – Ryskalina; NP – Nadezhda Peninsula  
+ 
+--- PAGE 7 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 7 
+ 
+ 
+Figure 4. T he geographic location and elevations of the Fildes Peninsula  extracted from the REMA DEM 
+(Howat et al., 2019; REMA, 2018 –2022). DP – Drake Passage, FS – Fildes Strait; MB – Maxwell Bay; 
+AI – Ardley Island; BD – Bellingshausen Ice Dome, NV – North Valley, NWP – North -western Platform, 
+CM – Central Massif, SM – South Mountains; capes: AP – Aerodromic, EP – Exotic, HTP – Half Three, 
+NP – Nebles Point, PP – Priroda, SP – Suffield; LB – Lednikovaya Bay; polar stations: AS – Artigas 
+(Uruguay), BS – Bellingshause n (Russia), FS – Frei (Chile), GWS – Chancheng (China)  
+ 
+In the region, there are two ASPAs of paleontological and ornithological profiles: No. 125 
+‘Fildes Peninsula’ and No. 150 ‘Ardley Island’ ( ATCM, 2009a, 2009b).  
+ 
+3. Materials and methods  
+We used fragme nts of the Reference Elevation Model of Antarctica (REMA) ver. 1.1 DEM 
+(Howat et al., 2019; REMA, 2018 –2022 ) as input data for geomorphometric calculations, 
+modeling, and mapping. To date, this DEM obtained photogrammetrically from WorldView -1, 
+2, and 3 sa tellite images is the most complete and accurate DEM of Antarctica.  
+Our preliminary assessment of the accuracy and quality of the REMA DEM showed that 
+within the almost all territories under study, they generally meet the requirements of 
+geomorphometric mo deling, that is, low level of high -frequency noise, low number of obvious 
+artifacts, and sufficient surface smoothness not requiring additional smoothing or filtering).  
+However, for the Fildes Peninsula of the King George Island (and generally for all the 
+South Shetland Islands ), the accuracy and quality of the REMA DEM are lower comparing with 
+the most territory of Antarctica. In particular, this territory is marked by a high number of 
+artifacts along island shores. This is connected with peculiarities of photogrammetric processing 
+of water surface images. At the same time, such artifacts can be identified and edited (removed). 
+--- PAGE 8 ---
+arXiv:2305.07523  [physics.geo -ph] 
+ 8 It is expected that description of the South Shetland Islands  will be improved in next versions of 
+the REMA DEM.  
+From the REMA DEM,  we extracted the following four fragments:  
+ For the Larsemann Hills: a fragment of 18,168 m   14,968 m, which includes the 
+Larsemann Hills oasis and adjacent areas of the ice sheet and outlet glaciers. The 
+extracted DEM contains 4,253,184 points (the eleva tion matrix of 2,272   1,872).  
+ For the Thala Hills: a fragment of 4,688 m   20,920 m, which includes the Molodezhny 
+and Vecherny Oases and adjacent areas of the ice sheet and outlet glaciers. The 
+extracted DEM contains 1,535,592 points (the elevation matri x of 587   2,616).  
+ For the Schirmacher Oasis: a fragment of 6,328 m   20,544 m, which includes the oasis 
+and adjacent areas of the ice sheet and ice shelf. The extracted DEM contains 2,034,648 
+points (the elevation matrix of 792   2,569).  
+ For the Fildes Pe ninsula: a fragment of 9,672 m   11,616 m, which includes the 
+peninsula, adjacent islands, and a portion of the Bellingshausen Ice Dome. The 
+extracted DEM contains 1,758,130 points (the elevation matrix of 1,210   1,453).  
+Since the REMA DEM does not descri be the submarine topography, the extracted DEMs 
+includes 2,068,674, 783,812, and 680,592 cells with elevation values for the Larsemann Hills, 
+Thala Hills, and Fildes Peninsula, correspondingly.  
+For all extracted DEM, the DEM grid spacing is 8 m.  
+Before fur ther processing, the extracted DEMs presented in the polar stereographic 
+projection were reprojected into the UTM one, zone 43S, 38S, 33S, and 21S for the Larsemann 
+Hills, Thala Hills, Schirmacher Oasis, and Fildes Peninsula, correspondingly (Figures 1 –4). 
+Reprojected DEMs also have the grid spacing of 8 m.  
+At the pre -processing stage, we manually edited the extracted DEMs in order to remove 
+obvious artifacts, in particular, false islands, which are actually images of icebergs as well as 
+well as a consequen ce of incorrect photogrammetric processing of satellite scenes containing 
+images of the sea surface. To edit the DEMs , we used the available topographic maps and 
+orthomosaic ( Ministry of Merchant Marine of the USSR, 1972 ; Instituto Geográfico Militar de 
+Chile, 1996; Australian Antarctic Division, 2005; Florinsky and Skrypitsyna, 2022).  
+From the edited DEMs, we derived digital models of 17 morphometric characteristics, 
+namely: 14 local morphometric variables, such as: slope (G), aspect ( A), horizontal curvat ure 
+(kh), vertical curvature ( kv), difference curvature ( E), horizontal excess curvature ( khe), vertical 
+excess curvature ( kve), accumulation curvature ( Ka), ring curvature ( Kr), minimal curvature ( kmin), 
+maximal curvature ( kmax), mean curvature ( H), Gauss ian curvature ( K), unsphericity curvature 
+(M); one nonlocal morphometric variable, catchment area  (CA), as well as two combined 
+morphometric variables : topographic index ( TI) and stream power index ( SI). The definitions, 
+formulas, and brief interpretations  of these morphometric variables are presented in Table 1.  
+Then we produced maps of the morphometric variables from the calculated digital models. 
+Morphometric maps for the Larsemann Hills, Thala Hills, Schirmacher Oasis, and Fildes 
+Peninsula are presented  on Figures 5 –21, 22 –38, 39 –55, and 56 –72, correspondingly.  
+For the pre -processing and editing of DEM, geomorphometric calculations, and mapping, 
+we used the System for Automated Geoscientific Analyses (SAGA) Version 7.8.2 software 
+(Conrad et al., 2015). I t should be noted that the capabilities of SAGA allow the direct 
+computation of digital models for only a part of the morphometric variables mentioned above. In 
+particular, we directly calculated digital models of six local morphometric variables using the  
+Evans method (Evans, 1972): G, A, kh, kv, kmin, and kmax. 
+Digital models of the remaining eight local morphometric characteristics 

@@ -1,0 +1,489 @@
+--- PAGE 1 ---
+GIScience & Remote Sensing
+ISSN: 1548-1603 (Print) 1943-7226 (Online) Journal homepage: www.tandfonline.com/journals/tgrs20
+Exploring the frozen frontier: unmanned aerial
+vehicles and multispectral sensors unveiling
+cryosphere dynamics in East Antarctica’s
+Dronning Maud Land
+Geetha Priya M & Krishna Venkatesh
+To cite this article: Geetha Priya M & Krishna Venkatesh (2024) Exploring the frozen frontier:
+unmanned aerial vehicles and multispectral sensors unveiling cryosphere dynamics in
+East Antarctica’s Dronning Maud Land, GIScience & Remote Sensing, 61:1, 2302739, DOI:
+10.1080/15481603.2024.2302739
+To link to this article:  https://doi.org/10.1080/15481603.2024.2302739
+© 2024 The Author(s). Published by Informa
+UK Limited, trading as Taylor & Francis
+Group.
+Published online: 10 Jan 2024.
+Submit your article to this journal 
+Article views: 1385
+View related articles 
+View Crossmark data
+Citing articles: 1 View citing articles 
+Full Terms & Conditions of access and use can be found at
+https://www.tandfonline.com/action/journalInformation?journalCode=tgrs20
+--- PAGE 2 ---
+Exploring the frozen frontier: unmanned aerial vehicles and multispectral 
+sensors unveiling cryosphere dynamics in East Antarctica’s Dronning Maud Land
+Geetha Priya M
+ and Krishna Venkatesh
+Centre for Incubation Innovation Research and Consultancy (CIIRC), Jyothy Institute of Technology, Bengaluru, Karnataka, India
+ABSTRACT
+In this study, we investigated specific components and intra-seasonal dynamic processes that play 
+pivotal roles in the East Antarctica’s central Dronning Maud Land (cDML) region. The present study 
+focuses on harnessing the potential of a multispectral sensor-based Unmanned Aerial Vehicle 
+(UAV) for cryosphere studies over the polar ice sheet in cDML (Schirmacher Oasis) region of East 
+Antarctica, conducted as part of the 42nd and 43rd Indian Scientific Expedition to Antarctica (ISEA), 
+under the aegis of National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth 
+Sciences, Government of India, during austral summer period from 2022 to 2023. The surveyed 
+area (~100 acres) encompasses a segment of the ice sheet frontal edge outer margin, situated near 
+the Maitri Indian research base at Schirmacheroasen, and includes a melt pond/supraglacial lake. 
+The results indicate that the ice sheet frontal edge segment experienced a decrease in elevation of 
+0.25 meters with a total mass reduction of 13.6 kilotons during one-week period. The supraglacial 
+lake accumulated meltwater with an average depth ranging from 0.25 to 1.6 meters, covering an 
+area spanning from 9.1 × 103 square meters to 24.7 × 103 square meters. The ultra-high resolution 
+multispectral UAV data also revealed dynamic changes in various cryo-facies classes, including 
+water bodies/meltwater, frozen meltwater, dry and wet snow, debris/bare ice, and bedrock during 
+the study period over the study area. This study represents a pioneering effort in assessing the 
+region near the Maitri research base in both spatial and temporal scales. It also marks the first 
+application of UAV surveying techniques with the integration of in-situ data from the Pressure 
+Sensor Assembly (PSA) to examine and understand its complex intra-seasonal dynamics and 
+characteristics. The research team is the first Indian group to employ UAVs for scientific research 
+in the Antarctic region, which is a notable advancement in Indian scientific exploration and 
+contributes to the expanding knowledge of the Antarctic region.ARTICLE HISTORY 
+Received 21 July 2023  
+Accepted 3 January 2024 
+KEYWORDS 
+UAV; melt pond; glacial Lake; 
+pressure sensor; East 
+Antarctica
+1.Introduction
+Remote sensing has proven highly beneficial in gather -
+ing information on remote and difficult-to-reach areas, 
+which constitute a significant portion of the cryosphere 
+(Jombo et al. 2023 ). Multiple remote sensors from mul -
+tiple platforms serve as valuable tools for monitoring 
+the environment (Fu et al. 2023 ). However, effectively 
+utilizing available satellite data for cryosphere research 
+requires striking a balance between spatial resolution 
+and temporal revisit. To address this, unmanned aerial 
+vehicles (UAVs) have emerged as cost-effective alter -
+natives to traditional spaceborne and airborne remote 
+sensing methods, capable of capturing high-resolution 
+spatiotemporal data and accessing remote locations. 
+Studies by Bhardwaj et al. (2016 ), Gaffey, and Bhardwaj 
+(2020 ), and Rossini et al. (2018 ) highlighted the poten -
+tial of UAVs for monitoring rapidly changing areas of the cryosphere. They found that UAVs can provide 
+frequent temporal revisit, which is necessary to docu -
+ment and understand the rapidly changing areas of the 
+cryosphere. In recent years, UAVs have increasingly 
+been employed as a remote sensing platform for study -
+ing different cryosphere components, including snow 
+cover, glaciers, ice sheets, permafrost, and polar targets 
+like wildlife, landforms, peatlands, and sea ice (Ahmed 
+et al. 2022 ; Di Rita et al. 2020 ; Geetha Priya et al. 2023 ; 
+Gindraux,
+--- PAGE 3 ---
+information to quantify the volume of surface melt on 
+these ice shelves. Their research unveiled a significant 
+increase in surface melting on Antarctica’s ice shelves 
+over the past four decades. In a separate study con-
+ducted by Saunderson et al. (2022 ), attention was direc -
+ted toward surface melt on the Shackleton Ice Shelf in 
+East Antarctica, covering the period from 2003 to 2021. 
+Their investigation brought to light a noteworthy esca -
+lation in surface melt on the ice shelf over the last twenty 
+years, with the most pronounced surge occurring in the 
+most recent five years. This understanding is crucial for 
+refining predictions of forthcoming dynamic alterations 
+in East Antarctica’s ice sheet and its potential contribu -
+tion to rising sea levels (Arthur et al. 2020 ). It is important 
+to note that supraglacial lakes (SGLs) can indirectly 
+influence ice shelf dynamics by lowering surface albedo, 
+intensifying surface melt, and inducing a warming effect 
+on the adjacent ice column (Arthur et al. 2020 ; Hubbard 
+et al. 2016 ; Lüthje et al. 2006 ; Tedesco et al. 2012 ). 
+Additionally, SGLs can act as reservoirs by storing melt -
+water for crevasse penetration and hydrofracture 
+(Scambos, Hulbe, and Fahnestock 2003 ; Scambos et al.  
+2009 , 2000 ). Simultaneously, monitoring the evolution 
+of Antarctic surface meltwater over time is pivotal for 
+advancing our understanding of surface hydrological 
+processes in Antarctica, which are anticipated to have 
+an increasingly substantial impact on the surface mass 
+balance of the ice sheets in the near future (Tuckett et al.  
+2019 ).
+Moreover, Geetha Priya et al. (2020 ) underscored 
+the potential of UAV technology for ongoing Polar 
+Science research, emphasizing that UAVs can provide 
+detailed information on the spatial and temporal 
+variability of surface melt, which is critical for under -
+standing glacier dynamics. In a different context, Wille 
+et al. (2019 ) explored the correlation between atmo -
+spheric rivers and surface melting occurrences in 
+West Antarctica. Their findings established a strong 
+connection between atmospheric rivers and a signifi -
+cant portion of surface melt events in this region, 
+highlighting the potential implications of heightened 
+atmospheric river activity for the stability of ice 
+shelves. Furthermore, Stuchlík et al. (2015 ) utilized 
+UAV technology to chart the surface of a glacier in 
+polar regions. Their study illuminated the potential of 
+UAVs in delivering high-resolution data concerning 
+glacier surface characteristics, including features 
+such as crevasses and melt ponds, which are notor -
+iously challenging to observe from ground level.The study aims to achieve three primary objectives. 
+Firstly, it involves estimating the mass balance of a 
+frontal edge segment in the ice sheet using a geodetic 
+method. This approach utilizes measurements and ana-
+lysis of changes in the ice sheet’s volume, extent, and 
+surface elevation over time to understand the net gain 
+or loss of ice. Secondly, the study focuses on investigat -
+ing the dynamics of the melt pond situated in the 
+surveyed region. Monitoring melt ponds in Antarctica 
+is crucial as they serve as indicators of ice sheet melting 
+and can contribute to the acceleration of ice loss 
+(Geetha Priya et al. 2022 ). Formation and refreezing 
+events of the melt pond has been captured which is 
+crucial as it provides valuable insights into the dynamic 
+behavior of the cryosphere and its response to chan -
+ging environmental conditions (Lombardi et al. 2019 ). 
+Lastly, the study aims to characterize the cryofacies 
+(ice-related features and structures) present in the sur-
+veyed region. This involves identifying and classifying 
+various features, such as wet snow, dry snow, bed rock, 
+debris/bare ice and melt water.
+The synthesized information contributes to a better 
+understanding of the region’s cryosphere dynamics 
+and processes. Surface ice flow velocity was not inves -
+tigated due t
+--- PAGE 4 ---
+known for its strong katabatic winds, which are 
+cold, dense air masses that flow downhill from the 
+interior of the continent toward the coast. These 
+winds can reach speeds of over 100 kilometers per 
+hour (62 miles per hour) and significantly influence 
+the local climate (Grazioli et al. 2017 ). The specific 
+focus of the UAV surveyed area, covering around 
+100 acres, is a section of the ice sheet frontal edge 
+adjacent to the Maitri, Indian research base at the 
+Schirmacher Oasis (Schirmacheroasen), located 
+inland to central Dronning Maud Land (cDML). 
+The Schirmacher Oasis is a ice-free landscape 
+region spanning 35 square kilometers and situated 
+100 meters above mean sea level. This area is 
+characterized by a diverse array of lakes, including 
+landlocked, proglacial, and epishelf lakes, and it is 
+positioned between the boundaries of the conti -
+nental ice sheet and the coastal Nivlisen ice shelf 
+(Warrier et al. 2014 ). Notably, within the surveyed 
+region, there is a significant feature, a supraglacial 
+lake with coordinates 70° 46’ 22.13” S, 11° 45’ 
+11.62” E covering an area of 9,500 square meters 
+(Figure 1). This particular lake holds immense 
+importance as it presents an opportunity for tar-
+geted research into the dynamics and characteris -
+tics of the water body system.3.Dataset overview
+To carry out the study, extensive fieldwork was con-
+ducted during the austral summer period from 
+November 2022 to February 2023. This included the 
+use of the UAV for aerial surveys, establishing of 
+Ground Control Points (GCPs) using Global 
+Navigation Satellite Systems (GNSS) survey techni -
+ques for accurate georeferencing of collected data, 
+and the deployment of pressure sensor assembly 
+(PSA) for melt pond parameters. Having done 19 
+UAV surveys, only 10 best survey samples covering 
+the study area is considered for the investigation and 
+analysis. Prior to the UAV survey, calibration proce -
+dures were performed for the Inertial Measurement 
+Unit (IMU), compass, camera, and other sensors in 
+accordance with the operations handbook. This step 
+was undertaken to ensure accurate and reliable data 
+collection during the UAV survey.
+3.1 UAV surveys and flight planning
+In the current investigation, aerial surveys were con-
+ducted using P4 RTK (real-time kinematic) 
+Multispectral unmanned aerial vehicle (UAV) outfitted 
+with a multispectral camera. A comprehensive UAV 
+Figure 1. Study area near the Maitri station, cDML, East Antarctica.GISCIENCE & REMOTE SENSING
+ 3
+--- PAGE 5 ---
+data collection effort was undertaken, consisting of a 
+total of 19 surveys between November 25th, 2022, and 
+January 6th, 2023. Each survey included three mis-
+sions, and within each mission, a total of eight flights 
+were executed, resulting in a combined total of 152 
+flights. In each individual survey, a substantial dataset 
+was obtained, comprising a total of 30,000+ ultra- 
+high-resolution images. However, for subsequent 
+analysis, a discerning approach was applied, and 
+only the top 10 surveys, based on predefined criteria, 
+were selected for further investigation. This ensured 
+that the subset chosen for analysis represented the 
+highest quality and relevance within the dataset. The 
+imaging system consists of six 1/2.9” CMOS sensors, 
+each measuring 2 mega pixels, with one RGB sensor 
+for visible light imaging and five monochrome sen-
+sors for multispectral imaging (Figure 2). It also has an 
+inbuilt sunshine/sunlight sensor. The UAV was flown 
+at a height of 95 meters above take-off point, with a 
+view angle of 90 degrees, and ground resolution of 5 
+centimeters per pixel. In order to provide hover and 
+capture options along with the required overlaps, the 
+UAV’s speed was set at 5 meters per second. In order 
+to interpret UAV data, the survey was designed to 
+obtain a frontal overlap of 75% and a side overlap 
+of 60%.
+The RTK feature of the UAV employed in this 
+study allows positional accuracy with a multispec -
+tral sensor, and it has a net weight of 1,487 grams. 
+The UAV under consideration for the study has a 
+single RGB camera as well as a multispectral camera 
+array with five cameras covering the blue, green, 
+red, red edge, and near-infrared bands (NIR), all of which are 2-megapixel global shutter cameras and 
+are mounted on a 3-axis stabilized gimbal. 
+Additionally, a survey using the global navigation 
+satellite system (SP 80) was conducted to gather 
+nine GCPs outside the ice sheet (over the stable 
+regions, Figure 1).
+3.2 UAV & weather data
+The present study extensively utilizes ultra high-reso -
+lution UAV datasets to obtain detailed and precise 
+information about the study region. Specifically, 
+approximately 10 suitable datasets have been col-
+lected and employed for analysis, as outlined in 
+Table 1. These UAV datasets offer a wealth of valuable 
+information, including high-resolution imagery and 
+topographic data for hydrological measurements. To 
+ensure high positional precision and minimize eleva -
+tion-dependent biases, the GCPs were strategically 
+placed in the field (Figure 3) with printed black and 
+white crosses over stable sections. The GCP survey 
+was conducted using SP80 Spectra Precision GNSS 
+receivers.
+For the purpose of analysis, weather information 
+for the study area was obtained from the automatic 
+weather station (AWS) installed 2 m above surface 
+near Maitri station by Indian Meteorological 
+Department (IMD), Government of India. The IMD 
+database provides comprehensive and detailed 
+weather data for Indian Antarctic research bases 
+(Maitri & Bharati). The specific weather data for the 
+study area was accessed through the following link: 
+https://nwp.imd.gov.in/maitri_mausam.php .
+Figure 2. (a) Multispectral sensor-based UAV used during the aerial survey at East Antarctica (b) field photograph.4
+ G. P. M AND K. VENKATESH
+--- PAGE 6 ---
+3.3 Pressure sensor assembly
+Due to logistical considerations, it was decided to 
+install the Pressure Sensor Assembly (PSA) close to 
+the Maitri, Indian research base in Dronning Maud 
+Land, East Antarctica (11°45’6.786“E, 70°46’22.475“S) 
+during the fieldwork. The current design of the 
+Pressure Sensing Assembly (PSA) is visually repre -
+sented in Figure 4. To ensure accurate pressure mea -
+surements, an armored silicon hose with a diameter 
+of 26 mm and a total length of 10 m was utilized. This 
+hose houses a pressure sensor. The pressure sensor is 
+connected to a slightly larger than 26 mm iron rod, 
+measuring 23 cm in length. The rod is inserted into 
+the hose using silicone sealant and secured with 
+hose clamps in the lower half of the hose. The pur-
+pose of the rod is twofold: it acts as a waterproof seal 
+and provides weight to keep the sensor in place. At 
+the top end of the hose, a T-junction is installed to 
+facilitate the connection of the pressure sensor to 
+the data logger via a logger cable. Another branch of 
+the T-junction connects to a 2 L expansion rubber 
+bladder. The bladder is typically filled halfway to 
+accommodate volume changes in the antifreeze 
+solution, such as those caused by solar heating, with -
+out generating excess pressure within the assembly. The hose itself is filled with a 50:50 mixture of ethy -
+lene glycol and water, serving as the antifreeze solu -
+tion. To mount the PSA, a 5 m-long pole is erected in 
+the middle of the supraglacial lake area. The PSA is 
+attached to the pole using a Teflon pulley and 
+guides. This pulley arrangement ensures that the 
+pressure sensor descends as the ice melts, maintain -
+ing contact with the bottom surface of the pond or 
+lake where meltwater accumulates. The installation 
+process involves drilling into the frozen pond using a 
+Jiffy ice auger (4 G four stroke) and extenders, reach -
+ing depths of up to 3 m. This setup was completed 
+by late November 2022, well before the melting 
+period.
+3.4 Pressure sensor DCX-22
+The pressure sensor utilized in the PSA is the DCX- 
+22 data logger from KELLER Druckmesstechnik AG, 
+Switzerland, known for its versatility in measuring 
+water level, water pressure, and temperature. The 
+specific variant used is the Sealed Gauge, which 
+offers the highest level of accuracy (±2. 5 cm) and 
+is suitable for submersion applications. With an 
+extended battery life, the DCX-22 data logger can 
+record data for up to 10 years, capturing measure -
+ments at hourly intervals. The user has the ability 
+to calibrate the pressure sensors integrated within 
+the DCX logger unit. The calibration process is 
+carried out using the KOLIBRI Desktop program. It 
+is crucial to ensure that the sensors are examined 
+or calibrated in the same positions they occupy at 
+the measuring point, typically in an upright posi -
+tion. Furthermore, the sensors should be placed 
+adjacent to each other at the same level. There 
+are various situations where these sensors may 
+require recalibration, such as during maintenance Table 1. Details of UAV mission survey over East Antarctica’s 
+cDML.
+Sl 
+No. Date of UAV survey & data Acquisition Number of Images
+1. 25/11/2022 1,090
+2. 30/11/2022 1,005
+3. 10/12/2022 1,005
+4. 17/12/2022 1,655
+5. 18/12/2022 1,605
+6. 20/12/2022 2,675
+7. 22/12/2022 2,755
+8. 24/12/2022 2,690
+9. 26/12/2022 2,715
+10. 06/01/2023 2,705
+Figure 3. Printed black and white crosses.GISCIENCE & REMOTE SENSING
+ 5
+--- PAGE 7 ---
+activities, when altering the measurement config -
+uration, or after the measuring station has been 
+operational for a year or more.
+3.5 PSA data collection
+The pressure sensor, in conjunction with the data 
+logger, was programmed to gather both pressure 
+and temperature data at regular intervals of every 
+15 minutes. This configuration ensured that precise 
+measurements were captured throughout the mon -
+itoring period. To prevent data loss due to low battery 
+or memory issues and to maintain continuous contact 
+between the sensor and the melt pond ice floor or 
+bottom bed surface, the data was retrieved from the 
+logger on a daily basis manually. However, it is impor -
+tant to note that certain data gaps were encountered 
+when the sensor became exposed due to the freezing 
+of the pond or reduced water levels after late 
+December 2022. These factors interrupted the data 
+collection process during those periods. Within the 
+context of this study, the supraglacial lake depth was 
+precisely defined as the vertical separation between 
+the water level and the lowest point of the melt pond 
+or SGL bed within the specific cross-section under investigation. This definition allows for a comprehen -
+sive understanding of the depth of the melt pond or 
+SGL, taking into account variations in topography and 
+the underlying bed surface. Figure 5 illustrates the 
+mean temperature and hydrostatic pressure values 
+recorded by the sensor at the bottom of the melt 
+pond throughout the fieldwork period. These mea -
+surements provide valuable insights into the thermal 
+and hydrological characteristics of the melt pond. 
+When it comes to determining the height of the 
+water column using the hydrostatic pressure mea -
+sured by the DCX-22 device, it is essential to consider 
+the density of the medium. The KOLIBRI Desktop soft-
+ware, employs Equation 1 to calculate the water col-
+umn height. This equation allows for the conversion 
+of pressure readings in N/m2 to the corresponding 
+height of the water column in meters. The calculation 
+takes into account a water density of 999.89 kg/m3, 
+which is based on the average temperature observed 
+on December 20th, 2022, at around 1°C. Additionally, 
+the length of the iron rod has been factored into the 
+depth estimates to ensure accurate measurements.
+d¼P
+ρ�g(1) 
+Figure 4. (a) Graphical design and actual installation of the Pressure Sensor Assembly over the melt pond; (b) PSA setup over the melt.6
+ G. P. M AND K. VENKATESH
+--- PAGE 8 ---
+where p = hydrostatic pressure (N/m2), ρ = water den -
+sity (kg/m3), g = gravitational acceleration (m/s2), 
+d = height of water column (m)
+3.6 Ground validation points (GVPs)
+To gather additional data and validate the measure -
+ments obtained from the PSA system, manual mea -
+surements of the melt pond’s depth and temperature 
+were conducted at various locations distributed 
+around the perimeter of the pond (Figure 6). These 
+manual measurements served as ground validation 
+points (GVPs) and provided supplementary informa -
+tion to cross-check and validate the accuracy of the 
+PSA system’s measurements. However, in the interior 
+of the melt pond, where manual interventions were 
+not feasible due to the evolving melt process, includ -
+ing the presence of slush and large melt channels, the 
+PSA system played a crucial role in measuring the 
+depth. Designed specifically for this purpose, the 
+PSA system was able to overcome the challenges associated with manual measurements in such condi -
+tions. To ensure accuracy and consistency, both the 
+PSA installation point and the locations of the manual 
+measurement points were surveyed as ground valida -
+tion points. This surveying process further enhanced 
+the reliability of the data collected and allowed for 
+comprehensive analysis and comparison between the 
+PSA measurements and the manual measurements 
+taken at specific points within the melt pond.
+4.Methodological framework
+4.1 UAV data preprocessing
+Agisoft Metashape Professional Edition 2.0.1 is a 
+powerful software used for processing UAV images. 
+It performs a range of functions to transform the raw 
+UAV images into valuable geospatial data. The UAV 
+data processing steps were adopted from “Agisoft 
+Metashape User Manual: Professional Edition, 
+Version 1.8” and parameters related to align photos 
+-4
+-2
+0
+2
+4
+6
+8
+10
+190
+200
+210
+220
+230
+240
+250
+260
+T
+e
+m
+p
+e
+r
+a
+t
+u
+r
+e
+ 
+(
+°
+C
+)
+P
+r
+e
+s
+s
+u
+r
+e
+ 
+(
+m
+b
+a
+r
+)
+Dates
+Aver age Pressu reAverage TemperatureFigure 5. The pressure sensor assembly installed was monitored for 25 days during the Austral summer of 2022–2023 to determine 
+the hydrostatic pressure and temperature.
+Figure 6. (a) Manual depth measurements (b) pressure sensor with the thermo sensor.GISCIENCE & REMOTE SENSING
+ 7

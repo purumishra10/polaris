@@ -1,0 +1,182 @@
+--- PAGE 1 ---
+AL/0 3-Advisory for Maitri Station  
+Page 1 of 5 
+ 
+National Centre for Polar  & Ocean Research  
+Indian Scientific Expedition to Antarctica ( ISEA )  
+MAITRI - Indian Research Station at Schirmacher Oasis, Antarctica  
+Since 1983 the Indian scientific endeavors  in Antarctica have been sustained on a year -round basis, 
+from the Indian Permanent stations “Dakshin Gangotri” (1983 -89) and “Maitri” (1989 – till date). In the 
+year 1988 an ice free, rocky area on the Schirmacher Oasis was selected to build the Second 
+Research Station “Maitri ” (-70.76683367 and 11.73078318 ). It is an inland station about 100 km from 
+the shore at an elevation of about  117 meters above sea level.  
+ 
+ 
+ 
+The building was erected on steel stilts, and has since stood the test of time.  The infrastructure 
+available at the station has enabled the scientists to conduct research in various disciplines such as 
+Atmospheric Sciences & Meteorology, Earth Sciences including Glaciology, Human Biology & 
+Medicine, Biology & Environmental Sciences etc.  
+ 
+Maitri during austral summers   
+Maitri during austral winters  
+
+--- PAGE 2 ---
+AL/0 3-Advisory for Maitri Station  
+Page 2 of 5 
+ Maitri also serves as a gateway to one of the largest mountain chains in central Dronning Maud land, 
+located south of Schirmacher .  About 20,000 sq. km. area in Wohlthat, Orvin, and Muhlig Hoffmann 
+Ranges have been geologically mapped by Indian scientists, making Maitri as their base Station.  
+Several research programs initiated by India in the Schirmacher oasis and its environs hav e also 
+contributed directly to global experiments mounted under the aegis of the Scientific Committee on 
+Antarctic Research (SCAR).  It has a capacity to accommodate 65 person s in summer and 25 in 
+winter.  
+Maitri  is approachable by sea route between Novembe r and March of the succeeding calendar year 
+(Austral Summer  season) from Cape Town . The voyage plan varies annually depending on the 
+operational requirement. Alternately, Maitri  is also approachable by chartered flights between Cape 
+Town and Novolazarevska ya (Novo) air strip  under the aegis of  Dronning Maud Land Air Network 
+(DROMLAN) between November and February of the succeeding calendar year. Cape Town -Novo 
+flights  (ILLUSION -76 aircrafts) take about 5.5 hours . Flight operations require intricate planning and 
+are not available as a matter of choice, but based on operational requirements.  
+1. MODE OF TRANSPORT AROUND MAITRI  
+To provide logistical support and smooth transportation for carrying out field work and for collecting 
+samples  from far off locations , transport / earth movers /load hauling vehicles  are available at the 
+station. These can be used with the prior permission from the Leader at the station. Two helicopters 
+remain onboard ship and provide a convenient and quick way fo r field work . However, Schirmacher 
+Oasis (area ~32 km2) for field work and sample collection is approachable on foot.  
+ 
+ 
+2. OPERATIONAL EXPERIMENTS  AT MAITRI STATION  
+Apart from the experiments performed during the previous expeditions following experiments/  
+instruments are running i n and around the Maitri station ; 
+2.1 Moveable Atmospheric Radar for Antarctica (MARA)  
+MARA is very high frequency (VHF) radar operating at frequency 54.5 MHz.  It provides continuous 
+measurements of full height profiles of turbulence, waves, winds and static stability in the boundary 
+layer, free troposphere, lower stratosphere and in the mesosphere near -mesopause  
+[P.I. – Sourav Chatterjee, NCPOR, E -mail- sourav @ncaor.gov.in ] 
+2.2 Ionosonde:  
+Canadian Advanced Digital Ionosonde (CADI), meant for ionospheric studies up to the altitude of 
+about 500 km, is operated in the radio frequency range 1 -30 MHZ. High power radio frequency pulses 
+are transmitted from the instrument  and waves reflected from the ionosphere are received 
+subsequently, which provides an excellent tool for the diagnosis of the ionosphere.  
+[P.I. Dr Rupesh Das,  NPL, E-mail- rupesh1948@gmail.com]  S. No.  Vehicles  Number  
+1 Pisten Bully  14 
+2 Snow Scooter  04 
+3 Toyota arctic truck  Tata Xenon – XT 01 
+4 Tata Xenon – XT 01 
+5 Bulldozer (BD -50) 01 
+6 Mantis Crane 50 MT  05 
+7 Excavator  01 
+8 Trailer  13 
+9 Sledge  13 
+10 Side loader  02 
+--- PAGE 3 ---
+AL/0 3-Advisory for Maitri Station  
+Page 3 of 5 
+ 2.3 Ionospheric Scintillation and TEC Monitoring:  
+For the L band ionospheric scintillation and total electron content (TEC) monitoring GSV -4004B 
+GISTM dual-frequency receiver is operational.  
+[P.I. Dr Rupesh Das,  NPL, E-mail- rupesh1948@gmail.com]  
+2.4 Magnetometers:  
+Different types of magnetometers (Digital Fluxgate magnetometer – DFM, Proton Precision 
+magnetometer – PPM, Induction Coil magnetometer – ICM) are continuously monitoring terrestrial 
+magnetic field. Magnetic observations are vital for understanding the ele ctromagnetic changes in the 
+near-Earth environment due to internal or external origin.  
+[P. I. - Prof. S. Gurubaran, IIG, E-mail - gurubara@iigs.iigm.res.in]  
+2.5 Imaging Riometer:  
+Cosmic radio waves reaching to the Earth’s surface are monitored by Imaging Riom eter at 38.2 MHz. 
+Strength of the cosmic radio signal varies with the changing ionospheric density, which is affected by 
+various space weather events. Riometer in turn provides a method to passively study the ionospheric 
+conditions and dynamics.  
+[P. I. - Prof. S. Gurubaran, IIG, E-mail - gurubara@iigs.iigm.res.in]  
+2.6 Global Atmospheric Electricity:  
+Extremely weak return current is observed in the fair -weather regions, which is driven by 
+thunderclouds in the troposphere. Long -wire antenna and electric field mil l monitor atmospheric 
+current and electric field, which in turn provides global pattern of thunderclouds.  
+[P. I. - Prof. S. Gurubaran, IIG, E-mail - gurubara@iigs.iigm.res.in]  
+2.7 Meteorological observations:  
+Automatic weather station (AWS) continuously monit ors atmospheric parameters, for example, 
+temperature, pressure and humidity. Balloons are periodically launched from Maitri to record altitude 
+profile of temperature and ozone content.  
+[P.I. - Indian  Meteorological Department, New Delhi , E -mail - apecimd@gmail.com ] 
+2.8 Seismograph : 
+Seismograph located at 70° 45′ 56.21" S and 11° 44′ 10.78 " E record s ground vibrations in the 
+frequency range of  0 to 500 Hz.  Mainly used for studying the seismic waves, earthquakes and deep 
+interior of earth.   
+[P. I. - Dr Vineet K. Gahalaut, NGRI,  E-mail - vkgahalaut@ngri.res.in]  
+2.9 Global positioning system (GPS):  
+GPS takes signals from satellite and provide accurate coordinates and their temporal variation.  It 
+receives signals in the frequency range of 1176 -1575 MHz  and is located at 70° 45′ 56.21" S and 11° 
+44′ 10.78 " E.  Useful in studying the crustal deformation and plate movements.   
+[P. I. - Dr Vineet K. Gahalaut, NGRI, E -mail - vkgahalaut@ngri.res.in]  
+2.10   Meteorology sensor:  
+Meteorology sensor records /provides temperature, pressure and humidity.  This sensor is integrated 
+with GPS and is located at 70° 45′ 56.21" S and 11° 44′ 10.78 " E. 
+[P. I. - Dr Vineet K. Gahalaut, NGRI,  E-mail - vkgahalaut@ngri.res.in]  
+--- PAGE 4 ---
+AL/0 3-Advisory for Maitri Station  
+Page 4 of 5 
+ 2.11   NOx Analyser:  
+It measures NO, NO2 and NOx in ppb level on fifteen minutes average basis at ground level. This 
+analyser utilizes the photometric detection of chemiluminescence which results from the gas phase 
+reaction of ozone with NO. It meets EMC emission (EN -5008 -1): Generic emission standards. The 
+lowest detection limit is 0.4 ppb with linearity of ± 1%.  
+[P. I. – Dr A. K. Tiwari,  NCPOR , E-mail: anoopktiwari@gmail.com]  
+2.12   Aerosol Spectrometer:  
+To monitor the concentration of size variation of particles in 15 channels f rom ≥ 20 µ m to 0.3 µm 
+aerosol spectrometer a class 3 -B laser is operated at 15 minutes average interval at ground level.  
+[P. I. – Dr A. K. Tiwari,  NCPOR, E-mail: anoopktiwari@gmail.com]  
+2.13   Aethelometer:  
+It provides real -time readout of the black or elementa l carbon aerosol particles (BC or EC) in an air 
+stream in ng/m3 on fifteen minute average interval. Instrument performs optical analysis at seven 
+different wavelengths from 370 to 950 nm.  
+[P. I. – Dr A. K. Tiwari,  NCPOR, E-mail: anoopktiwari@gmail.com ] 
+3. OPERATIONAL EXPERIMENT S IN THE SOUTHERN OCEAN   
+Experiments are also performed during the voyage of the ship  and instruments are also  deployed in 
+the Southern Ocean  to unravel the scientific mysteries . 
+3.1 Bio-Argo floats  
+In order to continuous monitoring of vertical profile of bio -optical and biogeochemical component in 
+the southwest sector of the Southern Ocean, four PROVOR BIO Argo floats at 42°26’S 31°53’E, 
+54°52’S 18°5’E, 50°03’S 18°5’E &48°7’S 18°7’E  were deployed in southern ocean during 33rd ISEA 
+in collaboration with INCOIS, Hyderabad. All these floats are equipped with Dissolved Oxygen and 
+chlorophyll sensor along with CTD for traditional temperature, salinity and depth measurements and 
+drifts at 2000m depth.  
+[P. I. – Dr Prince Praksah , NCPOR , E-mail: prakash@ ncaor .gov.in ] 
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.- 
+Please feel free to get in touch for clarifications with our team,  
+Useful Contacts  
+1. Dr Yogesh Ray  
+Scientist -D | Manager – Maitri Station  
+(Maitri Operations)  
+Phone: +91 -832-25255 30 
+Email: yogesh@ncaor.gov.in  
+yogeshray@gmail.com  2. Dr Anand Kumar Singh  
+Scientist -C | Manager – Bharati Station  
+(Bharati Operations)  
+Phone: +91-832-25255 24 
+Email: aks@ncaor.gov.in   
+aksncaor @gmail.com  
+ 
+3. Ms. Reena Naik  
+(HR/ Team / Travel/ Medical / Training) Phone: 
++91-832-2525520  
+Email: reena.log@ ncaor .gov.in  
+ 4. Dr Shailendra Saini  
+Scientist -E | Scientist in Charge  
+(Antarctic Logistics)  
+(Cargo Movement & Cape Town Operations)  
+Phone: +91 -832-2525568  
+Email: shailendra .saini@gmail.com  
+--- PAGE 5 ---
+AL/0 3-Advisory for Maitri Station  
+Page 5 of 5 
+ 5. M. Javed Beg  
+Scientist -G  
+Group Director (Antarctic Operations and 
+Infrastructure)  
+Phone: +91 -832-2525521  
+Phone: +91-832-2525521  
+Fax: +91 -832-2520877; 2525520  
+Email: mjbeg@ncaor.gov.in  
+javed.beg@gmail.com   
+ 

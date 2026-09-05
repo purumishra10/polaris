@@ -1,0 +1,342 @@
+--- PAGE 1 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025      
+94 
+This is an open access article under the CC BY 4.0 license  
+  
+ 
+ 
+ 
+ 
+ 
+ 
+Research  article      Geotechnical Engineering and Engineering Geology  
+ 
+Experience of using low - and medium -frequency ground penetrating radars  
+to study the internal structure of a glacier and the bedrock topography  
+in the Schirmacher Oasis area , East Antarctica  
+ 
+Marina P. Kashkevich1, Alina S. Boronina1, Evgenii M. Mikhailov2, Serge y V. Popov1,3 
+1 Saint Petersburg State University , Saint  Petersburg , Russia  
+2 All-Russian Geological Research Institute of A.P.Karpinsky , Saint  Petersburg , Russia  
+3 VNIIOkeangeologia , Saint  Petersburg , Russia  
+ 
+ 
+How to cite this article : Kashkevich M.P., Boronina A.S., Mikhailov E.M., Popov S.V.  Experience of using 
+low- and medium -frequency ground penetrating radars to study the internal structure of a glacier and the 
+bedrock topography in the Schirmacher Oasis area, East Antarctica . Journal of Mining Institute . 2025. Vol. 273. 
+N 16597 , p. 94-107. 
+ 
+Abstract  
+During the expeditionary research of 2023 -2024 in the conditions of thick Antarctic ice sheet, the medium - and 
+low-frequency ground penetrating radars (GPR) OKO -3 with a  150 MHz antenna and Triton -M with an extendable  
+25-50-100 MHz antenna (LOGIS LLC, Russia) improved and adapted for glacier investigations were tested for 
+the first time. An example of the ice sheet study in the Schirmacher Oasis area showed that the OKO -3 GPR 
+allows obtaining detailed information on the internal structure of the ice sheet to depths of about 200 m and 
+successfully solving glacial stratigraphy issues. The Triton -M GPR has proven itself well for mapping the roof 
+of underlying rocks to depths of 250 -300 m. The article presents new data on the glacier structure in the Novo 
+Runway area, as well as information on the glacier thickness and the subglacial rock base topography near the 
+Schirmacher Oasis (Novolazarevskaya and Maitri stations). Typical  structures of the glacier strata in this area 
+are gently sloping layers and steep folds that replace them, complicated by crevasses. The subglacial topography 
+to the south of the oasis is quite gentle. Individual uplifts and depressions do not exceed 30 m . The interface 
+between the ice and the rock base was recorded over a distance of 4.5 km to the south of the oasis. In the east, 
+about a kilometre from the last rock outcrop, the oasis is limited by a sharp depression in the bed. New data opens 
+up the poss ibility of constructing the ice sheet models, studying its dynamics and evolution, and finding patterns 
+in the crevasse formation.  
+ 
+Keywords  
+ground penetrating radar; Schirmacher Oasis; glacier structure; glacial stratigraphy; bedrock topography; OKO -3 
+ground penetrating radar; Triton -M ground penetrating radar  
+ 
+Received : 15.10.2024                Accepted : 10.04.2025                Online : 02.06.2025                Published : 07.07.2025 
+ 
+Introduction  
+Russian (former Soviet) radio -echo sounding (RES) research in Antarctica began in February 
+1964, when employees of the Arctic and Antarctic Research Institute (AARI) conducted the first 
+experiments to study the electromagnetic waves propagation in a glacier body [1]. Since then, this 
+method has been successfully used on the sixth continent to study the glacier structure, the subglacial 
+topography, and to determine the state of the subglacial medium, inc luding the presence of water 
+bodies [1-3]. 
+Later on, portable subsurface  sounding radars ( ground penetrating radar, GPR) were developed , 
+which have a smaller penetration depth, but significantly greater detail. High resolution and mo-
+bility  of GPR enabled to solve many urgent issues of ensuring the safety of logistics operations in 
+Antarctica. The GPR make it possible to study the structure of a
+--- PAGE 2 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025   
+95 
+This is an open access article under the CC BY 4.0 license  
+ 
+hydrography features of oases for the prompt assessment of the state of transport hubs and commu-
+nication routes [4-6]. 
+In addition to deep radar studies of features under kilometre -thick ice layers and, on the 
+contrary, very detailed GPR near -surface surveys using high -frequency antennas, specia l atten-
+tion should be paid to glacier studies in the medium depth range (first hundreds of metres) using 
+medium - and low -frequency antennas from 25 to 150 MHz. The data obtained make it possible 
+to study the internal structure of glacier strata and to cons truct their 3D models. It becomes pos-
+sible to map folded structures in the glacier and faults in them by tracing marker horizons, to 
+correlated fold elements and crevasse areas, to identify and outline individual ice flows and zones 
+of their junction. Thes e data provide a background for modelling the processes occurring in glaciers . 
+Such GPR, in addition to the internal structure of the glacier, allow for mapping the subglacial 
+topography, which is of key importance in the formation of layers in glacier str ata. The ice flow 
+direction, the crevasse occurrence probability, and the englacial channel development depend  
+on it. An idea of the ice sheet thickness is important as it is and is primary information required 
+for mathematical modelling of glacier dynami cs and heat and mass transfer in it [7-9]. In addition, 
+mapping the subglacial topography is also an urgent task to ensure the safety of t ransport operations 
+and the placement of infrastructure. In areas with smooth near -horizontal limits of underlying  rocks, 
+unbroken ice layers are highly likely. They seem to be the most stable and safe areas. On the 
+contrary, pronounced topography, elevati on differences, large inclination angles of the rock base 
+walls are prerequisites for deformations and various fault types in the glacier body, hindering its 
+use for organizing communication routes, constructing facilities, etc. However, mapping the sub-
+glacial topography with the required degree of detail is not simple. High ice resistance [10] and 
+significant depths exclude the use of electrical resistivity tomogra phy. Complex conditions for 
+the excitation of elastic vibrations limit the use of shallow seismic exploration. Magnetotelluric 
+prospecting, transient electromagnetic method, and other electromagnetic techniques with un-
+grounded lines based on the diffusion equation do not provide the required detail. The most  
+suitable method for solving the issue at hand is GPR with low -frequency antennas and equipment 
+with a long record length.  
+In this article, the authors share their experience in using two GPR developed by LOGIS LLC 
+(Russia) on the Antarctic ice sheet: OKO -3 with a shielded AB -150 antenna (central frequency  
+150 MHz) and Triton -M with telescopic unshielded 25 -50-100 MHz antennas.  
+A brief overview of radar research in Antarctica  
+Ice-penetrating radars have  been used to study glaciers since the middle of the last century. 
+The first Russian (former Soviet  Union ) studies on the application of this method were conducted  
+at Mirny Station in February 1964 by employees of the Ice and Ocean Physics Department of t he 
+AARI. Two years later, the first experiments were conducted with a radar installed on board  
+an Il -14 aircraft. In February 1968, the first our areal airborne radar survey was carried out  
+on Enderby Land. In 1967, AARI developed the first Russian (form er Soviet)  ice-penetrating 
+radar for studying thick polar glaciers, the RLS -60-67 [1]. Similar foreign studies were conducted 
+by the Scott Polar Research Institute (SPRI) employees in December 1963 on the Brunt Ice  
+Shelf [11]. 
+Since the 1970s, RES research has become the main method for s
+--- PAGE 3 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025      
+96 
+This is an open access article under the CC BY 4.0 license  
+  
+attenuation in the glacier (which depends on the frequency) and the size of the antennas, which 
+are critical for mounting on an aircraft. In Russian practice, RES research with a sounding pulse 
+frequency of 60 MHz have been used for a long time. Recently, a device wit h a frequency of  
+130 MHz has been used. A comprehensive review of these types of research is given in [1, 3] and 
+other papers.  
+Ice-penetrating radars, with their high power (to 80 kW) and a fairly broad pulse (to 1 μs), allow 
+successful locating of multi -kilometre glaciers. However, for the same reasons, they cannot provide  
+detailed studies of the near -surface part, while it is of significant interest both for glaciology and for 
+solving engineering issues, in particular, ensuring the transport operations safety by identifying cre-
+vasses in the glacier body. For this purpose, GPR are used, which have a much lower power and the 
+sounding pulse duration. After the discovery of Lake Vostok [13, 14], the radar method is actively 
+used to identify and study subglacial water bodies [15-18]. 
+High -frequency GPR (400 -900 MHz) proved themselves well for studying the up per part of 
+a glacier to a depth of 20 m. The first examples of their successful application were given in the 
+works of foreign authors and relate to studies of both Antarctic and mountain glaciers [2, 19, 20]. 
+Since 2013, GPR have been regularly used by the Russian Antarctic Expedition (RAE) experts to 
+ensure the transport operations safety, construction of infrastructure facilities, and other  
+engineering tasks. GPR studies are part of glacier engineering su rveys, where they occupy a  
+leading place among other techniques. GPR with antennas of the specified frequencies provide 
+for detecting crevasses and determining their morphology, assessing the thickness of ice above 
+water bodies, marking and outlining dang erous zones on glaciers and snow -firn strata. As an 
+example, we can cite the work on selecting a site for the construction of an airfield at Mirny 
+Station, identifying crevasses in sectio ns of the route of the Progress – Vostok logistic traverse, 
+and studying a lake that formed at the site of a large depression in the Dålk Glacier in the Progress 
+Station area  [21, 22]. 
+Near the Progress Station, GPR studies have been conducted for several years. They enabled 
+to organize a safe route between the station and the airfield [1], select sites for a fuel storage 
+depot, and survey a section of the glacier for crevasses where scientific expedition vessels are 
+unloaded [23]. High -frequency GPR also helps to build airbases in Antarctica, including both 
+searching for suitable sites for subsequent construction and surveying existing runways [24, 25]. 
+Examples include monitoring the international Novo Runway [26], construction of the  
+new Zenit runway near the Progress Station, searching for safe sites on the glacier for  
+building airfields near the Russkaya and Mirny stations, as well as the Bunger Hills field  
+camp. In addition, GPR provides important assistance in the study of permafrost, including in 
+Antarctica [27-29]. 
+In comparison with powerful ice -penetrating radars providing depths of hundreds and even a few 
+thousand metres, as well a s high -frequency antennas used for detailed study of the upper section, 
+undeservedly little attention is paid to low - and medium -frequency radars with a central frequency 
+range of 25 -150 MHz. They make it possible to study in detail the glacial strata stru cture to depths of 
+about 200 m, to obtain data on the morphology of lake basins with a water column thickness of several 
+tens of metres, to map the subglacial rock base at depths of 250 -300 m [30, 31]. These data provide 
+a background for modelling gl
+--- PAGE 4 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025   
+97 
+This is an open access article under the CC BY 4.0 license  
+ 
+Since 2017, RAE researchers have been carrying out work on the Boulder – Ledyanoe – Dålk 
+lake system, as well as on the sinkhole formed on Lake Dålk site (Progress -1 field base area, Larse-
+mann Hills). The work involved GPR with a set of antennas of differe nt frequencies: 900, 500, 200, 
+150, and 75 MHz. To obtain bottom reflections in the deepest depressions of these lakes, an antenna 
+with a frequency of 75 MHz was used. Thus, reflections were recorded on Lake Boulder at a water 
+thickness of more than 40 m [22]. New data on Lake Progress structure, in particular its subglacial 
+part, were obtained using 500 and 38 MHz antennas [33]. 
+The paper  [29] presents the results of work with the GSSI SIR -20 GPR at a sounding pulse frequency 
+of 100 MHz at the boundary of the ice cap with the Larsemann Hills oasis, aimed at mapping the roof of 
+the bedrock beneath the glacier. The maximum possible sounding depth was 89 m, the maximum depth 
+of the identifiable glacier strata was 75 m. The authors [29] noted the possibility of identifying areas of 
+meltwater accumulation in depressions in the rock topography when analysing the wave field.  
+The VIRL -7 GPR (20 MHz) is successfully used to study mountain glaciers in the Pamirs, Cau-
+casus, and Polar Ura ls. In [34], based on VIRL -7 GPR surveys, the change of the Abramov Glacier 
+volume in the Pamirs was evaluated over the past 32 years. The maximum ice thickness was 219 m. 
+Similar work assessed the ice thickness change on Elbrus for the period from 1997 to 2017 using the 
+VIRL -6 GPR (20 MHz) mounted on a helicopter [35]. The maximum ice thickness obtained by the 
+authors on the Bolshoy Azau Glacier was 237±12.6 m.  
+GPR with antennas of different frequencies are actively and successfully used in the Svalbard 
+glaciers study. In particular, the Pulse Ekko GPR with a 50 MHz antenna enables to obtain reflections 
+from inte rfaces in the glacier at depths greater than 250 m. The authors of [36-38] show positive 
+experience in mapping the underlying rock base, studying the distribution of warm ice fragments in 
+the glacier body, and identifying englacial channels. The GPR method makes a significant contribu-
+tion to the study of glaciers and soil in Greenland [39, 40], as well as Iceland and the islands of the 
+Canadian Archipelago [41, 42]. 
+Work area and research targets  
+The work area is in the vicinity of the Schirmacher Oasis (East Antarctica), including its eastern 
+end, as well as the area to the south, where on the ice cap, approximately 7 km from the oasis, there is 
+a Novo Runway (Fig. 1). The study targets were the subglacial rock base in the continuation of the 
+Schirmacher Oasis and the ice cap itself.   
+ Fig.1. Area  of GPR lines  
+ 
+1 – lines made by the OKO -3 GPR , AB-150 antenna ; 2 – lines made by the Triton -M GPR , 25 MHz antenna;  
+3 – route; 4 – infrastructure facilities  
+ 
+ 
+--- PAGE 5 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025      
+98 
+This is an open access article under the CC BY 4.0 license  
+  
+The topography mapping of the subglacial rock base was performed along a system of routes 
+located to the east of the oasis, as well as to the south along the tracks connecting the Russian 
+Novolazarevskaya Station and the Indian Maitri Station with the Novo  Runway. During this work, 
+the lines passed from the rock outcrops of the Schirmacher Oasis and near Aerodromnaya Hill 
+for reliable mapping of the subglacial surface. The lines began in areas with a smooth topography 
+at the places of rock outcrops in order  to avoid lateral reflections from steeply dipping rock walls. 
+For the same reason, the routes did not pass near the vertical walls of the ice cap. Regular gridding 
+of the line was hampered by the abundance of rivers and streams that eroded channels in the  
+glacier more than 1 m deep, as well as the presence of snow swamps in the lowlands. The eleva-
+tion difference on the line along the route to the runway (route TR1) was about 270 m from 
+absolute elevations of 144 to 157 m in the southeastern part of the oas is to the 420 m mark  
+4.8 km south on the ice cap. In the E -W direction, the elevations changed insignificantly, the 
+maximum difference was 14 m . 
+Along the runway itself, where the absolute marks of the daylight surface are from 548 to 
+570 m, the reflectio n from the rock base was not recorded on the radar images due to the large 
+thickness of the ice sheet. During the 67 th RAE season (November – December 2021), the authors 
+obtained the first data on the internal structure of the glacier within the runway and  in the vicinity 
+of it. Then, the ice flow junction zone and the fold systems adjacent to it from the west and east 
+were found. During the present study, in the 69 th RAE season (December 2023 – February 2024), 
+the authors selected the specified area for te st assessment of the discussed equipment capabilities 
+for studying the internal structure of the glacier to depths of 150 m, including mapping of folded 
+structures and other features.  
+Equipment, methods of field work and data processing  
+The Triton -M GPR wi th an unshielded 25 -50-100 MHz extendable antenna and the improved 
+OKO -3 GPR with a 150 MHz shielded antenna with a long record length, adapted for glacier 
+studies, were tested for the first time in a thick Antarctic ice sheet conditions. The GPR survey 
+started with the field trial. It was aimed at selecting the equipment (radar type and central fre-
+quency of antennas) and survey modes (number of accumulations, wheel calibration, sweep time, 
+number of points per route, etc.). The goal was to compare the equi pment and select the optimal 
+parameters for mapping the subglacial topography and studying the internal structure of the glacier  
+at depths exceeding 100 m.  
+The surve y was carried out on foot (Fig. 2). When working with Triton -M, the recording wa s 
+made in continuous mode (Fig. 2, a). Wh en working with the OKO -3 GPR with a 150 MHz antenna, 
+an odometer was used to increase accuracy, which ensured uniform data recording al ong the route 
+every 10 cm (Fig. 2, b). GPR routes were positioned by the  EFT M2 GNSS DGPS complex (Fig. 2, c), 
+and when t he distance from the geodetic point at Novolazarevskaya Station was more than 3 km, 
+by the Garmin GPSMap 64st satellite receiver using GPS and GLONASS navigation satellites. 
+Since the survey took place in conditions of rugged terrain and significant elevat ions, planar and 
+altitude referencing was made at defined topographic points every 100 m. Such points were marked 
+in the radar images using the “marker” tool. Further, during office processing after interpolation, 
+each route acquired its own coordinate. Th is method ensures referencing accuracy of the sought 
+features to the first tens of centim
+--- PAGE 6 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025   
+99 
+This is an open access article under the CC BY 4.0 license  
+ 
+sections to depth sections. In our case, the situation is simplified, since the work area is on blue ice, 
+on which the snow cover is either absent or insignificant. Thus, the GPR section is converted to a 
+depth section in a model of a homogeneous medium with a permittivity of ε = 3.17, which corre-
+sponds to the propagation speed of electromagnetic waves of 16.8 cm/ns. The estimate of ε o f ice 
+was based on numerous diffracted wave travel time curves in the glacier and the common depth 
+point (CDP) method. The CDP was used with the OKO -2 GPR with AB -150 extendable antennas. 
+The generator and receiving antennas were spaced symmetrically relat ive to the centre with a step 
+of 0.5 m. The maximum spacing was 20 m. The CDP arrangements were in areas with horizontal 
+limits of the subglacial rock base, for which a GPR survey was previously carried out along a system 
+of perpendicular lines. The obtain ed values of the permittivity and, accordingly, the propagation 
+speed of electromagnetic waves, are in good agreement with similar characteristics of ice considered  
+in [43, 44]. The depth of limits within the glacier under study were repeatedly confirmed by  
+auger drilli ng when studying lakes covered by ice and englacial tunnels. The error was no more 
+than 3 -4 %. 
+Triton -M GPR. The shape and structure of the Triton -M GPR antenna (an extendable flexible 
+monoski) allow it to be easily moved along the glacier surface, passing  around snowdrifts, zastrugas, 
+and other obstacles. Another advantage is the absence of wires, cables, and other connections that 
+greatly complicate work in conditions of low temperatures, snow, and strong wind. The autonomous 
+recording and control unit is  connected to a laptop via Wi -Fi. During the work, various combinations 
+of survey parameters were tested: the sounding pulse frequency, the record length, the number of 
+points per route . 
+A survey with a 25 MHz antenna, a 1 ,600 ns sweep time, and 1 ,024 poin ts per route was per-
+formed on the RW line along the runway axis over a 1 ,300 m segment from the starting point. The 
+resulting radar image (Fig. 3, a) shows that the first 100 ns, corresponding to a 9 -metre ice strata, are 
+noisy due to the low -frequency signal and contrast reflection, presumably from the operator. Nume -
+rous reverberations, also masking the upper part of the GPR section, correspond to mino r crevasses, 
+Fig.2. Survey in the Novo Runway area  
+--- PAGE 7 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025      
+100 
+This is an open access article under the CC BY 4.0 license  
+  
+mostly healed. The crevasses are seasonal, appearing on open ice areas in spring (October – Novem-
+ber) due to sharp day and night temperature changes. During the Antarctic summer, these minor cre-
+vasses fill with water, then freeze and, as a rule, completely heal.  
+At long recording times, the glacier layering is clearly observed. Thus, to the 1 ,200 ns mark 
+(depth of about 100 m), the patterns  are still visible (Fig. 3, a, inset). The layers observed in the radar 
+Fig.3. GPR section along the RW line along the central axis of the runway:  
+a – obtained by the Triton -M GPR with a 25 MHz antenna (the inset shows an enlarged section,  
+in a square); b – obtained by the OKO -3 GPR, AB -150 antenna,  
+the arrow indicates one of the layers in the glacier body  
+--- PAGE 8 ---
+ 
+ Journal of Mining Institute . 2025.  Vol. 273. P. 94-107 
+© Marina P. Kashkevich, Alina S. Boronina, Evgenii M. Mikhailov, Serge y V. Popov, 2025   
+101 
+This is an open access article under the CC BY 4.0 license  
+ 
+images reflect ice accumulation and are poorly distinguishable by permittivity. The phenom enon of 
+the intense reflections in radar images with weak differentiation of layers by electrophysical proper-
+ties can be explained by the low attenuation of the electromagnetic wave in a homogeneous and high -
+resistance medium. Ice is exactly such a medium,  where the presence of even minor inhomogeneities 
+at the contact of two layers is sufficient to form a high -amplitude reflection. Such inhomogeneities 
+can presumably be different densities of interlayers, mineral inclusions, as well as the shape, orienta-
+tion, and size of crystals, which is explained by different weather conditions during the snow accu-
+mulation and its metamorphism. Thus, providing the minimal difference in permittivity in the glacier 
+body layers, the obtained result can be considered quite s atisfactory.  
+OKO -3 GPR. The improved OKO -3 GPR with the antenna monoblock AB -150 (see Fig. 2, b) 
+was tested in Antarctica for the first time. It allows setting a longer record length, proportionally 
+increasing the number of points per route. This makes it much more suitable for studying glaciers and 
+compares favourably with the previous generation OKO -2 equipment, where the record length was 
+limited by th e number of discrete points per route (512 points), which on a 1 ,600 ns sweep time made 
+the radar image almost unreadable, the patterns were poorly traced, the layers were broken into rec-
+tangles.  
+Figure 3, b shows  a fragment of the section along the RW route (central part), obtained with the 
+OKO -3 GPR, AB -150 with a 1 ,600 ns sweep time and 2 ,048 points per route. Due to the weak 
+attenuation of  the electromagnetic wave in the continental ice and the absence of contrasting 
+interfaces in the upper section, the signal amplitude is enough to form a clear reflected signal even at 
+maximum recording times. Due to the high resolution provided by a suffi cient number of samples 
+and a powerful transmitter antenna, the layers in the glacier are clearly distinguishable at depths 
+exceeding 130 m.  
+Comparison of the OKO -3 and Triton -M GPR for studying the internal structure of a glacier. 
+During the field trial, sections with a record length of 800 ns obtained on the same RW line section 
+using the OKO -3 GPR wi th a 150 MHz antenna unit (Fig. 4, a) and the Triton -M GPR with a frequency 
+of 50 MHz were compared (Fig. 4, b). 
+Due to the absence of contrasting interfaces in the glacier strata, an insignificant difference in the 
+permittivity of the features under study, and often their minor sizes (ice layers differing in the degree 
+ 
+ Fig.4. GPR sections along line RW 

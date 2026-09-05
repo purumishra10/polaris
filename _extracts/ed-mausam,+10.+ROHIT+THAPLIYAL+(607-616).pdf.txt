@@ -1,0 +1,426 @@
+--- PAGE 1 ---
+ 
+ 
+ 
+607  
+ 
+ 
+MAUSAM  
+ 
+ 
+ 
+ 
+ 
+ 
+   
+ 
+UDC No. 551. 510.534.1 :  551.581.21 (239.9)  
+ 
+Analysis of stratospheric ozone and meteorological parameters observed at 
+Bharati station, Larsemann hills, Antarctica during the  
+37th Indian scientific expedition to Antarctica  
+ 
+ROHIT THAPLIYAL  
+Meteorological Centre, Dehradun, Mohkampur, Haridwar Road, Dehradun, Uttarakhand – 248 005 
+ (Received 9 Septe mber 2021, Accepted  12 April 2022)  
+e mail : rohitthapliyalimd@gmail.com  
+ 
+ 
+ 
+सार — लगभग 140 �म�लयन वषर पहले द��ण अमे�रका, अफ्का, अंटाकर्टका और ऑस्े�लया स्हत भारत 
+सुपरकॉिनटननट ग�डवाना का ्हससा था। जब सुपरकॉिनटननट �वभािजत हुआ, तो भारतीय पलेट उततर-पूवर क् ओर बढ़�, 
+जब�क ऑस्े�लयाल और अफ्क् पलेट तुलनातमक रप से कम दूर� और ब हुत कम ग�त से आगे बढ़�ं। अंटाकर्टका 
+लगभग िसथर रहा। अंटाकर्टका के �लए 37वां भारतीय वै�ा�नक अ�भयान भारती सटेेन, लारसेमैन ्हलस, अंटाकर्टका मन 
+भारत मौसम �व�ान �वभाग (आलएमडी) के सदसय� का चौथा ेीतकाल�न अ�भयान था। अ�भयान के दौरान, सतह और 
+ऊपर� हवा मन मौसम संबंधी पे�ण, ऊधवारधर ओजोन माप, मौसम क् �नरंतर �नगरानी और पूवारनुमान क् �रकॉ�ड�ग क् 
+गल। मौसम संबंधी इन सभी पाचल� का गहन �वशलेषण और अधययन �कया गया। तापमान �वशलेषण से पता चला है �क 
+सबसे ठंडा मह�ना �सतंबर का, और सबसे गमर जनवर� का था। पूरे वषर तेज और लगातार उततर-पूव� अगभीर पवनन देखी 
+ग�, मल सबसे तेज पवन वाला मह�ना था। इस अव�ध के दौरान 15 ्दन� क् अव�ध मन नौ बफ़�ले तूफ़ान देखे गए 
+िजनमन 5 अगसत, 2018 को अ�धकतम अससी समुद� मील ग�त वाला पवन का झ�का था। इस अ�भयान के दौरान, कुल 
+32 बैलून-ज�नत जीपीएस-आधा�रत ओज़ोनस�डे  के आरोहण �लए गए और उनके �वशलेषण से पता चला �क ओजोन सांदता 
+सांदता क् नयूनतम सथूलता 15 �सतंबर और 10 अकटूबर के बीच पे��त क् गल। साथ ह�इस अधययन मन अंत�र� के 
+मौसम, मौसम संबंधी �वेेष घटनाएं और भारती सटेेन के पास पाए जाने वाले जीव� को देखा गया और उनके  
+दसतावेज तैयार �कए गए। 
+ 
+ABSTRACT . India, along with South America, Africa, Antarctica and Australia, was part of the supercontinent 
+Gondwana some 140 million years ago. When the supercontinent split, the Indian plate moved north -eastward while the 
+Australian and African plates moved compar atively less distance and at much lower speeds. Antarctica remained almost 
+stationary. The 37th Indian Scientific Expedition to Antarctica was the fourth wintering of India Meteorological 
+Department (IMD) members at Bharati Station, Larsemann Hills, Antarc tica. During the expedition, recording 
+meteorological surface & upper -air observations, vertical ozone measurement, continuous weather monitoring  and 
+forecasting were performed. All these meteorological parameters were thoroughly analyzed and studied. Temp erature 
+analysis showed that the coldest month was September  and the warmest was January. Strong and persistent north -easterly 
+near-surface winds were observed throughout the year, with May being the windiest month. During the period, nine 
+number of blizza rds spanning a period of 15 days were observed with a maximum wind gust of eighty knots during a 
+blizzard on 5th August , 2018. During the expedition, a total of 32 balloon -borne GPS -based ozonesonde ascents were 
+taken  and their analysis showed that the minimum thickness of ozone concentration is observed between 15th September 
+and 10th October. Also, space weather, special meteorological phenomena and fauna found near Bharati station were 
+observed and documented in this st udy. 
+ 
+Key words  – Indian scientific expedition to Antarctica, Blizzard, To tal column ozone, Weather extreme, A urora . 
+ 
+ 
+  
+1.  Introduction  
+ 
+Antarctica  is also known as a land of extremes; it is 
+the coldest, windiest and driest continent. Almost the whole continent is covered with ice with an average 
+thickness of around 1.9 k m (Fretwell et al., 2013). The 
+sea-ice cover around the polar continen t of Antarctica has 
+a strong seasonal cycle, with a maximum sea -ice cover  in MAUSAM, 73, 3 (July 2022), 607-616 
+ 
+  
+ 
+ 
+DOI : https://doi.org/10.54302/mausam.v73i 3.1322  
+Homepage: https://mausamjournal.imd.gov.in/index.php/MAUSAM  
+--- PAGE 2 ---
+ 
+ 
+                          MAUSAM, 73, 3 (July 2022)  
+608  
+ 
+Fig. 1.   Current weather instruments system, solar radiation sensors 
+and surface observatory installed near Bharati station, 
+Antarctica  
+ 
+ 
+September and a minimum in February (NASA). This 
+cycle affects the global climate as well as global 
+thermohaline circulation. Therefore, a meteorological 
+programme to study atmospheric parameters in Antarctica is required.  
+ 
+About 140 million years ago, th e supercontinent 
+Gondwana split up into Africa, Antarctica, Australia  and 
+India. The Indian plate drifted north -eastward with a very 
+high speed (18- 20 cm yr
+-1 during the late Cretaceous 
+period) subsequent to its breakup from Gondwanaland. It 
+then slowed to  ∼5 cm yr-1 after the continental collision 
+with Asia roughly 50  Million years ago (Klootwijk et al., 
+1992; Gaina et al., 2007)  resulting in the formation of the 
+Himalayas. Tectonically and spiritually, the Larsemann 
+Hills region is assumed to be the conne ction between 
+India and Antarctica in Gondwanaland. The Bharati 
+research station in Larsemann Hills, East Antarctica, was 
+commissioned on 18th March , 2012 to facilitate year -
+round scientific research activity by the Indian Antarctic program. The Indian met eorological programme at 
+Bharati, Larsemann Hills, East Antarctica, started on 23
+rd 
+November 2014 with the 34th Indian scientific expedition 
+to Antarctica. The meteorological programme included measuring, recording  and analyzing meteorological 
+parameters and solar radiations. Radiosonde/Ozone sonde upper air instruments are used for year -round monitoring 
+of stratospheric ozone concentration. The data thus 
+generated is used for weather forecasting and long -term 
+climate studies. Fig . 1 shows the location of t he 
+installation of IMD’s scientific equipment. The regular 
+scientific activities carried out in the 37
+th Expedition            
+were  : 
+ 
+(i) Recording of 3 hourly synoptic observations and the 
+transmission of main synoptic observations.  TABLE 1  
+ 
+Details of the extreme weather parameters observed  
+during the 37th ISEA  
+ 
+1. Lowest Temperature 
+recorded  -29.8 °C  
+on 29 -08-2018 
+2. Highest Temperature 
+recorded  +09.9 ° C 
+on 5-01-2018 
+3 Maximum gust  80 knots on 5-08-2018 with  
+(Ultrasonic wind sensor)  
+4 Number of Blizzards  9 
+5. Lengthiest Blizzard  24 hours  5-11-2018/0201  UTC  to                  
+6-11-2018/0159 UTC  
+6 Total Snowfall  85.0 mm  
+(from Dec 2017 to Nov 2018)  
+7. No of  snowfall  days  122 
+8. Number of Aurora observed  76 times  
+ 
+9 Lowest Station level 
+Pressure  949.6hPa (954.7 hPa : MSLP)  
+05/11/2018 
+10 Highest Station level 
+Pressure  1015.4 hPa (1021 hPa : MSLP)  
+03/06/2018 
+ 
+ 
+(ii) Continuous monitoring of weather systems by 
+analysis of current observations and satellite imageries.  
+ (iii) Weather forecast and briefing for helicopter & ship 
+operations, outdoor construction work, field visits by scientific & logistic team members  and other outdoor 
+work.  
+ 
+(iv) Balloon -borne GPS -based radiosonde and Ozone 
+sonde ascents were taken for the analysis of the vertical 
+ozone profile.  
+ 
+(v) Space weather monitoring.  
+ 
+Besides the above, regular maintenance and upkeep 
+of scientific instruments are required in the harsh Antarctic weather.  
+ 
+2.  Analysis of meteorological parameters   
+ 
+Details of the extreme meteorological observations 
+and salient weather features observed from 1
+st December , 
+2017 to 30th November , 2018 at Bharati station are shown 
+in Table 1. The analysis and variations in the 
+meteorological parameters recorded during 37th ISEA are 
+discussed below:  
+ 
+2.1. Temperature  
+ 
+During the expedition, which started from 1st 
+December , 2017, the highest Maximum & Lowest 
+
+--- PAGE 3 ---
+ 
+ 
+THAPLIYAL  : ANALYSIS OF STRATOSPHERIC OZONE AND METEOROLOGICAL PARAMETERS  
+609  
+ 
+ 
+Figs. 2( a-h).  Observed month -wise and day -wise variation of different meteorological parameters. ( a) month -wise & ( b) day -wise maximum, minimum 
+& average temperature;  ( c) month -wise & ( d) day -wise maximum, minimum &  average MSLP; ( e) month -wise & ( f) day -wise 
+maximum, minimum & average relative humidity; ( g) month -wise maximum wind gust, maximum wind and highest average wind and 
+(h) day -wise maximum, minimum & average wind speed  
+(a) 
+(b) 
+(c) 
+(d) 
+(e) 
+(f) 
+(g) 
+(h) 
+--- PAGE 4 ---
+ 
+ 
+                          MAUSAM, 73, 3 (July 2022)  
+610  
+ 
+ 
+ 
+Figs. 3( a&b).  (a) Monthly average wind speed in knots and the number of days with wind speed more 
+than 23 knots and ( b) Wind rose diagram of surface wind at Bharati station  
+(a) 
+(b) 
+--- PAGE 5 ---
+ 
+ 
+THAPLIYAL  : ANALYSIS OF STRATOSPHERIC OZONE AND METEOROLOGICAL PARAMETERS  
+611 Minimum temperatures were recorded as +09.9 °C (5th 
+January , 2018) and - 29.8 °C (29th August , 2018), 
+respectively. The highest average of daily maximum 
+temperature was recorded as +03.7  °C in the month of 
+January. However, the lowest average of daily minimum 
+temperature was recorded as − 19.1 °C in the month of 
+September. Thus, January was the warmest  and September 
+was the coldest month during the expedition. Fig.  2 (a) 
+shows the monthly average, highest maximum and lowest 
+minimum temperatures recorded in each month and            
+Fig. 2(b) shows the daily maximum, minimum and 
+averag e temperatures. During austral winter, July and 
+August were relatively warmer than other months of the winter (May, June and September) period. The diurnal variation of temperature was higher during the austral 
+summers as compared to the austral winter mon ths.  
+ 
+2.2. Pressure   
+ 
+The average Mean Sea Level Pressure (MSLP) 
+fluctuated at its peak of 994.8  hPa and a low of 978.0 hPa. 
+The highest and lowest MSLP of the expedition were 
+recorded as 1021.0 hPa on 3rd June, 2018 & 954.7 hPa on 
+5th November , 2018, res pectively. The month of June 
+experienced the highest  and November experienced the 
+lowest average monthly MSLP. Fig . 2 (c) shows the 
+monthly average, highest maximum and lowest minimum MSLP recorded in each month and F ig. 2(d) shows the 
+daily maximum, minimum and average MSLP.  
+ 
+2.3. Relative humidity  
+ 
+The climate of Antarctica is arid and does not show 
+much fluctuation in average monthly relative humidity 
+(RH). The highest maximum (97%) and lowest minimum 
+(28%) RH was  observed in the month of January. T he 
+increase in humidity is mainly due to the passing weather 
+system and on rare occasions of advection fog. Fig . 2 (e) 
+shows the variation of monthly average, highest maximum 
+and lowest minimum RH recorded in each month and         
+Fig. 2(f) shows the dail y maximum, minimum and 
+average RH observed at Bharati station.  
+ 
+2.4. Wind  
+ 
+Antarctica is the windiest continent on Earth. Many 
+of the early explorers (Mawson , 1915) noted the presence 
+of strong and persistent near -surface winds, which was 
+later studied by many (Dare and Budd,  2001; King , 1989; 
+Parish , 1982; Parish and Waight , 1987; Murphy and 
+Simmonds , 1993) in detail. The two main forces that drive 
+winds in the coastal region of East Antarctica are 
+mesoscale katabatic winds and synoptic- scale cyclonic 
+systems (Schwerdtfeger , 1984; Streten , 1963; Phillpot , 
+1997) that superimpose gradient winds over the low -level 
+mesoscale flow.  Wind gust is defined as a sudden and brief increase 
+in speed of the wind which usually lasts for less than 20 
+seconds (NOAA). Howeve r, for synoptic observations the 
+surface wind is reported as the average wind direction and speed of the wind over the 10- minute period (World 
+Meteorological Organization, 1995). The monthly 
+maximum wind gust, maximum surface wind and highest 
+daily average wind of each month are shown in F ig. 2(g). 
+The daily maximum, minimum and average surface wind 
+are shown in F ig. 2(h). 
+ 
+The month of May was the windiest month of the 
+expedition, with the average monthly surface wind of  
+18.0 knots  and the wind gust of more than 23 knots was 
+recorded on 28 days in the month. However, the maximum wind gust of 80 knots was recorded on 5
+th 
+August , 2018. The highest daily average wind of 35 knots 
+was recorded on 17th December , 2017. During the 
+expedition, the recorded wind gust of more than 23 knots 
+was observed on 270 days. Fig . 3(a) shows the monthly 
+average wind speed and the number of days with wind 
+speed more than 23 k nots.  Fig . 3(b) shows the month -
+wise windrose of surface winds  and it can be seen that the 
+north -easterly surface winds prevailed throughout the year 
+in Bharati station, Larsemann  Hills region of East 
+Antarctica.  
+ 
+2.5. Precipitation a
+--- PAGE 6 ---
+ 
+ 
+                          MAUSAM, 73, 3 (July 2022)  
+612  
+ 
+Figs. 4( a&b). Observed month -wise ( a) cloud coverage and ( b) precipitation over Bharati station  
+ 
+ 
+TABLE 2  
+ 
+Details of the blizzards observed during the 37th ISEA  
+ 
+Date/Time  Extreme Values during a blizzard  
+Duration               
+Hr : Min  Commencement  Cessation  MSL Pressure (hPa)  Temperature ( °C) Wind (knots)  
+  Max Min Max Min Max 
+December 2017 (One)  
+16/1936 UTC  17/0730 UTC  973.8  963.4  -0.8 -1.9 73 11:54  
+January 2018 (NIL)  
+February 2018  (NIL) 
+March 2018  (NIL)  
+April 2018  (NIL) 
+May 2018 (Two)  
+08/1630 UTC  08/2000 UTC  980.2  976.8  -13.1 -15.6 47 03:30  
+23/2015 UTC  24/0230 UTC  980.6  979.1  -8.8 -12.5 48 06:15  
+June 2018 (One)  
+05/0230 UTC  05/1915 UTC  975.8  966.4  -6.8 -8.5 50 16:45  
+July 2018 (One)  
+21/1130 UTC  22/0530 UTC  982.4  974.3  -3.6 -6.2 52 18:00  
+August 2018 (Three)  
+09/0950 UTC  10/0030 UTC  987.8  985.7  -5.1 -10.1 57 14:40  
+27/1345 UTC  27/1915 UTC  968.1  961.9  -10.2 -12.8 46 05:30  
+30/1815 UTC  31/1215 UTC  978.9  970.8  -7.6 -10.7 63 18:00  
+September 2018  (NIL)  
+October 2018  (NIL)  
+November 2018  (One)  
+05/0201 UTC  06/0159 UTC  969.9  954.4  -4.0 -8.6 49 24:00  
+(a) (b) 
+--- PAGE 7 ---
+ 
+ 
+THAPLIYAL  : ANALYSIS OF STRATOSPHERIC OZONE AND METEOROLOGICAL PARAMETERS  
+613  
+ 
+ 
+ 
+Figs. 5( a&b). (a) Global solar radiation and ( b) UV- A radiation in MJ/m2 recorded at Bharati station  
+ 
+ 
+ 
+was observed on 22nd January,  2018 (63 days of 
+continuous sunshine). Polar nights started on 28th May, 
+2018 and the first sunrise, which marked the end of polar 
+nights, was observed on 16th July, 2018  (49 days of 
+darkness). The Pyranometer and UV -A sensors are used to measure the global solar irradiance and UV -A irradiance. 
+The global solar irradiance and UV -A irradiance were 
+maximum in the month of November and December when 
+there is 24 hours of sunlight  and the plot with received 
+power in terms of Megajoules per square meter is depicted  
+(a) 
+(b) 
+--- PAGE 8 ---
+ 
+ 
+                          MAUSAM, 73, 3 (July 2022)  
+614  
+ 
+ 
+ 
+Figs. 6 ( a&b). (a) Monthly frequency of aurora days during 37th ISEA 
+and ( b) image of Aurora captured on 9th July, 2018 
+ 
+ 
+ in Fig . 5. The UV -A and global radiation values shows 
+typical dumbbell -shaped graphs with maximum values in 
+November and December  
+ 
+2.7. Blizzards statistics  
+ 
+A blizzard is a violent weather phenomenon in which 
+horizontal visibility is reduced to less than 1000  m due to 
+heavy drifting and blowing of snow by strong near -surface 
+winds. Generally, winds with a speed of more than           
+23 knots are sufficient to blow falling snow or loose snow, 
+thus reducing the horizontal visibility. The blizzard can 
+last as long as a week or even more; the longest and 
+strongest blizzard observed during 37
+th ISEA was in 
+November 2018, lasting for 24 hours. In 37th Expedition 
+(Dec 2017 -Nov 2018), a total of 9 Blizzards occurred with 
+a maximum number of 3 blizzards in the month of August and no blizzard in six months (Jan, Feb, Mar, Apr, Sep 
+and Oct). The total number of blizzard days was fifteen 
+(15) dur ing the expedition. The details of the individual 
+blizzards are given in Table 2. The 24 hour heaviest 
+snowfall of 8.1 mm was recorded during the blizzard 
+dated 31
+st August , 2018 with a maximum wind gust         
+of 63 knots. The   lowest  MSLP during the expedition was   
+ 
+ 
+ 
+Fig. 7.   Image of thick fog approaching from northwest direction 
+over Bharati station on 9th March, 2018 
+ 
+ 
+954.4 hPa and it was observed during the blizzard on 5th 
+November , 2018.  
+  
+3.  Space weather and special phenom enon  
+ 
+Aurora  : Manual observation of Auroras was done  
+and it was observed 76 times during the expedition. The 
+phenomenon is clearly visible during the nighttime  and it 
+was first visible on 19th February , 2018 after the end of 
+polar days. The frequency of auroras is highest in April, 
+followed by September, March  and May (Fig.  6), which 
+suggests enhanced solar activities during these months.  
+ 
+Fog : Fog is a very rare phenomenon in the cold and 
+dry climate o f Antarctica, but it was observed on 9th 
+March , 2018. Fig . 7 shows the fog line approaching the 
+Bharati station on a clear sky day.  
+ 
+High -speed winds  : Strong surface winds are 
+common in Antarctica  and a maximum wind gust of        
+80 knots was recorded on  5th August , 2018. The maximum 
+wind gust during a blizzard was 73 knots, recorded on  
+17th December , 2017. These hurricane winds have the 
+potential to cause severe damage to scientific installations.  
+(a) 
+(b) 
