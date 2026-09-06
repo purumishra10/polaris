@@ -1,0 +1,8 @@
+route_id,origin,destination,transport_mode,duration_hrs,season_window,constraints
+LEG_AIR_01,CPT,NOVO_AIR,Heavy Air Transport (Ilyushin IL-76TD),5.75,Late Oct to mid-Feb,"Requires blue-ice friction coefficient >= 0.35, surface temp < -5C for heavy landing"
+LEG_AIR_02,NOVO_AIR,PROG_AIR,Ski-Equipped Feeder (Basler BT-67 / Twin Otter),9.5,Mid-Nov to late Jan,"Requires visual flight rules (VFR), en-route fuel cache availability"
+LEG_SEA_01,CPT,QUILTY_BAY,Polar Class Icebreaker / Expedition Vessel (e.g. MV Vasiliy Golovnin),312.0,Dec to Feb,Sea ice concentration in Prydz Bay <= 6/10ths
+LEG_SEA_02,QUILTY_BAY,INDIA_BAY,Polar Class Icebreaker / Expedition Vessel,144.0,Jan to early Mar,Fast-ice edge stability at Lazarev Ice Shelf
+LEG_SEA_03,INDIA_BAY,CPT,Polar Class Icebreaker,240.0,Late Feb to mid-Mar,Autumn sea-ice freezeup deadline (March 15 hard exit)
+LEG_LAND_01,INDIA_BAY,MAITRI_STN,Over-Ice Heavy Convoy (PistenBully 300 Polar + Sledges),12.0,Year-round / Summer ops,Crevasse danger zones between Ice Shelf and Schirmacher Oasis hinge zone
+LEG_LAND_02,QUILTY_BAY,BHARATI_STN,Barge + PistenBully Shore Transfer,1.5,Year-round / Summer ops,Quilty Bay wave swell and fast-ice thickness

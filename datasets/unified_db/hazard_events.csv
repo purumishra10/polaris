@@ -1,0 +1,10 @@
+id,event_id,station_id,event_type,start_time,end_time,severity,max_metric_value,metric_unit,description
+1,BLZ-2017-01,BHARATI,BLIZZARD,2017-12-16 19:36:00,2017-12-17 07:30:00,SEVERE,73.0,knots,Summer blizzard during early expedition setup
+2,BLZ-2018-02,BHARATI,BLIZZARD,2018-05-08 16:30:00,2018-05-08 20:00:00,MODERATE,47.0,knots,Autumn polar night precursor
+3,BLZ-2018-03,BHARATI,BLIZZARD,2018-05-23 20:15:00,2018-05-24 02:30:00,MODERATE,48.0,knots,Onset of polar night period
+4,BLZ-2018-04,BHARATI,BLIZZARD,2018-06-05 02:30:00,2018-06-05 19:15:00,MODERATE,50.0,knots,Mid-winter extended gale
+5,BLZ-2018-05,BHARATI,BLIZZARD,2018-07-21 11:30:00,2018-07-22 05:30:00,MODERATE,52.0,knots,"End of polar night, heavy snow drift"
+6,BLZ-2018-06,BHARATI,BLIZZARD,2018-08-09 09:50:00,2018-08-10 00:30:00,MODERATE,57.0,knots,Deep low pressure trough
+7,BLZ-2018-07,BHARATI,BLIZZARD,2018-08-27 13:45:00,2018-08-27 19:15:00,MODERATE,46.0,knots,Late winter gust event
+8,BLZ-2018-08,BHARATI,BLIZZARD,2018-08-30 18:15:00,2018-08-31 12:15:00,SEVERE,63.0,knots,Annual absolute min temperature period
+9,BLZ-2018-09,BHARATI,BLIZZARD,2018-11-05 02:01:00,2018-11-06 01:59:00,MODERATE,49.0,knots,Longest blizzard of the year (24 hrs continuous); lowest MSLP (954.7 hPa)

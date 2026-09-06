@@ -1,0 +1,66 @@
+{
+  "station_id": "BHARATI",
+  "status": "Operational since 18 March 2012",
+  "coordinates": {
+    "lat": -69.4068,
+    "lon": 76.1953,
+    "elevation_m": 35
+  },
+  "population": {
+    "winter": 24,
+    "main_building_beds": 47,
+    "emergency_summer_camp": 25,
+    "peak_capacity": 72
+  },
+  "architectural_specs": {
+    "designers": "bof architekten + IMS + m+p",
+    "container_modules_count": 134,
+    "cantilever_overhang_m": 6.0,
+    "support_structure": "Steel V-columns on bedrock (prevents snow drift accumulation)",
+    "thermal_envelope": {
+      "container_wall_insulation_mm": 170,
+      "wall_u_value_w_m2k": 0.135,
+      "outer_triple_glazing_u_value_w_m2k": 0.5,
+      "inner_double_glazing_u_value_w_m2k": 1.1,
+      "design_operating_delta_t": {
+        "outside_c": -40.0,
+        "inside_c": 20.0,
+        "indoor_rh_percent": 30
+      },
+      "design_max_wind_kmh": 270
+    }
+  },
+  "power_and_hvac": {
+    "generation_type": "Combined Heat & Power (CHP) units with full waste-heat recovery",
+    "thermal_efficiency": "Residual CHP heat is sufficient for 100% space heating and snow-melt",
+    "water_system": "Seawater Intake Pump House + Multi-Stage RO Desalination + Lake backup",
+    "telemetry_link": "High-speed ECIL X/S/C-band downlink direct to NRSC Shadnagar & NCPOR"
+  },
+  "master_plan_zones": [
+    {
+      "zone_id": 1,
+      "name": "Infrastructure & Living Zone",
+      "desc": "Main building, fuel farm, workshop, summer camp"
+    },
+    {
+      "zone_id": 2,
+      "name": "Magnetic Silence Zone",
+      "desc": "Upper atmospheric physics, DFM/PPM magnetometers"
+    },
+    {
+      "zone_id": 3,
+      "name": "Future Expansion Zone",
+      "desc": "Reserved for modular expansion units"
+    },
+    {
+      "zone_id": 4,
+      "name": "Pristine Conservation Zone",
+      "desc": "Ecological baseline, no vehicular transit"
+    },
+    {
+      "zone_id": 5,
+      "name": "Antenna & Earth Station Zone",
+      "desc": "ECIL X/S-band radomes & satellite telemetry"
+    }
+  ]
+}

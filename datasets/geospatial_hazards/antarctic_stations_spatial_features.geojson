@@ -1,0 +1,219 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAITRI_MAIN",
+        "station": "MAITRI",
+        "name": "Maitri Main Complex (Elevated Stilt Module)",
+        "category": "BUILDING",
+        "status": "OPERATIONAL",
+        "elevation_m": 117
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.730783,
+          -70.766834
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAITRI_PRIYADARSHINI_LAKE",
+        "station": "MAITRI",
+        "name": "Lake Priyadarshini (Zub Lake - Freshwater Supply)",
+        "category": "WATER_RESERVOIR",
+        "status": "ACTIVE_PUMP_INTAKE",
+        "surface_area_ha": 35.0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.732,
+              -70.762
+            ],
+            [
+              11.742,
+              -70.764
+            ],
+            [
+              11.739,
+              -70.769
+            ],
+            [
+              11.728,
+              -70.768
+            ],
+            [
+              11.732,
+              -70.762
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MAITRI_II_PROPOSED_ZONE",
+        "station": "MAITRI_II",
+        "name": "Maitri-II Master Plan Development Footprint",
+        "category": "MASTER_PLAN",
+        "status": "PLANNED_2029",
+        "area_km2": 2.5
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.7,
+              -70.758
+            ],
+            [
+              11.745,
+              -70.758
+            ],
+            [
+              11.745,
+              -70.772
+            ],
+            [
+              11.7,
+              -70.772
+            ],
+            [
+              11.7,
+              -70.758
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BHARATI_MAIN",
+        "station": "BHARATI",
+        "name": "Bharati Main Building (134 Container Aerodynamic Shell)",
+        "category": "BUILDING",
+        "status": "OPERATIONAL",
+        "elevation_m": 35
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          76.19525,
+          -69.4068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BHARATI_ZONE_2_MAGNETIC",
+        "station": "BHARATI",
+        "name": "Bharati Zone 2: Magnetic Silence Sanctuary",
+        "category": "SCIENCE_SANCTUARY",
+        "status": "RESTRICTED_VEHICLES",
+        "instruments": [
+          "DFM Magnetometer",
+          "PPM Magnetometer",
+          "Field Mill"
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              76.19,
+              -69.404
+            ],
+            [
+              76.194,
+              -69.404
+            ],
+            [
+              76.194,
+              -69.407
+            ],
+            [
+              76.19,
+              -69.407
+            ],
+            [
+              76.19,
+              -69.404
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "BHARATI_ZONE_5_EARTH_STATION",
+        "station": "BHARATI",
+        "name": "Bharati Zone 5: ISRO / ECIL Earth Station Radomes",
+        "category": "TELECOM_EARTH_STATION",
+        "status": "OPERATIONAL",
+        "bands": [
+          "X-Band",
+          "S-Band",
+          "C-Band"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          76.1985,
+          -69.4055
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "HAZARD_CREVASSE_NOVO_MAITRI",
+        "station": "MAITRI",
+        "name": "Seasonal Crevasse Shear Zone (Novo-Maitri Traverse)",
+        "category": "HAZARD_ZONE",
+        "severity": "CRITICAL_OCT_NOV",
+        "gpr_depth_m": 200
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              11.75,
+              -70.785
+            ],
+            [
+              11.83,
+              -70.785
+            ],
+            [
+              11.83,
+              -70.81
+            ],
+            [
+              11.75,
+              -70.81
+            ],
+            [
+              11.75,
+              -70.785
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

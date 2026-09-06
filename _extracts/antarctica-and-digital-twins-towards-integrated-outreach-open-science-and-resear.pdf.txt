@@ -1,0 +1,532 @@
+\n\n===== PAGE 1 =====\n\nAntarctic Science (2026), 00,1 – 9
+doi:10.1017/S0954102026100819
+Perspective
+Antarctica and digital twins: towards integrated outreach, open
+science and research station management
+Javier Menéndez-Blázquez
+ICBiBE - Cavanilles Institute of Biodiversity and Evolutionary Biology, University of Valencia, Spain
+Abstract
+Antarctica constitutes a natural laboratory dedicated exclusively to peaceful and scientific purposes. In this context, Antarctic research
+stations represent the operational hubs for scientific activity and the primary sites of human presence on the continent. However, theirremoteness, logistical complexity and strong seasonality constrain public visibility, accessibility and the monitoring of scientific operations .
+This perspective paper explores the potential of spatial digital twins (SDTs) as integrative tools to address these limitations and proposing a
+conceptual framework for their application in Antarctic research stations. This framework leverages virtual platforms for the operational and
+scientific monitoring of infrastructures, as well as for open data dissemination, decision support and improved accessibility, in line with theprinciples of the Antarctic Treaty. By synthesizing spatial data, sensor networks and real-time streams, SDTs enable the continuous monitoringof complex socio-technical systems. Drawing on their transformative role in fields such as urban planning and industrial management,
+SDTs can enhance operational management, scientific tracking and open data dissemination. Finally, the discussion addresses the potential
+technical, logistical and institutional challenges associated with their implementation into Antarctic research stations, such as data availabi lity,
+cost-benefit balancing, standardization, scalability for large-scale stations and long-term maintenance. Despite these hurdles, SDTs have thepotential to become a valuable and scalable standard for monitoring, managing and communicating scientific activity in one of the mostremote and scientifically significant regions on the planet.
+Keywords: Antarctic research; Geographic Information Systems (GIS); open research; polar regions; science communication; spatial data
+(Received 4 February 2026 UTC; revised 12 July 2026 UTC; accepted 13 July 2026 UTC)
+Introduction
+Antarctica, including the Southern Ocean and its surrounding
+islands, constitutes a territory devoted exclusively to peaceful
+and scientific purposes, as established by the Antarctic Treaty(The Secretariat of the Antarctic Treaty 1991). This historical and
+legislative framework promotes international cooperation, openscience and data exchange as fundamental principles for advancing
+knowledge in one of the most pristine, remote and sensitive
+systems on the planet (Dudeney & Walton 2012,D o d d s 2024b ,
+Leary & Jabour 2024). Scientific activity in the region is primarily
+conducted through camps and research stations distributed across
+the continent, from the geographical South Pole to coastal and
+island environments, with a notable concentration in the AntarcticPeninsula (COMNAP 2017). Since the mid-twentieth century,
+these stations and their associated infrastructure have played akey role in sustaining the human presence in Antarctica; evolving
+from temporary settlements and small clusters of structures into
+complex scientific platforms, with a progressive increase in both
+Corresponding author: Javier Menéndez-Blázquez; Email: jmenen-
+dezblazquez@gmail.com
+Cite this article: Menéndez-Blázquez, J. 2026. Antarctica and digital twins: towards
+integrated outreach, open science and research station management. AntarcticScience ,1 – 9 .
+https://doi.org/10.1017/S0954102026100819their number and operational capacity (Nielsen 2013,H u d s o n
+2023, Menéndez-Blázquez 2023). Today, Antarctic research
+stations function as platforms for environmental observation,
+scientific laboratories and communication and logistical hubs,
+accommodating diverse personnel such as researchers, logisticalstaff (sometimes supported by the military) and other stakeholdersthat enable research activities at these latitudes. However, their
+geographical isolation and generally limited human presence pose
+significant challenges for the systematic monitoring of activitiesand for the transparent dissemination of Antarctic science to theinternational community and society at large.
+As highlighted by Nighat Amin (International Polar Founda-
+t i o n ) ,‘ A nA n t a r c t i cs t a t i o ni sn o tj u s tab u i l d i n g ,b u tr a t h e ri th a s
+become a process by which we can redefine the world in which welive, a means to challenge existing realities and create new ones’(Nielsen 2013). This vision reframes research stations not merely
+as static infrastructures but as dynamic socio-technical systems in
+which scientific, logistical, environmental and human dimensionscontinuously interact. Managing this complexity demands anovel technological approach capable of mirroring such dynamicinteractions. This perspective paper explores and illustrates a
+conceptual framework for the application of digital twins as
+integrative platforms for these research stations. The novelty ofthis contribution lies in bridging the gap between advanced digital
+© The Author(s), 2026. Published by Cambridge University Press on behalf of Antarctic Science Ltd. This is an Open Access article, distributed under the terms of the Creative Commons
+Attribution-NonCommercial-NoDerivatives licence ( https://creativecommons.org/licenses/by-nc-nd/4.0 ), which permits non-commercial re-use, distribution, and reproduction in any
+medium, provided that no alterations are made and the original article is properly cited. The written permission of Cambridge University Press or the r ights holder(s) must be obtained
+prior to any commercial use and/or adaptation of the article.
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 2 =====\n\n2 Javier Menéndez-Blázquez
+modelling and the unique constraints of remote polar logistics,
+offering a roadmap to harmonize fragmented data sources into
+a coherent digital ecosystem. In this context, digital twins haveemerged as key technologies for representing complex systemsthrough virtual models that are continuously updated with real-time data (Crespi etal.2023). Their ability to integrate diverse data
+sources, off-site sensors, predictive models, interactive dashboards
+and advanced visualizations (Yan et al. 2019,B o t í n - S a n a b r i a
+et al. 2022,F a h i m et al. 2022)m a k e st h e mp a r t i c u l a r l yw e l l
+suited for remote, dynamic and multidisciplinary environments
+such as Antarctica: the stations comprise critical infrastructures
+and heterogeneous data streams, rendering each station anautonomous system well suited to digital twin-based modelling.Furthermore, this perspective paper addresses the technical andlogistical challenges involved, contending that these systems could
+strengthen scientific, management and outreach activities in line
+with the principles of transparency and international cooperationunderpinning the Antarctic Treaty System.
+Spatial digital twins
+Digital twins are dynamic computational models that replicate
+real-world systems, physical environments and their interactionswith other elements, continuously integrating observational datato reflect their state and evolution in near-real time (Crespi et al.
+2023). When these models are built upon a Geographic Informa-
+tion System (GIS) framework, they are referred to as ‘GIS-based’ ,‘geospatial’ or ‘spatial digital twins’ (hereinafter SDTs; Lehner &Dorffner 2020), enabling the visualization and analysis of spatial
+information across multiple dimensions (2D/3D). SDTs allow the
+s i m u l a t i o na n dp r e d i c t i o no fp a s to rf u t u r es c e n a r i o s ,a sw e l la s
+the assessment of management alternatives, making them essen-tial tools for operational and strategic decision-making (Crespiet al.2023). These technologies are capable of adapting to diverse
+requirements, and they have been successfully applied in industry,
+energy system monitoring and optimization, agriculture, envi-ronmental conservation and smart cities (Schrotter & Hürzeler2020,B a y e r&P r u c k n e r 2023,C l e m e n t i et al.2024,D u r d e n 2025,
+Melesse 2025). Although these foundational principles are today
+becoming well-established, they have yet to be implemented in
+the scientific context of research stations in the Antarctic region,representing a unique opportunity for innovation for both SDTsthemselves and polar science.
+Digital twins in Antarctic research stations
+Translating this technology to Antarctic research stations requires
+a tailored architecture that addresses their structural and opera-tional diversity, as well as the connectivity provided by research
+and logistical vessels, which act as vital mobile nodes within the
+broader Antarctic network ( Fig. 1 ). In practice, this system is
+envisioned as a web-based geospatial platform that serves as theintegrative hub for the entire digital ecosystem (e.g. ArcGIS Enter-prise, TerriaJS, etc.). Far from being a single piece of software, the
+SDT architecture is composed of different modular components:
+1) a data-integration and storage layer for harvesting real-timesensor feeds and heterogeneous d atasets (e.g. using FIWARE or
+Apache Kafka platforms for ingestion and PostgreSQL/PostGIS
+for data management), 2) a GIS-based interface for spatial data
+management (as mentioned previously), 3) modular dashboardsfor real-time monitoring and data visualization and 4) interactive3D and Building Information Modelling (BIM) modules forinfrastructure representation (e.g. ESRI ecosystem, CesiumJS,
+Autodesk Platform Services, Geolibre.app, etc.; Figs 2 &3). Fur-
+thermore, this web-based environment functions as a centralizedknowledge repository, enabling direct integration of externalproject links, real-time research documentation and multimediavisualization tools, among other benefits. This modular framework
+addresses the aims of the SDTs, serving as a dynamic interface
+for the seamless integration of energy systems, logistical flowsand scientific datasets, providing a unified environment for bothinternal station management and public outreach.
+Science outreach and dissemination
+The implementation of SDTs in an Antarctic research station
+should be rooted in the fundamental pillar of scientific outreach,enabling both the general public and the scientific community toaccess real-time information regarding ongoing activities. A SDTcan serve as a valuable outreach hub by integrating the basic geo-
+graphical context with detailed data from diverse sources ( Fig. 2),
+effectively bridging the gap between site location, ongoing researchprojects and related scientific findings for a broader audience.For example, the yearly Spanish Army penguin sponsor campaign
+(https://ejercito.defensa.gob.es/en/unidades/Antartica/antartica/a
+padrinamiento/index.html?__locale =en) aims to raise awareness
+regarding the conservation of these sentinel species on DeceptionIsland (South Shetlands Islands, Antarctic Peninsula). However,apart from mentioning the name of the island, its website does
+not provide additional information regarding its location, nor the
+species breeding areas, conservation status, biology, latest scientificfindings for the species, and so on.
+To provide insight into stations’ human presence or occupancy
+models, SDTs could consolidate dashboards or similar tools sum-
+marizing the composition and diversity of station personnel (e.g.number of researchers, logistical and technical staff, as well as theirnationalities; Fig. 2), reflecting the collaborative nature of Antarctic
+science (Karplus et al. 2022). Furthermore, they could integrate
+information on ongoing research projects (including disciplines,
+research teams and affiliated institutions), thereby facilitating the
+dissemination of ongoing campaign objectives and strengtheningnetworking within the scientific community ( Fig. 2 ;J a n get al.
+2020,V i l aetal.2025). In addition, some of these ongoing research
+projects rely on the use of remote and automated logger devicesthat collect publicly accessible data (e.g. open-source meteorolog-ical sensors, fixed cameras and renewable energy data; as exampleis the Spanish Antarctic research station BAE Juan Carlos I in
+Livingston Island; cndp.utm.csic.es/rt/ ), which can be seamlessly
+integrated within a SDT ( Fig. 2).
+Many Antarctic stations and research facilities are named after
+pioneering scientists and explorers, yet their contributions often
+remain unknown to the public. SDTs provide a unique opportunity
+to integrate historical and biographical contexts, providing recog-nition for their figures (e.g. the late Josefina Castellví, a pioneeringfigure in Antarctic science and the first woman to serve as directorof the Spanish Antarctic research station; Fig. 3a ), thereby connect-
+ing scientific outputs with the people behind them.
+SDTs further enhance outreach by enabling dynamic 3D visu-
+alizations of research station infrastructure and the surroundinglandscape (Yan etal.2019, Lehner & Dorffner 2020). These realistic
+and immersive visualizations can be reconstructed from BIM and
+photogrammetric data (using drone imagery or on-site cameras;e.g. photorealistic techniques such as orthomosaics or Gaussiansplat cloud-points; Román etal.2024,Y a netal.2025), and they can
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 3 =====\n\nAntarctic Science 3
+Figure 1. Schematic overview of a digital twin framework applied to an Antarctic research station. The figure illustrates the integration of environmental se nsors, modular
+station buildings, support infrastructure, logistics and research activities and surrounding terrain within a spatial digital twin. Their main ap plications are summarized into four
+colour-coded categories: open science and data integration (purple), scientific communication (light orange), environmental monitoring and reg ulatory compliance (green) and
+operational and logistics planning (brown). The illustration is based on the Juan Carlos I Antarctic research station (Livingston Island) and the Sp anish research/logistical vessel
+Odón de Buen (IEO-CSIC).
+be complemented by virtual tours of the interiors of these facilities
+(Fig. 2 ;H u&A s s a a d 2024). They can also include 3D visualiza-
+tions of historical or scientific areas of interest, such as Antarc-tic Historic Sites and Monuments (HSM), or seasonal researchcamps located near the primary research facility (e.g. the Span-
+ish international Byers Camp on Livingston Island). Moreover,
+these 3D models enable the representation of historical scenariosand future projections, illustrating the addition of new build-ings or the removal of outdated ones, laboratory expansions andupdates to renewable energy systems (Boccaletti etal.2014,D a v i s
+2017), as well as changes in operational capacity over the years
+(Fig. 3a ).
+Along the same lines, SDTs can integrate or link to 360
+○virtual
+reality (VR) imagery and video platforms (Caruso & Schembra
+2024). Examples of existing VR experiences in polar regions
+include immersive reconstructions of research station surround-ings (e.g. VR visit to Spanish Gabriel de Castilla research station onDeception Island; https://ejercito.defensa.gob.es/videos/2021/anta
+rtida/web/index.htm ), as well as simulations of environments
+of scientific interest such as breeding colonies, marine habitats,
+archaeological or palaeontological sites, volcanic areas and glacierfronts (e.g. the POLARCSIC 360VR project; https://www.youtube.
+com/watch?si =R6B4iUUaAmEY8vf9&v =TenTISKoOkw&feature =
+youtu.be; Fig. 2 ). By showcasing these unique and often inac-
+cessible locations, VR experiences represent a powerful tool foroutreach and education and may also contribute to improved
+awareness and support for systematic conservation planning
+surrounding research stations (Brooks et al. 2024, Salinas et al.
+2024).
+Regardless of the context, accessibility must be a central pillar
+of SDT-based outreach. SDTs should be designed to provide multi-
+lingual interfaces, offering content not only in major international
+languages (e.g. official languages of the Antarctic Treaty System)b u tal soi nn a ti o n alo rc o - o ffi c ialla n g ua g e so fth es ta ti o n s ’n a ti o n al -ities, thereby broadening access for diverse audiences (e.g. Catalan,
+Basque or Galician in the case of Spain; Figs 2 &3a). For people
+with disabilities, SDTs can incorporate assistive technologies suchas screen reader compatibility, audio descriptions, adjustable fontsizes and high-contrast modes. These features help ensure thatscientific outreach is inclusive, allowing anyone, regardless of lin-
+guistic or physical limitations, to access and engage with Antarctic
+research.
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 4 =====\n\n4 Javier Menéndez-Blázquez
+Figure 2. Conceptual dashboard design applied to an Antarctic research station digital twin. The interface distinguishes between public-facing outreach (b lue tones) and restricted
+operational (red tones) components. The public interface provides information on station location, history, outreach materials, current occupan cy, active research projects and
+immersive experiences (e.g. virtual reality), incorporating accessibility and multilingual tools. The operational layer features real-time mon itoring of environmental parameters,
+energy resources and logistics, alongside simulation tools for emergency and infrastructure planning. Both components are unified by an interacti ve 3D model of the station’s
+infrastructure. The conceptual design is based on the Spanish Juan Carlos I Antarctic research station as a reference.
+Spatial digital twins as hubs for open science
+In the era of open access and scientific e-infrastructures, the avail-
+ability and sharing of research data have become fundamentalpillars in the knowledge generation, credibility and accessibility
+of science (Powers & Hampton 2019,I v i m e y - C o o k et al. 2025).
+SDTs can play a strategic role as central hubs, connecting sci-entific outputs, open data repositories, application programminginterfaces (APIs) and publications, facilitating an integrated andreusable ecosystem (Lehner & Dorffner 2020). For instance, the
+Spanish Polar Data Centre (Centro Nacional de Datos Polares;
+cndp.utm.csic.es ) exemplifies a repository that can be integrated
+into a research station SDT ( Fig. 2 ). By linking spatial context,
+metadata and real-time or historical datasets, SDTs allow users to
+e x p l o r ed a t ai na ni n t u i t i v em a n n e r ,e n h a n c i n gd a t ad i s c o v e r a b i l i t y
+a n dr e u se .Th u s ,S D T sc o n tri b u t et ot u rn i n gda tai n t ou sa b l ekn o wl -edge and promote international collaboration in Antarctic research(Jangetal.2020,V i l aetal.2025).
+Beyond formal research outputs, SDTs can also enhance the vis-
+ibility of citizen science initiatives. They can do this by centralizingaccess to information and linking together projects that operate at
+the interface between outreach and open science. Initiatives suchas Seal ( www.zooniverse.org/projects/cmfoley/seal-watch )o rP e n -
+guinWatch( www.zooniverse.org/projects/penguintom79/penguin
+-watch; Joneset al. 2018), where volunteers identify pinnipeds
+and adult penguins, chicks and eggs from camera-trap imagery,respectively, illustrate the scientific value of citizen-contributeddata in the context of remote polar areas. Integrating such projectswithin SDTs would not only connect them with institutional
+research efforts but also provide a richer spatial, environmental
+and operational context than that which is typically avail-able on standalone project websites, thereby enhancing thetransparency, interpretability and reusability of citizen science
+contributions.
+Operational and logistical planning
+Conceptually, SDTs can be organized into a public-facing layer
+for outreach and communication and a restricted operational
+l a y e rw i t hr o l e - b a s e da c c e s sd e d i c a t e dt ol o g i s t i c s ,m o n i t o r i n ga n dsafety management ( Figs 2 &3;C r e s p iet al.2023). By integrating
+real-time positioning systems (e.g. Automatic Identification
+System (AIS) and Automatic Dependent Surveillance - Broadcast
+(ADS-B)) they enable continuous monitoring of supply routes forships and other tracked vehicles (aircraft or terrestrial vehicles). Asa novel operational tool, SDTs can dynamically update the locationof scientific and technical personnel deployed in the field using
+satellite-based global communication and positioning systems
+in remote areas (e.g. Iridium), thereby enhancing personnelsafety, situational awareness and overall logistical efficiency while
+improving human occupancy models for the research station
+(Fig. 2). In addition to their use in outreach, the 3D visualizations
+and models described earlier provide practical tools for logisticalplanning and resource optimization within a single integratedvirtual environment. Inspired by their application in smart cities,SDTs can also be used to assess climatic and environmental risks
+affecting infrastructure (e.g. sea-level rise or changes in ice cover),
+as well as to simulate emergency and evacuation scenarios, such asfires or tsunamis, ultimately improving operational safety ( Fig. 2).
+Furthermore, they enable the assessment of the impact of new
+infrastructure at established stations (e.g. landing sites, energy
+installations, buildings or laboratories; Fig. 3b ;B o c c a l e t t i et al.
+2014), and they can even support the planning of entirely new
+stations (Xiaoping etal.2014).
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 5 =====\n\nAntarctic Science 5
+Figure 3. Conceptual detailed visualization of two interactive components of the Antarctic research station digital twin. a.History section illustrating the establishment of the
+research station, together with an interactive virtual model representing some of the former infrastructure present at that time. In the proposed co ncept, this visualization is
+complemented by textual resources and historical images to contextualize past periods. The interface is designed to be interactive, allowing users to explore and visualize changes
+in the station’s infrastructure over time. b.Conceptual planning tool for new infrastructure within the station’s digital twin, illustrated through the example of implementing a new
+wind turbine. This component showcases how the information provided by the digital twin can support infrastructure planning and decision-making pr ocesses. Both conceptual
+designs are based on the Spanish Juan Carlos I Antarctic research station.
+Environmental monitoring and regulatory compliance
+Scientific activity and human presence in Antarctica inevitably
+have environmental impacts and footprints arising from the
+o p e r a t i o no fr e s e a r c hs t a t i o n s( C r o s s i n etal.2020). In this context,SDTs enable the integration of observational data with different
+models, facilitating more accurate, near-real-time environmental
+monitoring, as has been demonstrated in other contexts (Lehner
+&D o r ff n e r 2020). By doing so, SDTs can help evaluate the
+environmental effects of human activities on the continent
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 6 =====\n\n6 Javier Menéndez-Blázquez
+(including emissions, fuel consumption and other operational
+impacts) while supporting the preparation of environmental
+reports in accordance with the Antarctic Treaty Madrid Protocol(Fig. 2; The Secretariat of the Antarctic Treaty 1991,A r s e c u l a r a t n e
+et al. 2024). Furthermore, they facilitate the simulation and
+tracking of pollutant spills, as well as waste management from
+generation to final disposal, in a traceable and quantifiable
+manner (Hughes 2003,E m n e tet al. 2015). Another key aspect
+that can be integrated into these systems is the detection andmonitoring of invasive species, such as the Antarctic mosquito,
+w h o s ep r e s e n c eh a sb e e np r i m a r i l yr e c o r d e di nr e s e a r c hs t a t i o n s
+(Volonterio etal.2013,L e eetal.2024). Collectively, SDTs optimize
+environmental management, strengthen regulatory compliancea n dfacili ta t era p id ,cr os s-s ta tio nalertsf o rem er gin gri s ks,f os t erin gtransparent and informed research community compliance in
+extreme environments.
+Challenges and limitations
+Despite their potential and multiple applications, the implemen-
+tation of SDTs in Antarctic environments faces several challenges,many of which are inherent to their remoteness and directly affect
+real-time monitoring applications. Limited connectivity, high
+energy demands, physical maintenance constraints and the riskof sensor disconnection during the winter, when many bases andmuch infrastructure remain closed, significantly impact systemreliability. Furthermore, the diversity of the polar programmes
+involved, the research stations and the technological systems and
+architectures could complicate the establishment of a single andstandardized SDT model. The Spanish Juan Carlos I Antarcticresearch station has been used here as an illustrative example
+of the broader applicability of this approach due to its historical
+relevance, operational capacity and recent modernization, amongother characteristics. The information presented is intentionallygeneric and does not aim to accurately represent the current stateof the station but rather to highlight the broader applicability of the
+proposed SDT approach to other Antarctic research stations. Thus,
+standardization of data formats, exchange protocols and monitor-ing methodologies is crucial to ensuring interoperability amongdifferent actors. In this context, the data hosted within a SDT
+could involve the management of sensitive information, requiring
+robust protocols against security vulnerabilities (Evangeline 2025),
+thereby guaranteeing transparency without compromising theoutreach aims and operational security.
+In addition, a primary barrier to SDT implementation is
+the acquisition bottleneck, particularly the reliance on manual
+inputs for operational workflows. Although automated sensornetworks effectively capture environmental data, the human-in-the-loop requirement for logistical and activity-based records
+remains a significant hurdle. While the proposed framework is
+well-suited for small- to medium-sized research stations withdefined operational scopes, scaling this system to larger, morecomplex infrastructure presents substantial challenges. To remainviable, SDT development must prioritize high-level automation
+by leveraging existing digital logs and interoperable software to
+minimize the administrative burden on station staff. In small-to medium-sized research stations, every staff member is acritical resource; therefore, relying on manual data entry not
+only is inefficient but also creates a direct trade-off with scientific
+personnel capacity. To bridge this gap, the system should pivotfrom manual human-input workflows towards autonomous dataacquisition. A compelling example of this shift is the automationof human occupancy modelling highlighted earlier - a novel
+application proposed for SDTs in terms of both public outreach and
+the management of scientific activities (see Fig. 2). By integrating
+diverse movement tracking technologies, such as indoor LiDAR-based positioning (Karki et al.2024), localized proximity sensors
+(e.g. radio frequency identification; RFID) for internal zones
+and satellite-based geolocation for field operations, the system
+can autonomously monitor human occupancy. This approachcontinuously tracks personnel across both interior facilities andremote field sites, replacing manual reporting with real-time data.
+This significantly improves the spatial mapping of human activity,
+which is essential for ensuring the protection of critical areas andthe biodiversity surrounding research stations (Salinas etal.2024).
+Nonetheless, a specific cost-benefit analysis on the research
+station scale is essential, weighing initial outlays against long-term
+gains in safety, logistical optimization and scientific transference.
+From an institutional perspective, this investment should not beviewed as an isolated expenditure but as a strategy to reduceadministrative overheads and enhance operational resilience.
+By prioritizing a modular architecture, national polar programmes
+can ensure incremental value gains at every stage, effectivelymitigating the risk of prohibitive upfront costs. Crucially, thisfinancial commitment must be contextualized within the broaderscale of polar operations: the cost of developing and maintaining a
+digital twin represents a negligible fraction of outgoings compared
+to the immense capital required for annual station maintenance,summer campaigns and vessel and/or aircraft logistics. Therefore,SDT funding should not be drawn from short-term, competitive
+research grants; rather, its long-term viability must be anchored
+directly within the core structural and operational maintenancebudgets of national polar programmes or research institutions.As recently highlighted by Morandini & Soutullo ( 2026), this shift
+is critical: current funding mechanisms often prioritize project
+novelty and visibility over institutional responsibility and long-
+term continuity, a structural weakness that compromises thegovernance capacity of Antarctic science. By integrating SDTs intothese institutional budgets, akin to the sustained support provided
+for physical infrastructure and field campaigns, these platforms
+are elevated from temporary project lifecycles to permanentmanagement assets.
+Ultimately, the effectiveness of a SDT depends less on tech-
+nical ingenuity than on this sustained institutional commitment.
+Beyond technical and financial hurdles, other systemic challenges
+remain: the risk of algorithmic bias in automated decision-making(Sabriet al.2025), the socio-ethical implications of constant per-
+sonnel monitoring for base dynamics (Mureddu et al.2025,C a n -
+tisaniet al.
+2026) and the administrative complexities of data
+governance and institutional stewardship among national pro-grammes in the current shifting Antarctic landscape (Haward &Jackson 2023,D o d d s 2024a ,A r p i 2026). Thus, the transition to
+a comprehensive SDT is not merely a technical upgrade but an
+institutional evolution that requires strategic resource alignment.
+Viewing these inevitable obstacles as evolutionary stages ratherthan barriers is essential to ensuring that the next generation ofAntarctic digital infrastructure remains resilient, accessible and
+a d a p t i v et ot h es h i ft i n gd e m a n d so fp o l a rs c i e n c e .
+Roadmap for spatial digital twin implementation
+The deployment of a station SDT should not be viewed as a single
+process but as an iterative evolution from a static visual asset
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 7 =====\n\nAntarctic Science 7
+to a dynamic operational engine. The following steps should be
+considered:
+1) A potential starting point may be the development of a 3D
+digital model (BIM/DSM (Digital Surface Model)) integrated
+with drone-based orthophotos of the research station’s sur-roundings (e.g. Román et al.2024). At this stage, a web-based
+SDT functions primarily as an immersive window for public
+outreach and scientific communication (station and research
+activities locations, dashboards and hubs for scientific projectdata-sharing repositories). By visualizing existing open-accessenvironmental feeds alongside the physical infrastructure, thesystem gains immediate value with minimal investment. This
+establishes a baseline for future data integration and functions
+as a standalone tool for the monitoring and management of sta-tion activities, including tracking projects under the AntarcticTreaty System (Salinas etal.2024).
+2) Having created and stabilized this first ‘twin’ , the process
+transitions into an active management hub by layeringrestricted, role-based operational data. This involves movingfrom static visualization to real-time monitoring, integratinglogisticalflows(e.g. humanoccupancy,vessel/aircrafttracking),
+infrastructure maintenance logs and sensor networks. This is
+where the SDT proves its utility, improving the science dissem-ination features (with near-real-time data) and transitioningto a decision-support system that optimizes station safety and
+logistics.
+3) In the long term, the system advances towards predictive
+maintenance and risk assessment ( Fig. 3b )a n de s t a b l i s h e s
+an interoperable data-sharing agreement that aligns with theAntarctic Treaty’s principles; individual station twins can
+eventually converge into a regional or common sovereignty.
+While this modular approach is designed for individualstations, it inherently lays the groundwork for regional synergy.As these twins mature, they could be integrated initially among
+stations sharing the same national programme (e.g. Profesor
+Julio Escudero (administered by Instituto Antártico Chileno,INACH) and Presidente Eduardo Frei Montalva (administeredby Fuerza Aérea Chilena, FACH), both Chilean stations at KingGeorge/25 de Mayo Island, Antarctic Peninsula), eventually
+extending to neighbouring international infrastructure that
+shares logistical chains. Although such ‘regional twins’ repre-sent a long-term aspiration, the standardization of digital twinp r o t o c o l sp r o p o s e dh e r ep r o v i d e st h eb a s i sf o rt h i sc o l l a b o r a t i v e
+digital ecosystem.
+Final considerations
+At present, (spatial) digital twins are emerging as novel and
+transformative tools for management, research and outreach
+(Crespiet al. 2023), and they have demonstrated great potential
+for their application in Antarctic logistical and research activityand their wider dissemination. The scientific ecosystem thatg o v e r n st h eh u m a np r e s e n c ei nA n t a r c t i c ap r o v i d e sa ni d e a l
+setting to maintain and feed SDTs with well-defined aims. This
+perspective paper illustrates and highlights several potentiala p p l i c a t i o n sa n du s e so fS D T s .C r u c i a l l y ,t h es c o p eo ft h e s eplatforms should synergize with existing digital initiatives for
+research and logistical vessels (also illustrated in Fig. 1 ;e . g .
+AI and Digital Twinning for Decarbonisation ( www.bas.ac.uk/
+blogpost/seeing-double-digital-twins-and-net-zero/ ) for reducing
+carbon emissions from the polar ship RRS SirDavidAttenborough ).By linking these mobile assets into the SDT ecosystem, we can
+capture a more holistic view of Antarctic logistics and scientific
+operations, effectively bridging the gap between offshore activityand land-based research infrastructure. As these systems evolve,their implementation could progressively expand, enriching theirutility across multiple domains and serving a wide range of
+stakeholders. Their ability to integrate real-time data, model infras-
+tructure, monitor logistical operations and assess environmentalrisks positions SDTs as essential platforms for decision-making inremote regions.
+Although this framework serves as a proof-of-concept for
+an individual base, there is potential for it to evolve into aregional-scale system. The Antarctic Peninsula, characterizedby a high density of international programmes (COMNAP2017) and shared logistics, represents the logical next step for
+such a development. Transitioning from a station-specific to
+a regional model will require addressing significant technicaland geopolitical challenges, ranging from international datainteroperability to institutional frameworks under the Antarctic
+Treaty System. Consequently, this work serves as a foundational
+step: by establishing standardized protocols at a station level, weprovide the necessary building blocks for future collaborative,continent-wide digital infrastructure.
+Beyond operational management, SDTs also enhance science
+communication and outreach. As noted by the late Antarctic
+researcher Andrés Barbosa, ‘The polar regions are very attractive,and we must take advantage of this circumstance to disseminatethem’ (García-Roa 2023). SDT models enable transparent and
+accessible public communication, bringing Antarctic science
+closer to the public while promoting education, outreach (Xavieret al. 2024,V i l aet al. 2025), international cooperation and
+networking within the scientific community (Kim & Jung 2016,
+Ríos-Silva et al. 2025). Much of the information that is available
+for some research stations and refuges is currently documented
+i naf r a g m e n t e dm a n n e ra c r o s sm u l t i p l ew e b s i t e s ,b l o g sa n do t h e ronline sources. SDTs provide the context needed to integrate thesedisparatedatasources,improvingaccessibility,usabilityandoverall
+understanding of station activities. Although, as mentioned, the
+full implementation of digital twins may face technological andlogistical limitations, the development of functional prototypesat selected research stations would represent a crucial first steptowards the digitalization of polar research infrastructure. Such
+efforts could contribute to more coordinated, data-rich science,
+which is crucial in light of the emerging conservation challengesin Antarctica that demand innovative tools and collaborativeapproaches from fragmented observation into coordinated fore-
+sight (Morandini & Soutullo 2026). They could also help to usher
+in a new era of open, collaborative and data-driven research in oneof the planet’s most fragile and remote ecosystems (Carter et al.
+2025).
+Acknowledgements. I want to thank to Paola Gabasa-Ulfe for her selfless
+provision of comments on the draft manuscript and visualizations, as well as
+the anonymous reviewers for their feedback during the publication process.I also wish to acknowledge Andrés Barbosa for his support in promotingSpanish Antarctic science, which inspired this work years after his passing.Finally, I acknowledge the late Josefina Cas tellví, a pioneer of Spanish Antarctic
+science. It was an honour to feature her legacy in this manuscript during therevision process shortly before her passing; she remains a guiding inspirationfor early-career polar researchers.
+Open research. Conceptual virtual models illustrated in the figures were
+developed using the generative AI model Gemini 2.5 Flash Image (NanoBanana, Google), based on manuscript author- and supervisor-defined
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 8 =====\n\n8 Javier Menéndez-Blázquez
+prompts and informed by open-access pictures as well as images taken
+directly by the author in different Antarctic campaigns. These original images
+were subsequently modified and integrated into the figures using Adobe
+Illustrator.
+Competing interests. The author declares none.
+References
+Arpi, B. 2026. The Secretariat of the Antarctic Treaty at 20: role, chal-
+lenges, and prospects in a changing governance landscape. PolarRecord ,62,
+10.1017/S0032247426100217 .
+Arsecularatne, B.P., Rodrigo, N. & Chang, R. 2024. Review of reducing
+energy consumption and carbon emissions through digital twin in built envi-ronment. JournalofBuildingEngineering ,98,10.1016/j.jobe.2024.111150 .
+Bayer, D. & Pruckner, M. 2023. A digital twin of a local energy
+system based on real smart meter data. Energy Informatics ,6,
+10.1186/s42162-023-00263-6 .
+Boccaletti, C., Di Felice, P. & Santini, E. 2014. Integration of renewable
+power systems in an Antarctic research station. Renewable Energy ,62,
+10.1016/j.renene.2013.08.021 .
+Botín-Sanabria, D.M., Mihaita, A.-S., Peimbert-García, R.E., Ramírez-
+Moreno, M.A., Ramírez-Mendoza, R.A. & Lozoya-Santos, J.d.J. 2022.Digital twin technology challenges and applications: a comprehensivereview.RemoteSensing ,14,10.3390/rs14061335 .
+Brooks, S.T., Jabour, J., Hughes, K.A., Morgan, F., Convey, P., Poly-
+meropoulos, E.T. & Bergstrom, D.M. 2024. Systematic conservation plan-ning for Antarctic research stations. JournalofEnvironmentalManagement ,
+351,10.1016/j.jenvman.2023.119711 .
+Cantisani, A., Schmutz, J.B., Marques-Quinteiro, P., Dall’Amico, L.,
+Cattuto, C., Antino, M., et al.2026. Social interactions in isolated, con-
+fined, and extreme environments: a study of Antarctic winter teams usingwearable sensors. Proceedings of the National Academy of Sciences of the
+United States of America ,123,10.1073/pnas.2533420123 .
+Carter, Z.T., Bode, M., Chown, S.L., Burrows, J.L., Shaw, J.D., W alsh, J.C.,
+et al. 2025. Emerging threats to Antarctic conservation. Nature Ecology &
+Evolution ,9,10.1038/s41559-025-02814-4 .
+Caruso, A. & Schembra, G. 2024. A VR 360
+○-video encoding framework
+with differentiated tile compression based on digital-twin technology. In
+2024IEEE 7th International Conference on Multimedia Information Pro-
+cessing and Retrieval (MIPR ). New York: IEEE, 10.1109/MIPR62202.2024.
+00089 .
+Clementi, M., Dessì, V., Podestà, G.M., Chien, S.-C., Wei, B.A.T. & Luc-
+chi, E. 2024. GIS-based digital twin model for solar radiation map-
+ping to support sustainable urban agriculture design. Sustainability ,16,
+10.3390/su16156590 .
+COMNAP. 2017. Antarctic station catalogue . Christchurch: Council of
+Managers of National Antarctic Programs Secretariat (COMNAP),154 pp.
+C r e s p i ,N . ,D r o b o t ,A . T .&M i n e r v a ,R . , eds. 2023.The digital twin .C h a m :
+Springer International Publishing, 1250 pp.
+Crossin, E., Verghese, K., Lockrey, S., Ha, H. & Young, G. 2020. The
+environmental impacts of operating an Antarctic research station. Journal
+ofIndustrialEcology ,24,10.1111/jiec.12972 .
+Davis, G.A. 2017. A history of McMurdo Station through its architecture. Polar
+Record ,53,10.1017/S0032247416000747 .
+Dodds, K. 2024a. Antarctica. Ch. 18InFong, B.C.H. & Ian, C.J., eds,The
+Routledgehandbookofgreatpowercompetition . London: Routledge.
+Dodds, K. 2024b. What is Antarctica? Geography ,109,10.1080/00167487.
+2024.2351768 .
+Dudeney, J.R. & W alton, D.W.H. 2012. Leadership in politics and science
+within the Antarctic Treaty. Polar Research ,31,10.3402/polar.v31i0.11075 .
+Durden, J.M. 2025. Environmental management using a digital twin. Environ-
+mentalScience&Policy ,164,10.1016/j.envsci.2025.104018 .
+Emnet, P., Gaw, S., Northcott, G., Storey, B. & Graham, L. 2015. Personal
+care products and steroid hormones in the Antarctic coastal environmentassociated with two Antarctic research stations, McMurdo Station and ScottBase.EnvironmentalResearch ,136,10.1016/j.envres.2014.10.019 .Evangeline, S.I. 2025. Ethical, privacy, and security implications of digital
+twins.InBalasubramaniam, S. & Seifedine, K., eds,AI-powered digital
+twins for predictive healthcare: creating virtual replicas of humans .H e r s h e y ,
+PA: IGI Global Scientific Publishing, 397–424.
+Fahim, M., Sharma, V., Cao, T.-V., Canberk, B. & Duong, T.Q. 2022. Machine
+learning-based digital twin for predictive modeling in wind turbines.
+IEEE
+Access ,10,10.1109/ACCESS.2022.3147602 .
+García-Roa, R. 2023. Entrevista a Andrés Barbosa: ‘Los ecosistemas
+antárticos son especialmente frágiles por sus condiciones extremas,cualquier cambio puede tener graves efectos en su biodiversidad.’National Geographic .A v a i l a b l ea t www.nationalgeographic.com.es/
+antartida/entrevista-a-andres-barbosa-los-ecosistemas-antarticos-son-espe
+cialmente-fragiles-por-sus-condiciones-extremas-cualquier-cambio-puede-tener-graves-efectos-su-biodiversidad_17936
+Haward, M. & Jackson, A. 2023. Antarctica: geopolitical challenges
+and institutional resilience. The Polar Journal , 13,
+10.1080/2154896X.2023.2205237 .
+Hu, X. & Assaad, R.H. 2024. A BIM-enabled digital twin framework for
+real-time indoor environment monitoring and visualization by integrat-ing autonomous robotics, LiDAR-based 3D mobile mapping, IoT sensing,
+and indoor positioning technologies. Journal of Building Engineering ,86,
+10.1016/j.jobe.2024.108901 .
+Hudson, K. 2023. Functional futurism: architectural competitions in Antarc-
+tica.ThePolarJournal ,13,10.1080/2154896X.2023.2205238 .
+Hughes, K.A. 2003. Influence of seasonal environmental variables on
+the distribution of presumptive fecal coliforms around an Antarcticresearch station. Applied and Environmental Microbiology ,69,
+10.1128/AEM.69.8.4884-4891.2003 .
+Ivimey-Cook, E.R., Sánchez-Tójar, A., Berberi, I., Culina, A., Roche, D.G.,
+Almeida, R.A., et al.2025. From policy to practice: progress towards data-
+and code-sharing in ecology and evolution. Proceedings of the Royal Society
+B:BiologicalSciences ,292,10.1098/rspb.2025.1394 .
+Jang, D., Doh, S. & Choi, Y. 2020. Networks of international co-authorship
+in journal articles about Antarctic research, 1998–2015. Polar Research ,39,
+10.33265/polar.v39.3647 .
+J o n e s ,F . M . ,A l l e n ,C . ,A r t e t a ,C . ,A r t h u r ,J . ,B l a c k ,C . ,E m m e r s o n ,
+L.M.,et al. 2018. Time-lapse imagery and volunteer classifications from
+t h eZ o o n i v e r s eP e n g u i nW a t c hp r o j e c t . Scientific Data ,5,10.1038/sdata.
+2018.124 .
+Karki, S., Pingel, T.J., Baird, T.D., Flack, A. & Ogle, T. 2024. Enhancing
+digital twins with human movement data: a comparative study of Lidar-based tracking methods. RemoteSensing ,16,10.3390/rs16183453 .
+Karplus, M.S., Young, T.J., Anandakrishnan, S., Bassis, J.N., Case,
+E.H., Crawford, A.J., et al. 2022. Strategies to build a positive and
+inclusive Antarctic field work environment. Annals of Glaciology ,63,
+10.1017/aog.2023.32 .
+Kim, H. & Jung, W.-S. 2016. Bibliometric analysis of collaboration network and
+the role of research station in Antarctic science. Industrial Engineering and
+ManagementSystems
+,15,10.7232/iems.2016.15.1.092 .
+Leary, D. & Jabour, J. 2024. The resilience of scientific co-operation as a
+foundational principle of the Antarctic Treaty. The Yearbook of Polar Law
+Online ,15,10.1163/22116427_015010014 .
+Lee, S.-Y., Kim, J.H., Kang, S., Park, K.C., Cho, S.M., Salinas, C.X., et al.
+2024. Detection of human enteric viral genes in a non-native winter cranefly,Trichocera maculipennis (Diptera) in the sewage treatment facilities at
+Antarctic stations. Parasites& Vectors ,17,10.1186/s13071-024-06555-4 .
+Lehner, H. & Dorffner, L. 2020. Digital geoTwin Vienna: towards a digital
+twin city as geodata hub. PFG - Journal of Photogrammetry, Remote Sensing
+andGeoinformationScience ,88,10.1007/s41064-020-00101-4 .
+Melesse, T.Y. 2025. Digital twin-based applications in crop monitoring.
+Heliyon ,11,10.1016/j.heliyon.2025.e42137 .
+Menéndez-Blázquez, J. 2023. Review of a journey in Antarctica: exploring
+thefutureofthewhitecontinent , by Sergio Rossi (2022). Cham, Switzerland:
+Springer Praxis Books. 198 pp. ISBN 978-3-030-89491-7; ISBN (eBook) 978-3-030-89492-4. Polar Research ,42,10.33265/polar.v42.10046 .
+Morandini, V. & Soutullo, Á. 2026. Epistemic opacity in Antarctic
+science: unknowing the last frontier. People and Nature ,8,
+10.1002/pan3.70324 .
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press\n\n\n===== PAGE 9 =====\n\nAntarctic Science 9
+Mureddu, F., Paciaroni, A., Pavelka, T., Pemberton, A. & Remotti, L.A.
+2025. Rights and responsibilities: legal and ethical considerations in adopting
+local digital twin technology. InRaes, L., Ruston McAleer, S., Croket,
+I . ,K o g u t ,P . ,B r y n s k o v ,M .&L e f e v e r,S . , eds,Decide better: open
+and interoperable local digital twins .C h a m :S p r i n g e rN a t u r eS w i t z e r l a n d ,
+291–317.
+Nielsen, H. 2013. From shelter to showpiece: the evolution of
+scientific Antarctic stations. The Polar Connection .A v a i l a b l ea t
+https://polarconnection.org/halley-history/
+Powers, S.M. & Hampton, S.E. 2019. Open science, reproducibility, and
+transparency in ecology. EcologicalApplications ,29,10.1002/eap.1822 .
+Ríos-Silva, F., Pertierra, L.R., Filippo, D.D., Justel, A., Tejedo, P., Lam-
+bert, F. & Benayas, J. 2025. Analysing the trends of research contributionsand scientific collaboration networks working in Antarctic science: a look tothe production of the Spanish programme honouring the memory of AndrésBarbosa.AntarcticScience ,37,10.1017/S0954102025100199 .
+Román, A., Navarro, G., Tovar-Sánchez, A., Zarandona, P., Roque-
+Atienza, D. & Barbero, L. 2024. ShetlandsUAVmetry: unmanned
+aerial vehicle-based photogrammetric dataset for Antarctic environmentalresearch. ScientificData ,11,10.1038/s41597-024-03045-1 .
+Sabri, S., Aghaabbasi, M., Atkinson, S.R., Amon, M.J., Hancock, P.,
+Azevedo, R., et al. 2025. Integrating human–machine systems and
+digital twin technologies: navigating trust, interoperability, and eth-ical challenges. Cognitive Systems Research ,94,10.1016/j.cogsys.2025.
+101414 .
+Salinas, C.X., Cárdenas, C.A., González-Aravena, M., Rebolledo, L.
+& Cruz, F.S. 2024. Mapping scientific fieldwork data: a potential tool forimproving and strengthening Antarctic Specially Protected Areas as aneffective measure for protecting Antarctic biodiversity. BiodiversityandCon-
+servation ,33,10.1007/s10531-024-02787-z .
+Schrotter, G. & Hürzeler, C. 2020. The digital twin of the city of Zurich
+for urban planning. P F G-J o u r n a lo fP h o t o g r a m m e t r y ,R e m o t eS e n s i n ga n d
+GeoinformationScience ,88,10.1007/s41064-020-00092-2 .
+The Secretariat of the Antarctic Treaty. 1991. Madrid Protocol. Avail-
+able at www.ats.aq/e/protocol.html
+Vila, M., Balagué, V., Cardelús, C., Geyer, A., Giralt, S., Gili, J.-M. &
+V aqué, D. 2025. Antarctic and Arctic science in the classroom and forsociety.AntarcticScience ,37,10.1017/S095410202510031X .
+Volonterio, O., Ponce de León, R., Convey, P. & Krzemi ´nska, E. 2013. First
+record of Trichoceridae (Diptera) in the Maritime Antarctic. Polar Biology ,
+36,10.1007/s00300-013-1334-4 .
+Xavier, J.C., Mateev, D., Wilmotte, A., Peña-Aguirre, A., Jupe, J.,
+Ramos-García, S., et al. 2024. Education and outreach activities by the
+Antarctic Treaty Parties: topics and target audiences. Antarctic Science ,
+36,
+10.1017/S0954102024000257 .
+Xiaoping, P., Haiyan, L. & Xi, Z. 2014. Selecting suitable sites for an Antarctic
+research station: a case for a new Chinese research station. AntarcticScience ,
+26,10.1017/S0954102013000965 .
+Yan, J., Zlatanova, S., Aleksandrov, M., Diakite, A.A. & Pettit, C. 2019.
+Integration of 3D objects and terrain for 3D modelling supporting thedigital twin. ISPRSAnnalsofthePhotogrammetry,RemoteSensingandSpatial
+InformationSciences ,IV-4-W8 ,10.5194/isprs-annals-IV-4-W8-147-2019 .
+Yan, Z., Yin, M., Shao, Y. & Remondino, F. 2025. Evaluating 3D Gaussian
+splatting for urban scene reconstruction. The International Archives of the
+Photogrammetry, Remote Sensing and Spatial Information Sciences ,XLVIII-
+1-W6-2025 ,10.5194/isprs-archives-XLVIII-1-W6-2025-251-2025 .
+https://doi.org/10.1017/S0954102026100819  Published online by Cambridge University Press

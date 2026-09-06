@@ -1,0 +1,572 @@
+\n\n===== PAGE 1 =====\n\n 
+ 
+ 
+ 
+Creating a Digital Twin and Polar Digital s pace in A ntarctica  
+ 
+Temenuzhka  Spasovaa* 
+aSpace Research and Technology Institute – Bulgarian Academy of Sciences, Department of 
+Aerospace information, Acad. G. Bonchev Str., Bl. 1, 1113 Sofia, Bulgaria  
+ABSTRACT   
+Through the creation of a polar digital space and the data architecture in it, an attempt will be made to get as close as 
+possible to the real possibilities of building a Digital Twin in the Antarctic or the polar region, and also to propose the 
+European data policy in the Antarctic and the Arctic.  
+The data sources and instruments at many of the Antarctic bases are not interoperable, and this creates a major problem 
+for comparison and simulation modeling even on a single island, let alone a larger area or the Antarctic mainland.  
+In most of the polar summer, the optical data is not of good quality due to the presence of frequent cloud cover. This 
+necessitates the mandatory use of in situ data in order to verify the others.  
+The purpose of this type of researc h is to enforce certain standards for data dissemination such as Open Data, Open Science, 
+and also to show the dynamics of certain territories on Livingstone Island based on research from the summer of 2022 -
+2023 through various methods, indices and applic ations, published on the project page1. The complex approach used in 
+the research provides reliable, up -to-date and interoperable information, regardless of the geographical location of the 
+objects and is devoid of subjective interference.  
+The use of data from a drone, ground data from SEKONIC spectrometer, data from NAVAL RSV 421ship2, satellites isn't 
+a new method, but a complex. Using the maximum number of applications and also creating an innovative weather station 
+certainly brings even greater added val ue to society and science, which seriously investigates climate change in polar 
+latitudes.  
+A ground weather station AWG, powered by an environmentally friendly magnesium -air battery, was developed especially 
+for a project of the Bulgarian Antarctic Base3. 
+The data and models will serve the Bulgarian initiative for the construction of the Digital Twins  in Antarctica and Arctica 
+or Digital polar space , initiatives such as Oceans and Seas , which is being pilot developed in the department of Aerospace 
+Informati on, Space Research and Technology Institute – Bulgarian Academy of Sciences.  
+ 
+Keywords : Antarctica, Climate changes, Digital polar space, Digital twins, Interoperability, SAR  
+ 
+1. INTRODUCTION  
+The purpose of this research does not mandate the use or non -use of particular data. This is an attempt to use some of the 
+high-value data that is open access and in machine -readable format for the Antarctic territory.  
+Combining them with in situ surveys, drone and satellite data, which are shared data on the Internet a s a good practice, can 
+create a digital polar space and support initiatives such as Oceans and Seas, Earth's Digital Twins and vario us types of 
+research with local , regional and global significance.  
+This research has brought together several use cases that  can be used in Antarctic climate change research for different 
+sites of interest.   
+ 
+*tspasova@mail.space.bas.bg  Ninth International Conference on Remote Sensing and Geoinformation of the Environment (RSCy2023),
+K. Themistocleous, D. G. Hadjimitsis, S. Michaelides, G. Papadavid, Eds., Proc. of SPIE Vol. 12786, 1278625
+© 2023 SPIE · 0277-786X · doi: 10.1117/12.2682918
+Proc. of SPIE Vol. 12786  1278625-1\n\n\n===== PAGE 2 =====\n\n 
+ 
+ 
+ 
+ 
+Data spaces or data digital spaces are data sharing ecosystems which are built on uniform rules, certified data providers 
+and recipients and tr ust among partners. They provide a secure and privacy -preserving infrastructure to pool, access, 
+process, use and share data. Data owners have control over who has access to their data, for what purpose and under what 
+conditions it can be used4.  
+The aim of this study is to demonstrate the importance of creating a polar data space that is properly structured and 
+interoperable databases. In this way, in addition to contributing to a more effective study of climate change, they will also  
+contribute to the con struction of many different models, one of which may be the Earth's digital twin.  
+According to the author, the construction of such a space can be upgraded and supplemented, because in addition to 
+distance research, there are other fields that actively gen erate data in polar conditions, such as medicine, biology, sociology 
+and others.  
+The fact is, however, that there are also quite a few differences in data structuring, and this is mainly due to the internat ional 
+teams and projects that develop mainly in th e Antarctic region, because in the Arctic and in the European part, the data are 
+more clearly defined and correspond of the interoperability requirements.  
+In this regard, the European Commission rules and Inspire , Open and Spatial Data Policy could easily be proposed and 
+implemented in relation to high -value data5 to which the data from research in the Antarctic during the summer season 
+2022 -2023 fall, where a synchronous monitoring approach was made based on remote sensing, Unmanned aerial 
+vehicles (UAV’s)  and in situ data.  
+Additionally, as hinted by their name, they are especially valuable when it comes to creating value -added services, 
+applications and, more generally, high -quality jobs for society a nd the EU6, figure 1. 
+The identification and definition of these high -value datasets lead to a significant change in the field of open data, as the 
+chosen datasets will be made available in harmonised technical standards. This aims to increase their potential for re use 
+and henceforth their impact6. 
+These charac teristics help overcome a series of barriers that often restrict the free circulation of information, such as high -
+use fees, non -machine -readable content, restrictive licences, poor interoperability or poor accessibility due to scattered 
+data holders6. 
+ 
+ 
+Figure 1  High -value datasets6  
+Thematic Areas, which must necessarily participate in the research and creation of digital space according to the EC, are:  
+Biodiversity , Coastal areas , Disaster risk reduction , Energy , Land use plannin, Marine and fisheries , Mountain areas , 
+Tourism , Transport, Water management , Disaster Response , Disaster Recovery  and Other.  
+Proc. of SPIE Vol. 12786  1278625-2\n\n\n===== PAGE 3 =====\n\n 
+ 
+ 
+ 
+According to the EC, the Scientific Discipline(s) involved in the construction of the Earth's Digital Twins, and why not in 
+Antarctica, are the following:  Solid Earth Geophysics, Biology/ Environmental Science / Ecosystems / Biodiversity, 
+Climatology, Geology, Classica l geography, Ecology, Economics , Social sciences, Earth observation, Mathematical 
+model ing, Decision theory and others7. 
+1.1. Region  of interest   
+The area of interest is Livingstone Island, nea r the Bulgarian Antar  tic base (BAB),  (Fig. 2). The area was selected due to 
+available field research in the southern parts of Livingstone Island from 2022. The author has already done remote sensing  
+in the no rthern part of the  island in the period 2016 -2018 8, 9 . 
+  
+Figure 2 Livingston Island (first ) and  area around BAB (second ) - Sentinel -2MSI composite images (Bands11 , 8a, 4 ) 
+2. DATA AND METHODS  
+2.1. Data acquisition  
+Spectral analysis is one of the most important  physical methods for studying objects. It ’s used to determine qualitative and 
+quantitative characteristics of objects based on their spectral curve, generated from in situ and satellite data . 
+Data from Sentinel -2 by the European Space Agency (ESA) as part  of the Copernicus program  were used . Sentinel -2 is a 
+land-monitoring constellation of two identical polar -orbiting satellites —Sentinel -2A and Sentinel 2B —phased at 180° to 
+each other. It is equipped with a state -of-the-art high -resolution multispectral im ager (MSI) instrument, which provides a 
+290 km swath width and covers all of Earth’s land surfaces, large islands, and inland and coastal waters every five days10.  
+ Table 1 Image acquisition dates Sentinel 2MSI (ESA)11 
+SENTINEL 2A MSI  DATE OF ACQUISITION  
+SENTINEL 2A MSI  O7/12/2022  
+SENTINEL 2A MSI  16/01/2023  
+ 
+When it ’s difficult to use cloud -free optical images, it is imperative to apply alternative methods and data for evaluation, 
+such as using satellite data from the microwave range, where the presence  of cloud cover is not an obstacle. This stems 
+from the different wavelengths in the optical and microwave ranges, and the use of the microwave range appears to be 
+Proc. of SPIE Vol. 12786  1278625-3\n\n\n===== PAGE 4 =====\n\n 
+ 
+ 
+ 
+more appropriate for the purposes of the study. With the help of radar images, the detection , identification and recognition 
+of water, wet areas, wet snow, ice and rocks is easier and is applicable for polar research12, 13. 
+Satellite images from the Sentinel -1B and 1A  sensor s were used. The dates of the satellite images used need to match the 
+rest of the satellites or be as close as possible in order to apply a comprehensive approach and data validation.  
+From the Sentinel -1 products, the GRD format, type IW, is selected, which usually contains images with hv, vv or hh 
+polariz ation, but for Antarc tica hh polarization is  available and used, with a length of λ=5.6ϲm in C -band from the 
+Electromagnetic spectrum. The spatial resolution of a pixel  in the polar region is about 12 /16 meters. The 2019 data has a 
+resolution of 33/35 meters (table 2).  
+Table 2  Image acquisition dates SAR from Livingston island  hh polarization , Sentinel 1(ESA)11 
+ 
+Sentinel 1  SAR  
+  
+DATE OF ACQUISITION  
+Sentinel 1B SAR hh polarization  04/01/2019  
+Sentinel 1B SAR hh polarization  03/03/2019  
+Sentinel 1B SAR hh polarization  30/03/2019  
+Sentinel 1А SAR hh polarization  08/01/2020  
+Sentinel 1А SAR hh polarization  01/02/2020  
+Sentinel 1А SAR hh polarization  08/03/2020  
+Sentinel 1А SAR hh polarization  01/04/2020  
+Sentinel 1А SAR hh polarization  11/01/2021  
+Sentinel 1А SAR hh polarization  07/02/2021  
+Sentinel 1А SAR hh polarization  03/03/2021  
+Sentinel 1А SAR hh polarization  08/04/2021  
+Sentinel 1А SAR hh polarization  09/01/2022  
+Sentinel 1А SAR hh polarization  02/02/2022  
+Sentinel 1А SAR hh polarization  10/03/2022  
+Sentinel 1А SAR hh polarizat ion 03/04/2022  
+Sentinel 1А SAR hh polarization  16/01/2023  
+Sentinel 1А SAR hh polarization  09/02/2023  
+Sentinel 1А SAR hh polarization  05/03/2023  
+Sentinel 1А SAR hh polarization  10/04/2023  
+ 
+Derivatives are formed during image processing images, which re quires the addition of new folders for data and metadata, 
+and it is good that they are saved outside the main ones, which are according to the standard set by the European Space 
+Agency (ESA). The author recommends that resized or georeferenced images be ti tled the same way, and in this case they 
+are titled Resize for data interoperability and compliance with the project's FAIR data principles  (figure 3 ). 
+Satellite data from Sentinel 3 have been processed with the SNAP product, which can be freely used and i s published on 
+the European Space Agency website14. All images have been transformed to degrees Celsius for greater reference when 
+analyzing the results.  Proc. of SPIE Vol. 12786  1278625-4\n\n\n===== PAGE 5 =====\n\n 
+ 
+ 
+ 
+Satellite data from the Sentinel 3 SLSTR measuring land surface temperature (LST) in the Livingstone I sland area provide 
+the information for 5 years (tabele 3).  
+ 
+ 
+Figure 3 Sentinel 1 A image metadata  granule11 
+Table 3 Image acquisition dates Sentinel 3 SLSTR  (ESA)11, 15  
+ 
+SENTINEL 3  SLSTR  
+  
+DATE OF ACQUISITION  
+Sentinel 3 B 07/12/2018  
+Sentinel 3 А  12/12/2018  
+Sentinel 3А  24/12/2018  
+Sentinel 3 B  07/12/2019  
+Sentinel 3А  12/12/2019  
+Sentinel 3А  24/12/2019  
+Sentinel 3 B 07/12/2020  
+Sentinel 3А  12/12/2020  
+Sentinel 3 A 24/12/2020  
+Sentinel 3 B 07/12/2021  
+Sentinel 3А  12/12/2021  
+Sentinel 3А  24/12/2021  
+Sentinel 3А  07/12/2022  
+Sentinel 3A  12/12/2022  
+Sentinel 3B  24/12/2022  
+ 
+The simplistic definition would be how hot the "surface" of the Earth would feel to the touch at a certain location. From 
+the satellite's perspective, the "surface" is all it sees whe n it looks through the atmosphere at Earth. It can be snow and ice, 
+the grass on the lawn, the roof of a building or the leaves in the crown of the forest. LST is not the same as air temperatur e, 
+which is included in the daily weather report16.  
+The LST re trieval algorithms are accurate to 1 K, especially at night when differential surface heating is absent16.  
+Proc. of SPIE Vol. 12786  1278625-5\n\n\n===== PAGE 6 =====\n\n 
+ 
+ 
+ 
+Since the study area was tested in  the summer when the Sun doesn’ t set, no significant differences in temperature were 
+observed between morning and midday temperature measurements, as images from two diff erent time ranges were 
+obtained.  
+Land surface temperature (LST) data are essential for understanding Antarctic climate change and how it will affect urban 
+and rural areas, where human activity and pop ulation growth are the main drivers of land surface thermal variation . 
+Level -2 LST provides land surface parameters with a resolution of 1 km. In addition to a measurement file with Land 
+Surface Temperature (LST ) values calculated and provided for each pix el, there are also a number of associated auxiliary 
+parameters that are visible from the product's drop -down menu when it ’s loaded ( figure 4 ). The figure presents a small part 
+of the parameters that are contained in the granule.  
+ 
+Figure  4 Sentinel 3 SLSTR  Level -2 LST11, 15  
+Altitude  and depth of snow cover in the Livingston Island area measured by Level -2 LST were used for data analysis 
+(figure 5 and figure 6 ) 11, 15. 
+  
+ 
+Figure  5 Altitude calculated by elevation  in Level -2 LST11,15  
+Proc. of SPIE Vol. 12786  1278625-6\n\n\n===== PAGE 7 =====\n\n 
+ 
+ 
+ 
+  
+ 
+Figure 6 Depth  of snow cover from Sentinel 3 SLSTR  (07.12.2022 )11, 15  
+ 2.2 Data  processing  
+The ecological monitoring of Livingstone Island,  Antarctica has been done over a period of five years, from 2019 to 2023 . 
+Satellite images from the same period each year were use d for this purpose. The selected satellite scenes were captured 
+during the summer season, when the vegetation in the area is well represented, there is strong melting of wet snow, snow 
+and ice, there are exposed rock massifs, strong presence of sea ice and  ice soup.  
+For this purpose, four hybrid models were created fo r monitoring individual objects (figure  7- 10). 
+ 
+ 
+Figure 7 Hybrid model of methodologies for monitoring : Snow and wet snow  
+ 
+ 
+ 
+ 
+Proc. of SPIE Vol. 12786  1278625-7\n\n\n===== PAGE 8 =====\n\n 
+ 
+ 
+ 
+ 
+ 
+Figure 8 Hybrid model of methodologies for monitoring: Ice, sea ice,  permafrost and rocks  
+ 
+ 
+Figure 9 Hybrid model of methodologies for monitoring: Vegetation (lichens, mosses, grasses)  
+ 
+ 
+ 
+Proc. of SPIE Vol. 12786  1278625-8\n\n\n===== PAGE 9 =====\n\n 
+ 
+ 
+ 
+  
+Figure 10 Hybrid model  of methodologies for monitoring : Water and surface water bodies  
+3. RESULTS  
+As a result of the created hybrid mode ls of monitoring methodologies, they can be used for weekly, monthly and annual 
+monitoring. Some of the described metrics or indicators can also be used in the models according to the observed objects 
+of interest and the availability of data.  
+Field researc h was done using a spectrometer on two territories of Livingston Island: Cape Hana Point and the territory 
+around the Bulgarian Antarctic b ase (BAS) . Over 100 spectral field profiles of various sites have been made, which can 
+be found in machine -readable f ormat on the official project page.  
+The purpose of this field study is to perform a spectral analysis and obtain representative statistical data of the most 
+important objects of interest around the BAB.  
+A Sekonic C -800-U mobile spectrometer was used for fi eld research.  
+The device measures natural light and flash, from 380 to 780 nm, a wide measurement range of color temperature (1600 
+to 40,000 K) and illuminance (1 to 200,000 lx in ambient light, 20 to 20,500 lx ・s in flash).  
+Also measures: color rendering properties (CRI, SSI, TLCI, TLMF, TM -30-18), color control parameters (Hue/Saturation, 
+CIE 1931 x, y chromaticity coordinate), lighting filter for Rosco Ⓒ and LEE Ⓒ, camera filter for Kodak Wratten  Ⓒ, 
+LEEⒸ and Fu jiⒸ and LB/CC index  
+The C -800 Series Utility software can be freely downloaded from Sekonic's official website17 . 
+Proc. of SPIE Vol. 12786  1278625-9\n\n\n===== PAGE 10 =====\n\n 
+ 
+ 
+ 
+ 
+Figure  11 Sekonik C-800 spectrometer, archive на Теmenuzhka Spasova  
+The table 4 demonstrates the data that was generated by the spectromete r. For each of the profile points, a photo was 
+taken and GPS coordinates were taken.  
+ 
+Table  4 Data  profile N28  from Sekonik C -800 Spectrometer . 
+ 
+ 
+Point 28, Sea ice  
+ 
+ 
+ 
+ 
+   
+ 
+ 
+ 
+ Date Saved,12.12.2022 г. 00:58:54 ч.  
+Title, Sea ice  №28_5943K , 634,962.345 
+3,051,7 13.722 Meters  
+Measuring Mode,Ambient  
+Color Space / White Point,  HSI, D65 
+CCT [K],5943  
+⊿uv,0.0027  
+Illuminance [lx],19000  
+Illuminance [fc],1760  
+Reference CCT [K],5000  
+LB Index [MK⁻¹],32  
+LB Camera Filter,81B  
+LB Lighting Filter,L223 1/8 CTO  
+CC Index,0.1M  
+CC#,0 .2M 
+CC Camera Filter,CC025M  
+CC Lighting Filter,L279 1/8 MINUS G  
+CRI Ra,99.3  
+CRI R1,99.4  
+CRI R2,99.8  
+CRI R3,99.4  
+CRI R4,99.5  
+CRI R5,99.7  
+CRI R6,99.5  
+CRI R7,98.9  
+CRI R8,97.8  
+CRI R9,94.2  
+CRI R10,99.7  
+CRI R11,99.5  
+CRI R12,98.7  
+CRI R13,99.6  
+CRI R14,99.7  
+CRI R15 ,98.7  
+TM-30-18 Rf,99  
+TM-30-18 Rg,100  
+SSIt,53  
+SSId,95  
+SSI1, --- 
+SSI2, --- 
+TLCI,100  
+TLMF, --- 
+CIE1931 x,0.3229  
+CIE1931 y,0.3378  
+Hue,43deg  
+Saturation,8%  
+ 
+Proc. of SPIE Vol. 12786  1278625-10\n\n\n===== PAGE 11 =====\n\n 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+The high color temperature values of the object that is demonstrated in fig. are 5943 in Kelvin. They  ensure th at the 
+research is done in daylight and in clear weather. Also the CRI values are high. A CRI equal to 100 Ra is assumed to be 
+daylight (sunlight), and in this particular case it is equal to 99.3 or extremely high. At this value of light, the col ors of the 
+observed objects are perceived most naturally. The same applies to the other values of R1 to R15, which for the object in 
+the case of sea ice are on average 99. These values are also observed for the other objects.  
+The Ra value is the fraction o f light produced by the light source. When measuring the luminous efficiency of a light 
+fixture, in this case the Sun, CRI measures all color ranges from R1 to R15, but the RA value measures only the blue -green 
+areas of the light fixture or sunlight, R1 to  R8, at that Ra point = 99.3. The most difficult color to reproduce is red (R=9) 
+and in the particular example it has the lowest values R9=94.2.  
+Data from the polar tests of the AWG station powered by the OXYMET™ environmental battery. Opportunities to use  
+environmentally friendly renewable energy sources in the Antarctic even if only to power the seasonal needs of scientists 
+and logisticians in the polar latitudes is an innovation, as enough energy is generated. The data are from 12/12/2022 ( table  
+5). AWG coordinates are used for reference point.  
+Only UV index data was not generated, but this can be compensated with Sentinel 3 data.  
+The values for field survey days are positive, which in the last few years for this part of the year is similar to data from 
+other BAB measuring instruments18, 19.  
+ 
+Table 5 Data from Automatic recording weather station (AWG )3 
+Antarctic Weather and GPS logger - AWG "Alissa",  
+powered by "OXYMET" - an ecological Magnesium -Air battery,  
+design & development: Iliyan Popov, Boris Shi rov  
+GPS Lat.  GPS Lon.  Cell 1,  
+Volts  Cell 2,  
+ Volts  Cell 3,  
+Volts  Luminance  UV Index  Temperature,  
+Celsius degree  
+-62.64  -60.37  1.12 2.1 3.06 4.97 0 9.2 
+-62.64  -60.37  0.9 1.93 3.26 4.96 0 9.22 
+-62.64  -60.37  1.04 1.8 3.15 4.97 0 9.4 
+-62.64  -60.37  1.04 2.12 3.13 4.96 0 9.6 
+-62.64  -60.37  0.95 1.96 3.35 4.97 0 9.65 
+-62.64  -60.37  1.18 2.23 3.15 4.97 0 9.88 
+-62.64  -60.37  1.17 2.12 3.4 4.97 0 9.81 
+Proc. of SPIE Vol. 12786  1278625-11\n\n\n===== PAGE 12 =====\n\n 
+ 
+ 
+ 
+-62.64  -60.37  0.98 2.16 3.34 4.97 0 9.9 
+-62.64  -60.37  0.98 1.96 3.14 4.97 0 9.97 
+-62.64  -60.37  1.06 1.9 3.29 4.96 0 10.02  
+-62.64  -60.37  1.13 2.1 3.63 4.96 0 10.06  
+-62.64  -60.37  1.14 2.15 3.25 4.97 0 9.96 
+-62.64  -60.37  1.07 2.4 3.59 4.97 0 10.08  
+-62.64  -60.37  1 2.12 3.15 4.96 0 10.1 
+-62.64  -60.37  1.04 2.15 3.22 4.97 0 10.14  
+-62.64  -60.37  1.16 2.34 2.95 4.96 0 10.17  
+-62.64  -60.37  1.07 2.2 3.2 4.97 0 10.21  
+-62.64  -60.37  1.14 2.39 3.33 4.97 0 10.22  
+-62.64  -60.37  1.09 2.16 3.27 4.96 0 10.24  
+ 
+Data from a drone was used to verify the current state of the investigated objects. The shots are from the dates 1 2.12, 
+18.12 and 24.12 .2022 , when a synchronous approach was made  (figure 12).  
+   
+   
+Figure  12 Dron images Author : Temenuzhka Spa sova, December 2022,  31st Bulgarian Antarctic Expedition  
+Drone data was used to verify the current state of certain obje cts during field research and to create spectral profiles from 
+satellite data (fig. 12). 
+Sentinel 3 LST data were used despite the lower resolution but high temporal resolution over a period of five years to 
+allow a comparison of five identical seasons  (figure 13). A clear change of LST is observed in the Antarctic region and the 
+BAB region in December 2018 and 2019, but it is not only on the database of 07.12, images from two more dates 12 and 
+24 December are considered, which change is significant during o f the Antarctic summer of 2020. And since this is a 
+snapshot reading, at that very moment a lower temperature was measured in the BAB region, but two weeks later the trend 
+is exactly the same as for 2018 and 2019 and the values are clearly visible in figur e 14. 
+Proc. of SPIE Vol. 12786  1278625-12\n\n\n===== PAGE 13 =====\n\n 
+ 
+ 
+ 
+There is an upward trend in the lowest temperature for the day, and also the highest, as in some places it reaches over 47 
+degrees by 2020, and after that the highest temperature decreases, but the lowest values increase sharply for the day and 
+reach  over 27 degrees . 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+  
+ 
+  
+Proc. of SPIE Vol. 12786  1278625-13\n\n\n===== PAGE 14 =====\n\n 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+  
+ 
+  
+Figure  13 LST from Sentin el 311, 15 Antarctica and Livingston I sland  on 07.12  for 5 y еars (2018 -2022)  
+ 
+Proc. of SPIE Vol. 12786  1278625-14\n\n\n===== PAGE 15 =====\n\n 
+ 
+ 
+ 
+ 
+Figure 14 LST from Sentinel 311, 15 Antarctica and Livingston Island on December 24, 2020  
+On the basis of LST, the lowest values of depth of snow cover from Sentinel 3 SLSTR (07.12.2022) were also measured, 
+which is also visible from the footage on the ground, since on 07.12.2022 on Livingston Island around BAB there is a 
+noticeable lack of wet sno w and snow cover8. However, these values are directly inversely proportional to the areas with 
+the presence of mosses, lichens and grasses.  
+From the made over 100 profiles, 8 p oints are demonstrated (fig. 15, 16,  table  6), which are compared with the grou nd data 
+from a spectrometer and for which it can be said that in the visible range from 380 to 780 µm t he spectral curves overlap 
+(figure15 , 16 and table 4) . 
+ 
+Figure  15 P1- rock on the shore, item 30; P2 -sea ice from the coast, item 28 (fig. |), P3 - ice, item 29; P4 -dry fine sand, item 
+23; P5 - water (shallow river on the shore), item 25; P6 -snow (dark), item 26; P7 - fine sand, item 22; P8 - water (river)  
+ 
+Figure 16 Spectral profile of points from Sentinel 2 MSI, 07/12/2022  
+Proc. of SPIE Vol. 12786  1278625-15\n\n\n===== PAGE 16 =====\n\n 
+ 
+ 
+ 
+Table 6 Spectral profile of point s from Sentinel 2 MSI, 07/12/2022 , CSV format  
+ 
+ 
+ 
+ 
+ 
+ 
+Through the SAR data, a warming trend is observed in the regions of interest, which demonstrate low dB reflectance 
+values, which is a sure sign of heavy melting and the presence of water even over are as normally occupied by snow and 
+ice (figure 17).January 2021, January and  February 2022 and January 2023 . The year 2022 makes an extremely big 
+impression. As the surface is highly melted throughout the month of February, which is not surprising because a similar 
+trend is observed for December 2022, when we have serious increases in  LST at the lowest temperatures . 
+SAR gives information about the presence of wet snow, ice and helps to identify ice rocks, as there is already a proven 
+classification of objects  8, 13. 
+The results, which were used to carry out a complex approach by the author, are from a 5 -year period and coincide with a 
+period in which field research was done, and for data verification and validation, multiple spectral profiles were made 
+using a  spectrometer. In this way, the spectral curves can be compared with those of a spectrometer, the data from a 
+meteorological battery can be used, and also the data from every single instrument located on Livingstone Island, 
+Antarctica, in order to obtain v ery comprehensive information, rather than interpolation data that averages the values of 
+different coefficients.  
+Proc. of SPIE Vol. 12786  1278625-16\n\n\n===== PAGE 17 =====\n\n 
+ 
+ 
+ 
+ 
+ 
+Figure 17 SAR images from Sentinel 1 in dB  
+ 
+Proc. of SPIE Vol. 12786  1278625-17\n\n\n===== PAGE 18 =====\n\n 
+ 
+ 
+ 
+4. CONCLUSION  
+Spectral curves have long shown their benefits, as they do not change, but can only  serve to validate research in polar 
+regions, as very often research is seasonal, and in winter the sites are difficult to access.  
+Seasonal field surveys are used to supplement and enrich information on spectral profiles and libraries for specific sites or  
+a group of sites . 
+Regardless of the observed objects, it’s desirable first to match data from optical and radar images, because if there is 
+specific data that is not visible with one satellite, it can be compensated by a second or third. This necessitates  the creation 
+of a data space in which data can be processed, but also processed by different experts, in order to extract maximum 
+information about the studied area. And last but not least, that this information is similarly structured so that it can be 
+shared and interoperable.  
+It turned out that the dynamics of Livingstone Island can be successfully inferred by the three satellites Sentinel 1 SAR, 
+Sentinel 2MSI and Sentinel 3LSTR, and also individually, but only with the availability of quality optical r ange data.  
+The parameters obtained from Sentinel 3LSTR are absolutely sufficient for the initial needs of building polar space data 
+for initiatives such as Digital Twins, Oceans and Seas with an average terrain resolution of 1 km, but periodically it will 
+be good to verify and with data from the other two satellites, and why not using more satellites like Sentinel 5P.  
+The four hybrid remote sensing monitoring models thus constructed could be successfully applied to the various needs, as 
+they have already be en proven to work through a synchronous approach during the 31st Bulgarian Antarctic Expedition.  
+With the models thus distinguished, we could partially support the structuring of the data on specific topics or objects of 
+interest.  
+And since there is also d ata and research from previous years, which are based on open data from the Copernicus program8, 
+the following conclusions can be drawn:  
+1. The dynamics of temperature change from 2018 to 2022 are clearly visible, and for this purpose, many more images 
+than the ones presented were used.  
+2. In addition to the temperature, the changes in the presence of snow cover from Sentinel 2, the retreat of the ice cover, 
+and the lack of sea ice characteristic of the area are also clearly observed.  
+3. All spectral indice s can be successfully applied when there is a lack of snow cover and rock exposure. There, the spectral 
+profiles show a 100% match between in situ and satellite data. This helps the good study of cracks in the rocks, which are 
+additionally verified with th e radar data, and where there are ground points, it is even recommended to use them together 
+with drone footage and photogrammetric models . 
+4. SAR continues to be the most accurate indicator when selecting data, but Sentinel 3 gives us daily information on  climate 
+change, which also gives enough additional parameters  
+5. From the conducted research and what has been seen on the ground, it can be concluded that the territory of BAB, Cape 
+Hanna Point and large areas of the western part of the island in the las t few years have been formed as local small heat 
+islands for Antarctica.  
+As for Hanna Point due to orographic reasons and the accumulation of large colonies of polar species of animals, this 
+phenomenon has been observed in previous years and is also visibl e in the large amount of vegetation such as mosses, 
+lichens and grasses.  
+ 
+Acknowledgements  
+ 
+This study was supported by „Polar scientific research for young scientists“, 2022 Bulgaria and Bulg arian Antarctic 
+Institute (BAI) , contract No. 70 -25-59/10.08.20 22, Project: DESTINATION EARTH ANTARCTICA – DIGITAL DATA 
+SPACE, PILOT PROJECT. Special thanks to BAI and the logistical support provided during the 31st Bulgarian Antarctic 
+Expedition, in which our team also took part in the First Group. Special thanks  to the team OXYMET3 behind the creation 
+of the innovative automatic recording weather station (AWG), which successfully operates in polar conditions.  
+ 
+ 
+ 
+ Proc. of SPIE Vol. 12786  1278625-18\n\n\n===== PAGE 19 =====\n\n 
+ 
+ 
+ 
+REFERENCES  
+[1] https://destination -earth -antarctica.eu/   
+[2] https://www.vesselfinder.com/bg/vessels/details/8112586    
+[3] https://oxymet.eu/   
+[4] https://id sa-bulgaria.gate -ai.eu/data -spaces   
+[5] https://data.europa.eu/en/publications/datastories/high -value -datasets -overview -through -visualisation   
+[6] https://data.europa.eu/en/publications/datastories/high -value -datasets -overview -through -visualisation   
+[7] https://destination -earth.eu/destination -earth/   
+[8] Temenuzhka Spasova , M onitoring of short -lived snow coverage by SAR data around Livingston island, South 
+Shetland islands in Antarctica, Adaptation futures 2018 – „5th I nternat ional climate change adaptation 
+conference”: Cape T own –South A frica 18 -21 june 2018   https://doi.org/10.15641/0 -7992 -2543 -3  
+[9] Tеmenuzhka Spasova, Roumen N edkov, Adlin Dancheva, Andrey Stoyanov, Iva Iv anova, and Nikolay Georgiev 
+"Seasonal assessment of the dynamics of sea ice based on aerospace data on Livingston island, N ew Shetland 
+islands in A ntarctica and Longyearbyen in the Arctic", proc. SPIE  11524, E ighth international conference on 
+Remote sensin g and G eoinformation of the E nvironment ( RSC y2020), 115240j (26 A ugust 2020); 
+https://doi.org/10.1117/12.2570829   
+[10] https://www.breeze -technologies.de/blog/different -esa-copernicus -sentinel -missions -and-what -they-measure   
+[11] https://scihub.copernicus.eu   
+[12] Temenuzhka Spasova (2019) Dissertation title (theme) Different approach for  monitoring of  surface water 
+bodys, f loods and wet snow cover based on Remote sensing and GIS . 
+[13] Spasova T., Nedkov R., (2019) "On the use of SAR  and optical data in asses sment of flooded areas," proc. SPIE 
+11174, S even th international conference on Remote sensing and Geoinformation of the E nvironment (rscy2019), 
+111740v  (27 june 2019); doi: 10.1117/12.2533660  
+[14]  https://step.esa.int/main/download/snap -download   
+[15] https://dataspace.copernicus.eu   
+[16] https://sentinels.copernicus. eu/web/sentinel/user -guides/sentinel -3-slstr/overview/geophysical -
+measurements/land -surface -temperature   
+[17] www.sekonic.com    
+[18] https://www.meteoblue.com/bg   
+[19] https://meteo.rocks/station/vrah -sinemorec -o-v-livingstan -yuzhnoshetlandski -ostrovi/27?app=true   
+ 
+ Proc. of SPIE Vol. 12786  1278625-19

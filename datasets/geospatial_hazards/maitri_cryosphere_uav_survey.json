@@ -1,0 +1,70 @@
+{
+  "survey_site": "Maitri Continental Ice-Sheet Margin (Schirmacher Oasis)",
+  "survey_area_acres": 100,
+  "survey_area_km2": 0.27,
+  "dem_resolution_cm": 8.5,
+  "supraglacial_lake_coords": {
+    "lat": -70.772814,
+    "lon": 11.753228
+  },
+  "melt_pond_dynamics_dec2022": [
+    {
+      "date": "2022-12-18",
+      "area_m2": 9151,
+      "depth_m": 0.25,
+      "volume_m3": 2279,
+      "air_temp_c": -2.1,
+      "bed_temp_c": -1.2,
+      "status": "Early Pooling"
+    },
+    {
+      "date": "2022-12-21",
+      "area_m2": 15420,
+      "depth_m": 0.85,
+      "volume_m3": 11200,
+      "air_temp_c": 0.4,
+      "bed_temp_c": 2.1,
+      "status": "Rapid Expansion"
+    },
+    {
+      "date": "2022-12-24",
+      "area_m2": 24727,
+      "depth_m": 1.6,
+      "volume_m3": 29272,
+      "air_temp_c": 1.8,
+      "bed_temp_c": 8.0,
+      "status": "Peak Volume (Surge)"
+    },
+    {
+      "date": "2022-12-28",
+      "area_m2": 18300,
+      "depth_m": 1.1,
+      "volume_m3": 16400,
+      "air_temp_c": -0.8,
+      "bed_temp_c": 3.4,
+      "status": "Subsurface Drainage"
+    },
+    {
+      "date": "2022-12-31",
+      "area_m2": 11050,
+      "depth_m": 0.45,
+      "volume_m3": 4500,
+      "air_temp_c": -3.5,
+      "bed_temp_c": -0.5,
+      "status": "Refreezing"
+    }
+  ],
+  "ice_sheet_mass_loss_headline": {
+    "duration": "7 days",
+    "elevation_drop_m": 0.25,
+    "mass_loss_kt": 13.6,
+    "cryofacies_classes": [
+      "meltwater",
+      "frozen_meltwater",
+      "dry_snow",
+      "wet_snow",
+      "bare_ice",
+      "bedrock"
+    ]
+  }
+}

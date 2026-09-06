@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "node_id": "CPT",
+      "name": "Cape Town International / Port",
+      "type": "Gateway Hub",
+      "country": "South Africa"
+    },
+    {
+      "node_id": "NOVO_AIR",
+      "name": "Novolazarevskaya Blue Ice Runway (AT17)",
+      "type": "Airfield (DROMLAN)",
+      "lat": -70.82,
+      "lon": 11.63
+    },
+    {
+      "node_id": "PROG_AIR",
+      "name": "Progress Skiway",
+      "type": "Skiway (Feeder)",
+      "lat": -69.38,
+      "lon": 76.38
+    },
+    {
+      "node_id": "INDIA_BAY",
+      "name": "India Bay (Lazarev Ice Shelf Calving Edge)",
+      "type": "Marine Fast-Ice Mooring",
+      "lat": -69.98,
+      "lon": 11.9
+    },
+    {
+      "node_id": "QUILTY_BAY",
+      "name": "Quilty Bay / Thala Fjord (Bharati Cove)",
+      "type": "Marine Deep Anchorage",
+      "lat": -69.41,
+      "lon": 76.19
+    },
+    {
+      "node_id": "MAITRI_STN",
+      "name": "Maitri Station",
+      "type": "Inland Station",
+      "lat": -70.7668,
+      "lon": 11.7308
+    },
+    {
+      "node_id": "BHARATI_STN",
+      "name": "Bharati Station",
+      "type": "Coastal Station",
+      "lat": -69.4068,
+      "lon": 76.1953
+    }
+  ],
+  "edges": [
+    {
+      "route_id": "LEG_AIR_01",
+      "origin": "CPT",
+      "destination": "NOVO_AIR",
+      "mode": "Heavy Air Transport (Ilyushin IL-76TD)",
+      "duration_hours": 5.75,
+      "season_window": "Late Oct to mid-Feb",
+      "capacity_pax": 60,
+      "capacity_cargo_tonnes": 18.0,
+      "constraint": "Requires blue-ice friction coefficient >= 0.35, surface temp < -5C for heavy landing"
+    },
+    {
+      "route_id": "LEG_AIR_02",
+      "origin": "NOVO_AIR",
+      "destination": "PROG_AIR",
+      "mode": "Ski-Equipped Feeder (Basler BT-67 / Twin Otter)",
+      "duration_hours": 9.5,
+      "season_window": "Mid-Nov to late Jan",
+      "capacity_pax": 18,
+      "capacity_cargo_tonnes": 2.5,
+      "constraint": "Requires visual flight rules (VFR), en-route fuel cache availability"
+    },
+    {
+      "route_id": "LEG_SEA_01",
+      "origin": "CPT",
+      "destination": "QUILTY_BAY",
+      "mode": "Polar Class Icebreaker / Expedition Vessel (e.g. MV Vasiliy Golovnin)",
+      "duration_days": 13,
+      "duration_range_days": [
+        10,
+        16
+      ],
+      "season_window": "Dec to Feb",
+      "capacity_cargo_tonnes": 4000,
+      "constraint": "Sea ice concentration in Prydz Bay <= 6/10ths"
+    },
+    {
+      "route_id": "LEG_SEA_02",
+      "origin": "QUILTY_BAY",
+      "destination": "INDIA_BAY",
+      "mode": "Polar Class Icebreaker / Expedition Vessel",
+      "duration_days": 6,
+      "duration_range_days": [
+        5,
+        7
+      ],
+      "season_window": "Jan to early Mar",
+      "distance_km": 3098,
+      "distance_nm": 1693,
+      "constraint": "Fast-ice edge stability at Lazarev Ice Shelf"
+    },
+    {
+      "route_id": "LEG_SEA_03",
+      "origin": "INDIA_BAY",
+      "destination": "CPT",
+      "mode": "Polar Class Icebreaker",
+      "duration_days": 10,
+      "duration_range_days": [
+        8,
+        12
+      ],
+      "season_window": "Late Feb to mid-Mar",
+      "constraint": "Autumn sea-ice freezeup deadline (March 15 hard exit)"
+    },
+    {
+      "route_id": "LEG_LAND_01",
+      "origin": "INDIA_BAY",
+      "destination": "MAITRI_STN",
+      "mode": "Over-Ice Heavy Convoy (PistenBully 300 Polar + Sledges)",
+      "duration_hours": 12.0,
+      "distance_km": 85.0,
+      "constraint": "Crevasse danger zones between Ice Shelf and Schirmacher Oasis hinge zone"
+    },
+    {
+      "route_id": "LEG_LAND_02",
+      "origin": "QUILTY_BAY",
+      "destination": "BHARATI_STN",
+      "mode": "Barge + PistenBully Shore Transfer",
+      "duration_hours": 1.5,
+      "distance_km": 1.2,
+      "constraint": "Quilty Bay wave swell and fast-ice thickness"
+    }
+  ]
+}

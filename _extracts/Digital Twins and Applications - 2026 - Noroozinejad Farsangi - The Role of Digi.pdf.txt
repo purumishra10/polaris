@@ -1,0 +1,1937 @@
+\n\n===== PAGE 1 =====\n\nDigital Twins and Applications 
+-REVIEW
+OPEN ACCESS
+The Role of Digital Twin for Space and Remote Terrestrial 
+Construction
+Ehsan Noroozinejad Farsangi
+Urban Transformations Research Centre, Western Sydney University, Sydney, NSW, Australia
+Correspondence: Ehsan Noroozinejad Farsangi (ehsan.noroozinejad@westernsydney.edu.au )
+Received: 20 May 2025 |Revised: 18 January 2026 |Accepted: 27 January 2026
+Keywords: digital twin |ESA |extreme‐environment construction |JAXA |NASA |predictive maintenance |remote infrastructure |space habitats |
+SpaceX |swarm robotics
+ABSTRACT
+Digital twin technology, continuously updated, high‐fidelity virtual replicas of physical assets, has matured rapidly in aerospace 
+and is now poised to transform construction in extreme environments on Earth and beyond. This Opinion Article synthesises 
+recent research, global case studies, and policy developments to argue that digital twins are pivotal for planning, autonomous 
+execution, and predictive infrastructure maintenance on the Moon, Mars, the deep ocean, polar regions, and remote deserts. By 
+coupling real‐time sensor data with physics‐based and AI‐driven simulation, twins enable risk‐free prototyping, swarm‐robot 
+coordination, and lifecycle resilience while reducing environmental footprints. We highlight strategic implications, data‐ 
+governance frameworks, workforce upskilling, and federated twin ecosystems and forecast emerging trends such as AI‐ 
+enhanced autonomy, XR interfaces, and smart‐material feedback loops. The article aims to inform multidisciplinary re-
+searchers, engineers, and policymakers by advocating the early adoption of digital twin standards to accelerate sustainable 
+resilient construction in the most challenging frontiers.
+1|Introduction
+Extreme environments, from the vacuum of space to the depths 
+of the ocean and the frozen expanse of the Arctic, pose un-
+precedented challenges to construction and infrastructure 
+development. Building and maintaining structures in these 
+settings is fraught with difficulties: human access is limited or 
+dangerous, conditions are unpredictable, real‐time communi -
+cation may be delayed, and mistakes or failures can be costly or 
+life‐threatening. As humanity prepares to establish a sustained 
+presence on the Moon and Mars and expands operations in 
+remote terrestrial regions, there is a pressing need for technol -
+ogies to mitigate these challenges. Digital twin technology has 
+rapidly gained attention as a potential game‐changer in this 
+context. A digital twin is essentially a living digital replica of a 
+physical asset or system, kept continuously in sync with the real 
+world via sensors, data streams, and simulations. By providing 
+an up‐to‐date virtual mirror of physical reality, digital twins enable engineers and operators to monitor conditions in inac -
+cessible locations, predict issues before they occur, and even 
+rehearse complex operations in silico, all of which are invalu -
+able for extreme environment construction [1–10 ].
+The concept of the digital twin originated in aerospace and 
+defence contexts and is deeply rooted in NASA's early experi -
+ences. During the Apollo programme of the 1960s–70s, NASA 
+developed what could be viewed as the first digital twin: a ‘living 
+model’ of the Apollo spacecraft that mission control used to di-
+agnose and solve problems remotely. In the Apollo 13 crisis of 
+1970, for example, simulators and physical models augmented 
+with real telemetry were used to replicate the damaged space -
+craft's condition, allowing engineers on Earth to devise a suc-
+cessful rescue procedure. This paved the way for the formal 
+concept, decades later, NASA's John Vickers coined the term 
+‘digital twin ’ around 2010 as the agency embraced model‐based 
+engineering for next‐generation programs. Since then, digital 
+This is an open access article under the terms of the Creative Commons Attribution License, which permits use, distribution and reproduction in any medium, provided the original work is properly 
+cited.
+© 2026 The Author(s). Digital Twins and Applications published by John Wiley & Sons Ltd on behalf of The IET +Zhejiang University Press.
+Digital Twins and Applications , 2026; 3:e70027 1 of 21
+https://doi.org/10.1049/dgt2.70027
+\n\n\n===== PAGE 2 =====\n\ntwins have evolved with advances in computing, sensors (Internet 
+of Things), and AI and have been adopted far beyond aerospace: 
+they now drive innovation in manufacturing, urban planning, 
+energy, healthcare, and more. Crucially, the underlying value of 
+digital twins lies in their ability to continuously integrate data 
+(from sensors, surveys, etc.), simulate behaviours under various 
+scenarios, and inform decision‐making in real‐time [11–15 ].
+For the construction industry, digital twins represent an 
+extension of earlier digital modelling techniques such as 
+Building Information Modelling (BIM) and computer‐aided 
+design, adding real‐time data and operational analytics to 
+static models. This dynamic data‐rich modelling is particularly 
+relevant for projects in extreme environments where traditional 
+on‐site oversight is infeasible. By creating a high‐fidelity virtual 
+construction site or infrastructure asset, project teams can ‘be 
+present’ virtually, analysing progress or problems from thou -
+sands of kilometres away. For instance, engineers could super -
+vise an autonomous construction rover on the lunar surface via 
+its digital twin, receiving continuous feedback on the rover's 
+performance and the surrounding environment, and even 
+intervening or re‐planning tasks through that virtual interface. 
+Similarly, a digital twin of an Arctic pipeline can display real‐ 
+time stresses, ground temperature, and structural integrity, 
+alerting operators to emerging risks such as permafrost thaw or 
+material fatigue long before a failure occurs [1, 16–19 ].
+This opinion article delves into the role of digital twins in 
+enabling construction and infrastructure development in space 
+and other remote or extreme terrestrial environments. We 
+structure the discussion as follows (Figure 1):•We begin with a clear definition of digital twins and the 
+fundamental principles that make them powerful in 
+establishing common understanding across our multidis -
+ciplinary audience.
+•We review the current state of digital twin technology in both 
+the construction sector and the space sector, highlighting 
+gaps and differences in maturity between these domains.
+•We explore applications of digital twins for space con-
+struction, encompassing lunar, Martian, and orbital pro-
+jects, including virtual prototyping/design, remote robotic 
+construction, and predictive maintenance of space assets.
+•We examine applications in remote terrestrial construction, 
+such as projects in the Arctic, underwater, and deserts, 
+focussing on how digital twins aid in planning, monitoring, 
+and maintaining infrastructure where human presence is 
+limited.
+•We present global case studies from public agencies and 
+private companies to illustrate how theory is being put into 
+practice around the world.
+•We discuss the strategic and policy implications, arguing 
+that digital twins can enhance infrastructure resilience and 
+sustainability but also require policy support in terms of 
+standards, investment, and collaboration frameworks.
+•Finally, we look ahead to future trends, including integra -
+tion with AI and machine learning, robotics and autono -
+mous swarms, extended reality interfaces, smart materials, 
+and interconnected digital twin ecosystems poised to shape 
+the next generation of construction technology.
+FIGURE 1|Schematic presentation of the article outline. (Developed by the author for this paper).
+2 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 3 =====\n\nThroughout, we aim to maintain a style that is rigorous and 
+evidence‐based yet accessible to policymakers and practitioners, 
+emphasising the transformative potential of digital twins for 
+meeting the engineering challenges of tomorrow's ‘extreme’ 
+projects.
+1.1|Definition and Foundational Principles of 
+Digital Twins
+A digital twin can be defined as a virtual representation of a 
+physical object, system, or process that is updated continuously 
+with real‐world data and used to inform decisions through 
+simulation and analysis. In essence, it is a computerised clone of 
+a real entity, mirroring that entity's state and behaviour in near 
+real‐time. Several authoritative definitions converge on the key 
+characteristics of digital twins. For example, a 2024 National 
+Academies report defines a digital twin as ‘a set of virtual in-
+formation constructs that mimics the structure, context, and 
+behaviour of a natural or engineered system… is dynamically 
+updated with data from its physical twin, has predictive capa -
+bility, and informs decisions that realise value, ’ emphasising that 
+bidirectional interaction between the physical and virtual sys-
+tem is central. The Digital Twin Consortium similarly describes 
+it as ‘an integrated data‐driven virtual representation of real‐ 
+world entities and processes, with synchronised interaction at a 
+specified frequency and fidelity, ’ highlighting the continuous 
+synchronisation of data. In simpler terms, the digital twin stays 
+in lockstep with its physical counterpart: as the physical asset 
+changes or operates, sensors and data feeds update the digital 
+model; conversely, analyses or control actions from the digital 
+side can be applied back to the physical side [13, 20–22 ].
+Foundational principles that underpin digital twins are depicted 
+in Figure 2.
+•Real‐Time Data Synchronisation: Digital twins rely on 
+data streams from sensors (e.g. IoT devices embedded in 
+equipment, structural health monitors, environmental 
+sensors) to ensure the virtual model reflects current reality. 
+This could be high‐frequency telemetry from a machine or 
+periodic updates on ecological conditions. The constant 
+data flow enables the twin to be a live mirror of the system's 
+state [23–25 ].
+•Simulation and Predictive Modelling: A digital twin is 
+not a static model; it is usually coupled with physics‐based 
+models, simulations, or AI algorithms that can predict 
+future behaviour or test scenarios. By leveraging high‐ 
+performance computing, digital twins can answer ‘what 
+if’ questions, such as how a lunar habitat will respond to a 
+meteoroid strike or how an underwater pipeline would 
+behave in a severe storm without risking the real asset. This 
+predictive capability allows proactive interventions (main -
+tenance, design changes, contingency planning) before real 
+problems occur [26–30 ].
+•Bidirectional Feedback and Control: Importantly, digi-
+tal twins are connected to their physical twins in a feedback 
+loop. Not only does data flow from the physical to the 
+digital (to update the model) but insights and commands 
+can flow from digital to physical. In practice, this means an operator could use the digital twin to send optimised con-
+trol inputs to a robot or adjust the operating parameters of 
+remote equipment. For example, if a digital twin detects via 
+simulation that a lunar rover's motor is overheating, it 
+might trigger a command to reduce speed or suggest a 
+cooling pause, thus directly influencing the physical oper -
+ation [25, 31, 32].
+•Lifecycle Span: A true digital twin often spans the entire 
+lifecycle of an asset from design and construction through 
+operations and maintenance to eventual decommissioning. 
+In the design phase, the twin (sometimes called a virtual 
+prototype) allows testing and optimisation. During con-
+struction, it can track progress and quality. In operations, it 
+monitors performance and degradation. And at end‐of‐life, 
+it can assist in safely decommissioning or repurposing as-
+sets. This lifecycle perspective is crucial for long‐term 
+infrastructure such as space habitats or remote in-
+stallations, ensuring continuity of knowledge and data [16, 
+26, 27, 32].
+•High Fidelity and Integration of Heterogeneous Data: 
+Digital twins integrate data from multiple sources and 
+disciplines, such as structural, mechanical, electrical, 
+environmental, and even human factors data. The fidelity 
+can range from coarse (for strategic planning) to ultra‐fine 
+(for detailed engineering). For instance, a digital twin of a 
+spacecraft might encompass its 3D CAD geometry, sensor 
+readings from its subsystems, orbital dynamics models, and 
+even software states. The richer and more accurate this 
+integrated model, the more value it provides. In construc -
+tion, this means merging BIM data, schedule (4D) data, cost 
+(5D) data, and real‐time sensor data into one cohesive 
+virtual space [16, 21, 28, 33].
+Together, these principles allow digital twins to function as 
+‘living’ models of their physical counterparts, supporting what 
+NASA researchers have called a shift towards ‘living models ’ or 
+‘living digital simulations ’ that evolve alongside the system [34]. 
+The idea of continuously living models marks a departure from 
+older practice where simulations were one‐off or sporadic. 
+Instead, the digital twin is constantly running and continuously 
+updated, providing an ongoing decision‐support tool.
+It is crucial to differentiate digital twins from related concepts. A 
+digital twin is more than a simple CAD model or a static 3D 
+visualisation; it is also more than just raw sensor data. Instead, it 
+is the fusion of model +data +analytics in a closed loop. In the 
+construction context, one can think of a digital twin as BIM plus 
+live data plus intelligence [35]. Similarly, terms such as digital 
+shadow or digital model sometimes refer to subsets of this idea. 
+A digital shadow might imply a one‐way data flow (physical to 
+digital only), lacking interactive, predictive elements. A fully 
+realised digital twin, by contrast, has two‐way interactivity and 
+autonomous updating.
+From a systems engineering perspective, digital twins are an 
+implementation of cyber‐physical systems. They tie together the 
+physical domain and the cyber domain, requiring robust system 
+integration. Key enabling technologies include IoT sensor net-
+works (to gather data), cloud and edge computing (to process 
+data and host models), and connectivity (to transmit data, 
+Digital Twins and Applications, 2026 3 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 4 =====\n\nespecially challenging in remote environments with limited 
+bandwidth or latency, such as deep space). Advances in ma-
+chine learning have also enhanced digital twins by allowing 
+data‐driven model updates and anomaly detection, com -
+plementing physics‐based approaches.
+A significant technical challenge for digital twin systems in 
+extreme environments is data synchronisation under con-
+strained connectivity, such as deep space, polar regions, or 
+remote terrestrial sites with limited bandwidth or intermittent 
+links. Traditional real‐time streaming of high‐frequency sensor 
+data is often infeasible in such contexts. To address this, systems 
+adopt edge computing and model‐informed buffering ap-
+proaches: raw sensor data are pre‐processed locally to extract 
+essential features and anomalies, and only compressed or high‐ 
+value summaries are transmitted to the remote twin, whereas 
+less critical data are stored and forwarded when connectivity 
+permits. This reduces bandwidth demand while preserving the 
+twin's operational fidelity. Concurrently, predictive models, 
+including physics‐based simulations and machine learning es-
+timators, fill in gaps during communication blackouts, allowing 
+the twin to maintain an up‐to‐date representation based on the 
+last known state and expected dynamics. Literature indicates 
+that this hybrid approach, combining local processing, priori -
+tised transmission, and predictive interpolation, enables digital 
+twins to function effectively despite low and variable bandwidth 
+conditions [36, 37]. Additionally, federated and distributed ar-
+chitectures leverage edge AI and sensor fusion to support syn-
+chronisation in bandwidth‐limited scenarios, which is also a 
+trending research direction [38].
+To summarise, a digital twin is the convergence of a virtual 
+model with the real world in real‐time, aimed at improving 
+understanding and decision‐making. This foundational concept 
+will be referenced throughout our discussion of how digital 
+twins can assist space and remote construction. By having a firm grasp of what digital twins are and what they can do, we can 
+better evaluate their current use and untapped potential in the 
+following sections.
+1.2|Current State and Technological Maturity in 
+Construction and Space Sectors
+Digital twin technology has reached markedly different levels 
+of maturity in the space sector (and related aerospace in-
+dustry) versus the construction sector. Understanding this 
+disparity provides context for how much work remains to 
+fully leverage digital twins in construction, especially for 
+extreme environments.
+Space Sector Maturity: The aerospace and space exploration 
+community is widely regarded as an early adopter and leader in 
+digital twin development. NASA and major aerospace com -
+panies have used high‐fidelity simulations and digital replicas 
+for decades as part of design, testing, and operations. In fact, 
+aerospace was ‘the first industry to disseminate the concept and 
+use of DTs, ’ starting around 2010 when NASA formally inte-
+grated digital twins into its technology roadmaps [2–4]. Since 
+then, the sector has produced a number of prominent digital 
+twin applications:
+•Spacecraft and Aircraft Systems: Companies like Boeing 
+and Airbus employ digital twins to monitor the health of 
+aircraft in operation and improve designs. A well‐cited 
+example is Boeing's use of a digital twin for the 787 
+Dreamliner to analyse its electrical battery systems after 
+service incidents. In the space realm, NASA created digital 
+twins for the James Webb Space Telescope (JWST) during 
+its development. Because JWST's huge folded structure 
+couldn't be fully physically tested on Earth, NASA built a 
+digital twin to simulate its thermal behaviour in orbit and 
+FIGURE 2|Foundation of a digital twin. (Developed by the author for this paper).
+4 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 5 =====\n\nto rehearse the complex deployment of its sun shield, 
+which had ‘344 different ways to fail’—in a virtual envi -
+ronment. This use of digital twins was instrumental in 
+ensuring JWST's successful commissioning. Space launch 
+systems similarly benefit: NASA's Space Launch System 
+(SLS) rocket and the Orion spacecraft for Artemis have 
+digital models used to predict performance and guide 
+design certification for parts that cannot be easily tested at 
+full scale.
+•On‐Orbit Operations and Satellites: Satellite operators 
+use digital twins to manage constellations and predict 
+orbital decay or collision risks. As an illustration, SpaceX 
+utilises digital twin technology to optimise the design and 
+testing of its Starship, simulating the entire lifecycle of the 
+vehicle under extreme conditions to identify issues before 
+actual flights. The Starship programme's iterative rapid 
+prototyping approach is underpinned by intensive simula -
+tion (essentially treating each prototype and launch as 
+feeding data back into a refined digital model). Even for 
+astronaut training, mixed‐reality simulations incorporate 
+digital twin elements: one training platform, drawing on 
+NASA and ESA systems, virtually replicates the ISS (In-
+ternational Space Station) and SpaceX's Falcon Heavy 
+rocket so that astronauts can practice missions and main -
+tenance tasks in a realistic digital environment.
+•Planetary Rovers and Landers: NASA's Mars rover teams 
+have long used a sort of digital twin for operations. For 
+example, the Curiosity and Perseverance rovers on Mars 
+each have an Earth‐based replica and a physics‐based 
+simulator that is fed telemetry from Mars, enabling oper -
+ators to try out manoeuvres virtually before commanding 
+the real rover. This reduces risk when driving over un-
+known terrain or using the robotic arm. The concept is now 
+extending to the Moon: as part of the Artemis programme, 
+NASA's Lunar Surface Innovation Initiative has developed 
+a digital twin of a proposed regolith excavator robot (the 
+ISRU Pilot Excavator, IPEx). Student teams in a recent 
+NASA challenge had to write software agents to navigate 
+this digital twin of the lunar excavator in a simulated moon 
+terrain, demonstrating how future lunar robots will likely 
+be managed via their digital counterparts.
+Overall, the space sector has achieved a high technological 
+readiness for digital twins in specific domains (design/testing of 
+vehicles, spacecraft operations). Many space digital twins are at 
+Technology Readiness Level (TRL) 7–9 (demonstrated in the 
+operational environment or actual use) for specific applications 
+such as spacecraft health management. Agencies such as NASA 
+and ESA continue to invest heavily: NASA's 2022 Digital Twin 
+Strategic Framework explicitly identifies digital twins as a key 
+‘technology foundation’ for enabling complex missions and 
+autonomy. There are, however, still challenges specific to space. 
+For instance, dealing with limited bandwidth and intermittent 
+connectivity (a Mars habitat twin must sync data over a 20‐min 
+one‐way delay), and ensuring models remain accurate under the 
+extreme physics of space (microgravity, radiation effects, etc.). 
+But directionally, the trend is clear: as missions become more 
+autonomous and farther from Earth, digital twins become 
+indispensable for mission control and for the assets themselves 
+to manage uncertainty.Construction Sector Maturity: By contrast, the architecture, 
+engineering and construction (AEC) industry has been slower in 
+adopting digital twins and is considered to be in the early stages 
+of maturity. The concept of digital twins entered construction 
+discussions more recently, piggybacking on the spread of BIM 
+and smart infrastructure initiatives [1, 16, 17]. Several factors 
+contribute to this lag:
+•The construction industry is traditionally fragmented and 
+project‐based, which makes standardisation of digital twin 
+approaches difficult. Early adopters exist, but there is not 
+yet a widely adopted standard or framework for what a 
+construction digital twin should include, unlike aerospace, 
+where NASA and others set clear digital twin definitions 
+early on. The terminology can be inconsistent (some firms 
+label enhanced 3D models as ‘digital twins’ even if they 
+lack live data links).
+•Most current applications in construction are limited in 
+scope. Digital twins in building operations (sometimes 
+called ‘smart building’ twins or city twins) are being used to 
+monitor energy usage, HVAC performance, or space uti-
+lisation in real‐time. For example, a commercial building 
+might have a digital twin that integrates its BIM model with 
+IoT sensors for temperature and occupancy, helping facil -
+ities managers optimise HVAC settings to save energy. 
+Similarly, infrastructure operators (such as bridge or rail 
+owners) have begun to create digital twins of assets to track 
+structural health. For example, the UK has piloted digital 
+twins for bridges where sensor data on strain and vibration 
+feeds into a model that predicts maintenance needs.
+•There are notable pilot implementations. Singapore's ‘Vir-
+tual Singapore’ is a digital twin of the entire city to aid urban 
+planning. Various large construction/engineering firms have 
+been experimenting; for instance, Kiewit and Fluor have 
+used digital models linked with construction site sensors 
+(drones doing reality capture to update progress in the 
+model). In one case, a Chinese project created a digital twin 
+of a new high‐rise during construction to track deviations 
+and prevent schedule delays, essentially a 4D (3D +time) 
+twin that updated daily with actual site data. These efforts 
+show promise but are not yet routine on all projects.
+•Industry analyses show rapidly growing interest. The global 
+market for digital twins in construction is expanding at 
+~30%+CAGR, projected to reach tens of billions USD by 
+the end of the decade. This growth is fuelled by the inter -
+section of BIM, IoT, and project management tools. How -
+ever, moving from interest to full deployment is slow due to 
+cost and skill barriers.
+Despite being behind aerospace, the trajectory is positive. Many 
+construction firms now recognise digital twins as key to digital 
+transformation in construction (often termed ‘Construction 
+4.0’). A recent survey indicated a sharp rise (~40x increase from 
+2010s to early 2020s) in research publications linking ‘digital 
+twin’ with construction and maintenance topics, reflecting 
+burgeoning R&D. Industry consortia (such as the Digital Twin 
+Consortium, which includes some AEC companies) and stan -
+dards bodies are working on reference architectures specifically 
+for construction and infrastructure digital twins.
+Digital Twins and Applications, 2026 5 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 6 =====\n\nIn summary, the space sector is a decade or more ahead in 
+applying digital twins operationally, whereas the construction 
+sector is catching up rapidly but from a lower base of maturity. 
+The construction industry's current use of digital twins is often 
+in isolated areas (such as building management or construction 
+logistics), and there remains a lack of full integration across an 
+asset's lifecycle and across different systems. However, for the 
+purposes of this article, which deals with remote and extreme 
+environment construction , it is worth noting that these kinds of 
+projects (space missions, Antarctic bases, etc.) tend to be one‐ 
+off, high‐stakes endeavours more akin to aerospace projects 
+than conventional construction. Thus, they may benefit from 
+adopting the aerospace mindset and maturity in digital twin 
+usage. Indeed, many remote construction projects are run by 
+governments or large organisations (e.g., a space agency or a 
+mining corporation) that can marshal the necessary high‐tech 
+approach. As we move into specific applications in the 
+following sections, we will see examples where construction in 
+extreme environments is leveraging aerospace‐like digital twin 
+techniques, effectively narrowing the maturity gap in those 
+niche scenarios.
+2|Applications of Digital Twins in Space 
+Construction
+Space construction refers to the building of structures and 
+infrastructure beyond Earth, including on the lunar or Martian 
+surface, in orbit (orbital platforms, space stations, large tele-
+scopes), or even in transit (spacecraft assembly). These activities 
+are inherently remote (far from human operators) and occur in 
+harsh conditions that preclude the constant presence of 
+workers. Digital twins are poised to play a pivotal role in all 
+phases of space construction by enabling comprehensive virtual 
+prototyping, remote operations, and predictive maintenance 
+capabilities. Below, we explore key application areas and pro-
+vide examples (Figure 3):2.1|Virtual Prototyping and Design of Space 
+Habitats and Structures
+Before committing to physical construction on the Moon or 
+Mars, engineers can build a complete digital twin of the pro-
+posed structure or habitat. This goes beyond static CAD models; 
+the twin can incorporate local environmental conditions 
+(e.g., lunar gravity, radiation, regolith properties) and simulate 
+the construction process. For instance, NASA and its partners 
+have developed detailed simulations of a lunar base to test 
+building methods such as 3D printing with regolith. A Chinese 
+research team at HUST's National Digital Construction Tech -
+nology Center created a ‘laboratory sandbox’ that simulates a 
+future lunar base, where they experimented with various habitat 
+designs (dome structures, egg‐shaped modules) under virtual 
+lunar conditions. This digital sandbox allowed them to evaluate 
+how different shapes would withstand the Moon's low gravity, 
+temperature extremes (~300°C swings), moonquakes, and ra-
+diation, leading them to an optimised ‘lunar pot’ double‐dome 
+concept. Such virtual prototyping, essentially a digital twin of 
+a not‐yet‐built habitat, is invaluable. It lets architects identify 
+optimal designs that balance structural strength, material use, 
+and habitability without costly real experiments on the Moon. 
+Moreover, using physics‐based twins, one can simulate assem -
+bly methods, for example, programme a swarm of construction 
+robots in the digital environment to see if they can autono -
+mously build the structure piece by piece (this ties into swarm 
+robotics, discussed later) [39–41 ].
+2.2|Remote Operation and Control of 
+Construction Robots
+On‐site human labour in space will be minimal. Construction 
+on the lunar surface or Mars will heavily involve robotic sys-
+tems, rovers, excavators, manipulators, and 3D printers, which 
+may be tele‐operated or semi‐autonomous. Digital twins enable 
+FIGURE 3|Application of digital twins in space construction. (Developed by the author for this paper).
+6 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 7 =====\n\na paradigm where these robots are operated through their vir-
+tual avatars. Instead of directly joystick‐driving a rover with a 
+time delay, an operator (or AI agent) interacts with the rover's 
+digital twin in a simulated real‐time environment, and com -
+mands are then executed by the physical rover, with the twin 
+providing continuous feedback. Japan's construction machinery 
+company Komatsu has explicitly endorsed this approach for 
+lunar construction: In a government‐sponsored programme for 
+autonomous lunar construction, Komatsu is developing digital 
+twin technology to precisely recreate lunar site conditions and 
+machine behaviour in a virtual environment. Their goal is that 
+an excavator on the Moon can be controlled ‘without being 
+anywhere near it’ by using the digital twin as the control 
+interface. The digital twin would show, for example, the exca -
+vator's exact position on the Moon, the terrain elevation map, 
+and the status of its systems, allowing operators on Earth to 
+drive it as if playing a realistic video game—thus overcoming 
+the distance and communication lag. This concept was proven 
+on Earth in analogous scenarios: Hitachi in 2024 reported a 3D 
+digital twin system for remote construction machines on Earth, 
+where sensor‐laden bulldozers and cranes were controlled from 
+afar with an interactive twin providing an ‘intuitive sense’ of 
+location and movement. The result was a safer and easier 
+remote operation that eliminated the need for expert skills, 
+since the operator could essentially see a live virtual replica of 
+the site and equipment. Translating this to the Moon, digital 
+twins can allow relatively unskilled operators (or AI autopilots) 
+to coordinate multiple robots digging regolith, assembling 
+habitat modules, laying cables, etc., all via a synchronised vir-
+tual site model. NASA's use of the IPEx excavator's twin in 
+student competitions hints at this future, the students' autono -
+mous software had to navigate the digital twin of the robot, 
+essentially treating it as the real thing [42–44 ].
+2.3|Construction Planning, Logistics, and 
+Simulation
+Space construction projects require meticulously choreographed 
+logistics; every material is precious, and every error is magnified 
+by distance. Digital twins of the construction process can 
+simulate the entire workflow. For example, consider building a 
+lunar landing pad from lunar concrete: a digital twin could 
+simulate bulldozers collecting regolith, a regolith processing 
+plant making bricks, robots laying the bricks, and so forth. 
+Planners can vary parameters in the twin (number of robots, 
+task sequences, energy availability, etc.) to optimise the plan 
+prior to execution. This was illustrated by the European Space 
+Agency (ESA) in analogue tests for a lunar base construction: 
+ESA created virtual construction sites to test how autonomous 
+robots might work together to build a lunar habitat, identifying 
+bottlenecks such as one robot waiting on another and then 
+tweaking the plan digitally. In one scenario, a swarm of small 
+robots was simulated to coordinate similar to ants (inspired by 
+ant colony behaviours) to excavate regolith and build a berm for 
+radiation shielding. The digital twin environment allowed the 
+testing of different swarm algorithms and communication 
+strategies without risking hardware. In NASA's case, they have 
+considered the in‐space assembly of large structures (like 
+assembling a space telescope in orbit using robotic arms); here 
+again, a digital twin of the structure and robots can run through the entire assembly sequence many times to iron out issues, 
+much like how aerospace uses ‘digital rehearsals’ for complex 
+deployments (as with JWST's sunshield deployment twin) 
+[45–47 ].
+2.4|Monitoring and Predictive Maintenance of 
+Space Infrastructure
+Once a structure or system is built in space, its digital twin 
+becomes the central tool for monitoring health and scheduling 
+maintenance. Space habitats or vehicles endure harsh condi -
+tions (thermal cycling, radiation, micrometeoroids) and must 
+often operate autonomously for long periods. A digital twin can 
+continuously ingest data from structural sensors (strain gauges, 
+temperature sensors, leak detectors, etc.) on, say, a lunar habitat 
+and compare those readings against expected values from the 
+twin's models. If the pressure in a section is dropping or a vi-
+bration signature changes, the twin (via algorithms) might 
+detect a probable leak or fatigue crack and alert operators before 
+a catastrophic failure. This approach is akin to how modern jet 
+engines on Earth are monitored by digital twins for early signs 
+of trouble. On the ISS, a rudimentary form of this exists where 
+ground control runs simulations using live telemetry to predict 
+when a system will break and needs replacing. Digital twins 
+would enhance that by being higher fidelity and possibly on‐site 
+(running on the habitat's computer for immediate responses). 
+An example in development is NASA's Gateway (the planned 
+lunar orbit station); engineers are creating detailed digital 
+models of Gateway's modules with the intention of using them 
+for operations and troubleshooting once Gateway is in orbit, 
+effectively having a virtual version of the station on the ground 
+that mirrors the real one in space. Another example is the 
+resilience of large space structures: as mentioned, JWST had a 
+digital twin to monitor its mirror temps; future mega‐structures 
+(such as a Mars transit ship or a lunar base's power system) will 
+likely have persistent twins for continuous diagnostics. The 
+predictive maintenance benefit is crucial when sending repair 
+parts or crews is expensive and delayed—the twin can forecast 
+when a component (e.g., a solar panel or life support filter) will 
+degrade so that spares and repair missions can be planned well 
+in advance [3, 15].
+2.5|Operational Training and Simulation (XR for 
+Construction Tasks)
+Digital twins can be combined with extended reality (XR), 
+including virtual reality (VR) and augmented reality (AR) to 
+train astronauts and robotic operators for construction tasks. 
+Before attempting a construction task on the Moon, the crew or 
+robotics team on Earth can practice it in VR using the digital 
+twin model of the site and the tools. NASA has embraced this 
+concept: one training simulation uses digital twins of spacecraft 
+subsystems and realistic physics in an immersive VR setup to 
+train astronauts on launch procedures and EVAs (spacewalks). 
+For construction, imagine an astronaut training to deploy a fold‐ 
+out habitat or to operate a drilling rig on Mars. They would wear 
+a VR headset that places them in a high‐fidelity digital twin of 
+the environment, complete with correct terrain and equipment 
+Digital Twins and Applications, 2026 7 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 8 =====\n\nbehaviour, enabling safe and practical training. When they later 
+perform the real task on Mars, their suits' AR displays could 
+even show live guidance overlayed from the digital twin (for 
+instance, highlighting where the next connector goes on a 
+structure, based on the twin's design). ESA has likewise looked 
+into using AR with digital twins for guiding astronauts in 
+assembling structures, as part of future lunar surface missions. 
+This combination of twin +XR makes the remote construction 
+process much more intuitive and robust [48–50 ].
+In summary, digital twins serve as the nerve centre for space 
+construction activities. They allow engineers to virtually be on 
+the Moon or Mars, designing, simulating, monitoring, and 
+controlling as if they were local, when in reality, they might be 
+hundreds of thousands of kilometres away. By doing so, digital 
+twins dramatically increase the feasibility of ambitious projects 
+such as building a Moon base. As Komatsu's team succinctly put 
+it, ‘digital twin technology is the key to outer space construction ’ 
+because it enables precise recreation of site conditions and 
+machine behaviour in the digital realm. The next section will 
+see that many of these same capabilities, remote monitoring, 
+simulation, and predictive analytics, are equally game‐changing 
+for construction in Earth's remotest corners.
+3|Applications of Digital Twins in Remote 
+Terrestrial Construction
+Remote terrestrial construction refers to building or managing 
+infrastructure in locations on Earth that are extremely difficult 
+to access regularly by people. This includes polar regions (Arctic 
+and Antarctic sites), undersea environments, deserts and other 
+isolated landscapes, and high‐risk zones. Such projects face 
+some analogous challenges to space construction: limited on‐ 
+site personnel, harsh weather or environmental conditions, logistical complications, and high stakes for failure. Digital 
+twins can be leveraged in these contexts to improve planning, 
+enable remote supervision, and ensure resilience (Figure 4).
+We will discuss a few representative environments and how 
+digital twins are applied:
+3.1|Arctic and Antarctic Infrastructure
+The far north and south of our planet host critical infrastructure 
+such as research stations, roads, pipelines, and mines, all under 
+severe cold and inaccessibility. Climate change is further 
+destabilising these environments (e.g., thawing permafrost 
+undermining foundations). Digital twins are emerging as vital 
+tools to monitor these assets in real‐time and predict issues 
+caused by environmental changes. For example, in Northern 
+Canada and Alaska, many buildings and pipelines are built on 
+permafrost. Engineers now use digital twins of these structures 
+to track ground temperature, soil movements, and structural 
+responses continuously. One policy report noted that ‘among the 
+most promising tools is Digital Twin technology, which offers an 
+evolving picture of how an asset is responding to environmental 
+conditions… for infrastructure built on permafrost, this means 
+engineers can track changes in ground temperature and moisture 
+over time and predict how these changes might impact the stability 
+of a road, pipeline, or building ’. Concretely, this might involve 
+sensors in the ground measuring permafrost thaw depth and in 
+the structure measuring tilt or strain; the twin assimilates these 
+data and runs thermal‐structural models to forecast when the 
+foundation will reach a critical level of settlement. Early 
+warnings from the twin can trigger interventions (such as 
+installing ground chillers or shoring up supports) to prevent 
+catastrophic failures due to permafrost collapse.
+FIGURE 4|Applications of digital twin technologies across extreme and critical environments, highlighting their roles in monitoring, 
+maintenance, operation, assessment, and overall benefits. (Developed by the author for this paper).
+8 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 9 =====\n\nMoreover, digital twins help with the maintenance logistics in 
+these regions. Because sending repair crews to the Arctic is 
+expensive and seasonal, a twin can tell you the optimal window 
+to fix something and exactly what is needed. For instance, a 
+digital twin of a remote Arctic bridge could predict that based on 
+current rust progression (tracked via sensors or inspections), a 
+specific joint will need reinforcement within 2 years, allowing 
+time to schedule a summer airlift of materials and engineers, 
+rather than being caught off guard in winter. The British Ant-
+arctic Survey (BAS) has used digital twin technology on its 
+research ship RRS Sir David Attenborough to reduce carbon 
+emissions and improve maintenance. They created a twin of the 
+ship's power and propulsion system to simulate fuel usage and 
+optimal settings under various conditions. This helped operators 
+run the ship more efficiently (a sustainability win) and also test 
+out upgrades digitally while the ship was in Antarctica, far from 
+any port [51–53 ].
+3.2|Underwater Construction and Subsea 
+Infrastructure
+The ocean environment presents continuous challenges for the 
+construction of oil rigs, subsea pipelines, wind turbines, and un-
+derwater tunnels. These assets are submerged, not easily reach -
+able for inspection, and subject to corrosion and pressure stresses. 
+Digital twins have become integral in the subsea industry for 
+maintenance and monitoring. A notable use case is the moni -
+toring of offshore oil and gas infrastructure. Traditionally, com -
+panies send divers or ROVs (remotely operated vehicles) every 
+few years to inspect platforms and pipelines. Now, with digital 
+twins, they can drastically reduce physical inspections. For 
+example, the National Subsea Centre in the UK highlighted how a 
+digital twin of a network of subsea pipelines continuously ana-
+lyzes sensor data (pressure, flow, vibration) to detect anomalies 
+such as small leaks or fatigue cracks. If a sensor detects a slight 
+pressure drop in a pipeline segment, the twin's model might 
+localise it to a potential pinhole leak and schedule a targeted ROV 
+inspection at that spot rather than a blind full survey. The twin 
+can also simulate the pipeline's integrity under different condi -
+tions, for example, how it would handle a 50‐year storm or varying 
+temperatures to guide preemptive maintenance.
+Remote operation is another aspect: many new offshore in-
+stallations are designed to be normally unattended facilities 
+(NUFs). Their operation is controlled from onshore control cen-
+tres, sometimes hundreds of kilometres away. Digital twins serve 
+as the virtual interface for operators to manage these remote 
+platforms. The twin of a subsea well can show valve states, flow 
+rates, and even a 3D visualisation of the equipment on the sea-
+floor, allowing engineers to open/close valves or adjust pumps 
+remotely with confidence, as if they had an eye on the seabed. This 
+mirrors what has been done in mining and space: operate via the 
+twin to compensate for not physically being there.
+Environmental impact assessment is also aided by digital twins 
+underwater. As noted by NSC, a twin can incorporate data on 
+water quality, currents, and marine life around a subsea struc -
+ture. By simulating potential incidents (such as an oil leak or 
+noise from construction) in the twin, companies and regulators 
+can predict the impact on the ecosystem and take measures to mitigate harm. This proactive use of twins aligns with sustain -
+ability goals (e.g., planning construction timing to avoid marine 
+mating seasons by simulating noise propagation in the ocean, 
+something a twin can do by coupling acoustic models with real 
+hydrophone data) [54–56 ].
+3.3|Desert and Remote Land Sites
+Deserts such as the Sahara, Australian Outback, or Gobi are 
+often chosen for massive projects such as solar farms, mines, or 
+pipelines. These areas have extreme heat and dust and are far 
+from population centres, making on‐site staffing difficult. In 
+such projects, digital twins support primarily remote operations 
+and performance optimisation. A solar farm in a desert might 
+have a digital twin that collects real‐time data from each panel 
+(temperature, output) and from weather stations (sunlight, dust 
+levels) to predict maintenance needs such as panel cleaning or 
+cooling requirements. With potentially thousands of panels, the 
+twin can use AI to identify which sections are underperforming 
+due to dust accumulation and then guide autonomous cleaning 
+robots or dispatch a small crew directly to those spots [57–59 ].
+Mining operations in remote deserts have been early adopters of 
+digital twin‐like approaches. Companies in Australia, such as 
+Rio Tinto, operate large iron ore mines in the Pilbara desert 
+from control centres in Perth (over 1500 km away). They use 
+integrated digital models of the mine sites, fed by data from 
+autonomous haul trucks, drilling rigs, and railway sensors. 
+Essentially, these are digital twins of the mines, complete with 
+topography updated by drone surveys and IoT data from ma-
+chinery, allowing managers to optimise production and detect 
+problems without setting foot in the mine pit. One report 
+mentions that top mining firms are ‘pioneering Digital Twin and 
+AI strategies to enhance productivity and safety’ in these remote 
+mines. The benefits include being able to simulate different 
+mine plans (such as digging sequences) in the twin to see which 
+yields the best efficiency or to foresee bottlenecks in the system 
+(such as a breakdown of a critical truck). Additionally, by 
+linking the twin to AI, anomalies such as an overheating truck 
+engine can be caught via patterns in the data, and the truck can 
+be rerouted to maintenance before it fails in the field. This 
+predictive maintenance via twin is directly credited with 
+reducing downtime in these remote mines.
+A specific example: Rio Tinto's Gudai‐Darri mine (formerly 
+Koodaideri) is branded as the company's most technologically 
+advanced mine. It uses a ‘digital twin of the mine’ to integrate 
+data from all assets and systems, a concept that Rio Tinto ac-
+knowledges was inspired by NASA's pioneering use of twins. 
+This twin coordinates autonomous drills, trucks, and even a 
+robotic train system (AutoHaul). The outcome is that personnel 
+can monitor and control the entire mining operation from a 
+single ops centre building, with the twin providing situational 
+awareness as good as being on‐site.
+3.4|Monitoring Long‐Distance Infrastructure
+Infrastructure that stretches over remote areas, such as long 
+pipelines, electricity transmission lines, or highways through 
+Digital Twins and Applications, 2026 9 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 10 =====\n\nuninhabited terrain can benefit from digital twins for segment‐ 
+wise monitoring. For pipelines, which often traverse deserts or 
+tundra, companies are implementing digital twin systems that 
+take in flow data, pressure readings, and even satellite imagery 
+to detect issues such as leaks or ground movement affecting the 
+pipeline. If a landslide in a desert canyon exposed a pipeline, 
+normally, it might go unnoticed for weeks; a well‐designed twin, 
+however, could combine remote sensing data with pipeline 
+strain gauge data to flag the anomaly within hours and pinpoint 
+the location for drone inspection. This cross‐referencing of 
+geospatial data and engineering data is a strength of digital 
+twins, creating what is essentially an ‘asset intelligence network’ 
+over huge distances. The operators of the Trans‐Alaska Pipeline, 
+for instance, have explored using a digital twin to simulate oil 
+flow and temperature profiles along the 800‐mile pipeline in 
+conjunction with permafrost data, so they can predict where 
+frost heave might cause the pipeline to shift and schedule pre-
+ventive re‐stabilisation [60–62 ].
+3.5|Extreme Disaster Response Construction
+Another remote scenario is when a disaster (earthquake, hur-
+ricane) wipes out infrastructure, and rapid rebuilding is needed 
+in a hazardous zone. Teams cannot always be on site (due to 
+aftershocks or contamination). Digital twins of the affected area, 
+constructed from satellite and drone data, can guide remote‐ 
+controlled construction equipment to clear debris or erect 
+temporary structures without putting responders in harm's way. 
+Although not routine yet, this application has been theorised: 
+for example, after a nuclear accident (such as Fukushima), a 
+digital twin of the site with radiological maps could be used to 
+plan robotic construction of containment walls and remotely 
+operate the machinery, minimising human exposure.
+Across these examples, the recurring theme is that digital twins 
+enable a shift from reactive site‐bound operations to proactive 
+remote and data‐driven operations. By having a continuously 
+updated virtual replica, organisations can make informed de-
+cisions without having eyes physically on the asset 24/7. This is 
+transformative for remote construction, where travel to the site 
+might be infrequent or dangerous. Furthermore, digital twins 
+contribute to sustainability and efficiency in these projects: 
+maintenance can be done just in time (reducing unnecessary 
+trips or component replacements), operations can be optimised 
+for energy use, and the lifespan of assets can be extended by 
+carefully monitoring and mitigating deterioration. For instance, 
+if a twin shows that reducing a remote diesel generator's load at 
+certain times will extend its life by a year, operators can adjust 
+accordingly and avoid having to fly in a replacement so soon, 
+saving cost and reducing carbon footprint [63–65 ].
+It is worth noting that while the technology is promising, imple -
+menting digital twins in these environments requires overcoming 
+challenges such as sparse connectivity (e.g., Antarctic stations 
+have limited bandwidth to send data to their twins in real‐time), 
+sensor reliability in harsh conditions and cybersecurity (remote 
+control via a twin must be secure against hacking). Nonetheless, 
+successful case studies are accumulating, as we will highlight in 
+the next section.Beyond the specific contexts of Arctic, subsea, desert, and 
+disaster zones, digital twins also offer transformative benefits for 
+other remote terrestrial infrastructure systems facing opera -
+tional and environmental challenges. For example, digital twins 
+are increasingly used in urban critical infrastructure networks, 
+such as water distribution systems, power grids, and trans -
+portation networks, to improve resilience and continuity under 
+climate‐induced risks. Urban Digital Twin (UDT) systems 
+integrate real‐time sensor data, predictive analytics, and simu -
+lation models to support decision‐making under uncertainty, 
+optimise resource allocation, and enhance service delivery 
+across extended networks vulnerable to floods, heat waves, or 
+supply disruptions [66]. Studies show that digital twins can 
+significantly improve resilience and sustainability in critical 
+infrastructure such as utility networks by enabling real‐time 
+anomaly detection and scenario planning, which reduces 
+downtime and service interruptions [36]. Moreover, infrastruc -
+ture digital twins in smart cities are being used to forecast social 
+and environmental stresses (e.g., anticipating load peaks or 
+infrastructure failures), demonstrating that remote terrestrial 
+use cases are not limited to isolated sites but extend to net-
+worked urban‐regional systems that are complex, geographi -
+cally dispersed, and subject to systemic risks [67].
+4|Global Case Studies
+To illustrate how digital twin technology is being applied in 
+both space and remote terrestrial construction, we present a 
+range of case studies from around the world involving govern -
+ment agencies, space organisations, and industry. These exam -
+ples demonstrate the real‐world impact and lessons learnt from 
+deploying digital twins in extreme environment projects:
+4.1|NASA—Artemis Programme and Lunar 
+Infrastructure
+NASA has integrated digital twin concepts throughout the 
+Artemis lunar exploration programme. Case in point: Artemis 
+Lunar Base Planning, NASA's analogue studies for a lunar base 
+(such as NASA Langley's habitat testbeds) rely on digital twins 
+to iterate designs. They created high‐fidelity digital models of 
+habitats and rovers, incorporating lunar environmental data, to 
+decide optimal layouts for Artemis Base Camp. Additionally, 
+NASA's Lunar VIPER rover (set to prospect lunar ice) has a full 
+digital twin for mission simulation; engineers at Ames Research 
+Center use it to simulate driving routes and drilling operations 
+in lunar soil before the rover goes to the Moon, reducing risk. 
+Strategically, NASA sees digital twins as crucial for sustaining 
+long‐term lunar operations where Earth contact is limited. 
+Policy‐wise, NASA's leadership has been evangelising digital 
+twins; for example, in 2021, NASA released a comprehensive 
+plan (NASA Technical Memo 20220018538) outlining how 
+digital twins, combined with AI and IoT, will enable ‘faster, 
+more agile processes’ and safer missions [68].
+An illustrative deep‐dive into NASA's use of digital twins is 
+found in its critical infrastructure and aerospace operations. In 
+the context of space missions and critical infrastructure, digital 
+10 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 11 =====\n\ntwins have been shown to significantly advance real‐time deci-
+sion support and predictive resilience. Ref. [36] describe how 
+integrated digital twin frameworks improve uptime, security, 
+and efficiency across power, transportation, and critical utilities 
+by bridging physical systems with virtual analytics. NASA's 
+Artemis programme extends this principle to space habitats and 
+vehicles: digital twins are constructed to ingest sensor data, 
+simulate environmental stresses, and forecast system degrada -
+tion before failures occur, enabling mission planners to priori -
+tise maintenance and risk mitigation under significant 
+communication delays. This is directly analogous to critical 
+infrastructure twins on Earth that integrate IoT streams and 
+predictive models to optimise maintenance cycles and reduce 
+unscheduled outages. Studies also point to the broader appli -
+cability of such frameworks in urban and smart infrastructure 
+resilience, highlighting that the design, testing, and validation 
+processes pioneered by NASA influence network‐scale twin 
+ecosystems used for complex terrestrial infrastructure.
+4.2|European Space Agency (ESA)—Analogue 
+Testing and ‘Digital Twin Earth’
+ESA's contributions span both space construction and Earth 
+system twins. On the space side, ESA has run analogue field 
+trials (e.g., Pangaea and Luna simulations) where astronauts 
+and robots perform mock lunar construction tasks; these trials 
+use digital twins of equipment and sites to evaluate operations. 
+On Earth, ESA is spearheading the ‘Digital Twin Earth’ project 
+under the EU's Destination Earth initiative. Although not about 
+construction, Digital Twin Earth is a platform simulating 
+Earth's climate and natural systems at high fidelity to inform 
+climate resilience strategies, a concept directly relevant to 
+designing resilient infrastructure. Insights from Digital Twin 
+Earth (e.g., predicting sea‐level rise or extreme weather pat-
+terns) feed into how we should build future coastal or Arctic 
+infrastructure. This demonstrates cross‐pollination: space 
+agencies are applying their digital twin expertise gained from 
+spacecraft to broader planetary management and infrastructure 
+policy, effectively treating Earth itself as a ‘remote environment’ 
+that needs a twin for better stewardship [69].
+4.3|Japan (JAXA) and Komatsu—Autonomous 
+Lunar Construction Project
+As mentioned earlier, Japan's Ministry of Land, Infrastructure, 
+Transport, and Tourism (MLIT) initiated a multi‐company 
+project for Autonomous Construction in Space (the ‘Stardust 
+Programme’). Komatsu, a leading construction machinery 
+manufacturer, was selected for its proposal to use digital twins 
+on the Moon. In practice, Komatsu is developing a suite of 
+construction equipment (bulldozers, excavators) that can oper -
+ate on the lunar surface. The digital twin component involves 
+creating a virtual lunar worksite with realistic physics. Komatsu 
+has been testing controlling earth‐moving robots in a simulated 
+lunar terrain (including latency to mimic the Moon‐Earth delay) 
+via their digital twins, and initial results showed operators could 
+grade soil remotely with only virtual feedback. This case study is 
+significant because it is a public‐private partnership: JAXA (Japan's space agency) provides lunar data and requirements, 
+MLIT provides funding and integration to national space strat -
+egy, and Komatsu provides technology and machinery know‐ 
+how. It shows how policy and industry can align; MLIT sees 
+value not just for space but also in how the tech can rebound to 
+benefit remote construction in Japan (e.g., operating construc -
+tion machines in disaster zones or hazardous areas via twins). 
+This programme thus has dual‐use: advancing lunar base ca-
+pabilities and modernising domestic construction automation 
+[42, 43].
+4.4|SpaceX—Starship Development and Mars 
+Mission Simulation
+SpaceX, a private company, has aggressively used digital simu -
+lations which effectively function as digital twins. The Starship 
+vehicle (intended for Moon and Mars missions) is so large and 
+novel that SpaceX cannot test everything physically. Instead, per 
+reports, SpaceX created a digital twin of Starship to simulate its 
+entire flight envelope and even a hypothetical Mars mission. A 
+2024 scientific paper noted that SpaceX's team runs simulations 
+‘based on publicly released data’ to validate Starship's design for 
+a human Mars mission, including interplanetary trajectory and 
+entry, descent, and landing sequences. In one instance, SpaceX's 
+twin revealed structural issues in ground tests, prompting 
+design tweaks before the next prototype was built, saving time 
+and money (this is partially evidenced by the relatively quick 
+iterations of Starship prototypes). Another facet: SpaceX's 
+launch facilities at Boca Chica, Texas, are heavily instrumented 
+and modelled; after the first Starship orbital launch attempt 
+caused pad damage, SpaceX used a digital twin of the pad and 
+rocket plume to redesign a new water‐cooled flame diverter for 
+the launch mount. By simulating the next launch with this twin, 
+they improved the pad's resilience. SpaceX's case underlines the 
+private sector's willingness to rely on digital twins for rapid 
+innovation. It also hints at how a Mars base by SpaceX might be 
+managed. Elon Musk has mentioned having ‘ops centres on 
+Earth controlling things on Mars’, which implies extensive 
+digital twin infrastructure to supervise those distant opera -
+tions [70].
+4.5|ispace and Other NewSpace Companies
+ispace, a Japanese startup, attempted a lunar landing in 2023 
+(Mission 1). Although not much is publicly disclosed about their 
+use of digital twins, it is known that they ran extensive simu -
+lations of the lander's descent and had a mission control that 
+visualised the lander's state in real‐time. We can infer that a 
+digital twin of the lander (with its dynamics) was used to 
+practice the landing sequence and adjust parameters. Although 
+the lander ultimately crashed, the company stated they would 
+analyse the data via their simulation models to pinpoint what 
+went wrong, essentially using the twin for post‐incident forensic 
+analysis, similar to how Apollo 13's twin was used. This pattern 
+is common: when new space companies (such as ispace, 
+Astrobotic, etc.) operate at lower budgets, digital twins offer a 
+cost‐effective means to test and troubleshoot without needing 
+multiple expensive physical prototypes [71].
+Digital Twins and Applications, 2026 11 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 12 =====\n\n4.6|United Kingdom—National Digital Twin 
+Programme
+The UK has been a thought leader in applying digital twins for 
+national infrastructure. Through the Centre for Digital Built 
+Britain (CDBB) and initiatives such as the Gemini Principles, 
+the UK government is pushing for ‘an ecosystem of connected 
+digital twins’ to improve infrastructure resilience and services. 
+Although this is more policy and strategy than a single project, it 
+has led to several pilot case studies: one involves a digital twin of 
+London's water supply network to predict leaks and optimise 
+water pressure (led by utility companies), another is a digital 
+twin of an offshore wind farm to maximise energy output and 
+schedule maintenance during favourable weather windows. For 
+remote construction relevance, the UK's effort demonstrates 
+how multiple twins can link. For example, a twin of an energy 
+grid can connect with a twin of a remote wind farm and a twin 
+of weather systems to form a holistic view. Policy‐wise, the UK's 
+approach addresses data sharing and interoperability, which is 
+crucial if, say, a space habitat twin should interface with Earth‐ 
+based systems or if a country wants to combine climate twins 
+with infrastructure twins to plan protective construction [72].
+An illustrative case in remote and connected infrastructure is the 
+development of Urban Digital Twins (UDTs) for resilient utility 
+systems. Ref. [66] shows that UDTs integrate real‐time sensor 
+feeds, advanced simulations, and predictive analytics to support 
+decision‐making across water, energy, and transportation net-
+works under climate stress. For example, digital twins of urban 
+water distribution networks facilitate instant monitoring of hy-
+draulic behaviour and enable intelligent response strategies to 
+pipe failures or demand surges before service disruption occurs, 
+enhancing reliability in the face of extreme events. Similarly, 
+digital twin frameworks for smart grids allow utilities to simulate 
+fault propagation and optimise load balancing under variable 
+environmental conditions, which is critical for networks covering 
+remote and high‐latitude regions [67]. These detailed cases 
+demonstrate that digital twin implementations can transition 
+from asset‐centric systems to network‐wide resilience platforms, 
+offering continuous adaptive capacity for distributed critical 
+infrastructure essential to communities under stress.
+4.7|Canada—Mining and Northern 
+Infrastructure
+Canadian companies and researchers have deployed digital 
+twins in mining (similar to Australia) and are exploring twins 
+for northern roads. Case: Diavik Diamond Mine (Northwest 
+Territories): This Arctic mine uses a digital twin to integrate 
+real‐time data from its open‐pit and underground operations 
+with its ore processing plant. The twin helps coordinate 
+equipment and predict maintenance, which is vital as the mine 
+is accessible by an ice road only part of the year. By knowing 
+exactly which truck or drill needs servicing and when, Diavik 
+can ensure parts are brought in on the annual ice road or flights, 
+avoiding emergency fixes in winter. Another Canadian project is 
+the SMARTICE programme, which uses a digital twin of sea‐ice 
+conditions along Arctic community ice roads (these are seasonal 
+roads over frozen sea used to truck supplies). The twin assimi -
+lates satellite imagery and sensor measurements to map ice thickness and strength, predicting when and where the ice road 
+will become unsafe. This directly informs the construction of 
+alternate land routes or bridges to maintain supply lines as 
+climate warms, showcasing a fusion of indigenous knowledge, 
+IoT, and twin technology for resilience [73].
+4.8|Industry—Shell's Digital Twin for Offshore 
+Platforms
+Royal Dutch Shell developed a comprehensive digital twin of its 
+massive Prelude floating LNG platform (offshore Australia), the 
+largest floating structure ever built. This twin includes a 3D 
+model of the entire facility and real‐time data from tens of 
+thousands of sensors. During operations, Shell's engineers 
+(often onshore) navigate the twin in VR to inspect equipment 
+‘virtually’ instead of doing risky on‐platform inspections. In one 
+instance, when a compressor fault occurred, engineers used the 
+twin's historical data and simulation capability to identify the 
+cause and fix it with minimal downtime, saving millions in lost 
+production. Prelude's twin is an example of scale: it is similar to 
+a mini‐city twin on the ocean. Shell has reported that lessons 
+from Prelude's twin allow them to design future platforms with 
+better placement of sensors and design for maintainability [74].
+These case studies collectively underline several points. First, 
+digital twin adoption is inherently interdisciplinary and often 
+requires collaborations (space agencies with manufacturers, 
+governments with tech firms). Second, the value of digital twins 
+has been proven in both prevention and response, preventing 
+failures (JWST, pipelines, wind farms) and responding to anom -
+alies (Apollo 13, ispace crash analysis, oil rig faults) more effec -
+tively. Third, policy frameworks such as the UK's or Japan's 
+indicate that governments are recognising digital twins as stra-
+tegic infrastructure in their own right, deserving investment akin 
+to physical infrastructure because of the insights they provide.
+For policymakers, these examples provide evidence that sup-
+porting digital twin development (through funding, open data 
+policies, standard‐setting) can yield safer, more resilient, and 
+efficient outcomes in construction projects. For industry leaders, 
+the cases demonstrate competitive advantages, companies that 
+leverage twins (SpaceX, Rio Tinto, Shell) can move faster, safer, 
+and often cheaper by anticipating issues and optimising 
+operations.
+In extreme environment construction, where uncertainty is 
+high, these advantages become even more critical. A lunar base 
+or a polar railway cannot afford trial‐and‐error to the same 
+degree as a temperate project; having a digital twin acts as a 
+high‐tech insurance policy and guide. The next section will 
+build on this by discussing strategic and policy implications in a 
+broader sense, considering how to maximise the benefits 
+observed in these cases (Figure 5).
+5|Strategic and Policy Implications for Future 
+Infrastructure Resilience and Sustainability
+The rise of digital twins in construction for extreme environ -
+ments carries significant strategic and policy implications. As 
+12 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 13 =====\n\nthe case studies and applications have shown, digital twins can 
+greatly enhance the resilience of infrastructure and contribute 
+to sustainability, but realising these benefits at scale requires 
+forward‐thinking policies, standards, and investments. We 
+highlight key implications and recommendations (Figure 6):
+5.1|Infrastructure Resilience Through Proactive 
+Management
+One of the most powerful implications is the shift from reactive 
+to proactive infrastructure management. With digital twins, is-
+sues can be forecast and mitigated before they escalate, which is 
+a cornerstone of resilience. For policymakers, this means that encouraging the use of digital twins in public infrastructure 
+(bridges, levees, power grids) could reduce disaster impacts and 
+maintenance costs. For example, a government could mandate 
+that all new critical infrastructure in hazard‐prone areas (flood 
+zones, permafrost regions, seismic zones) include a digital twin 
+for continuous monitoring. Over time, this could be written into 
+building codes or concession agreements for large projects. The 
+payoff is huge: less infrastructure failure means fewer emer -
+gency repairs and less risk to communities. A twin can simulate 
+disasters (similar to an earthquake's effect on a remote dam) and 
+identify vulnerabilities, guiding where to reinforce ahead of 
+time. In essence, digital twins make infrastructure adaptive, 
+they can feed early warning systems and support real‐time 
+emergency decision‐making (similar to how NASA's twins 
+FIGURE 5|Global initiatives leveraging digital twin technologies for infrastructure, construction, and mission resilience in space and extreme 
+environments. (Developed by the author for this paper).
+FIGURE 6|Key enablers and considerations for implementing digital twins in construction, including governance, ethics, resilience, and 
+sustainability. (Developed by the author for this paper).
+Digital Twins and Applications, 2026 13 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 14 =====\n\nhelp in mission anomalies). Governments should consider dig-
+ital twin data as part of national resilience planning, perhaps 
+integrating these into monitoring centres for natural disasters 
+[75, 76].
+5.2|Sustainability and Efficient Resource 
+Utilisation
+By optimising operations and maintenance, digital twins 
+contribute to sustainability goals. They help extend the lifespan of 
+assets (through timely maintenance and avoiding catastrophic 
+failures that lead to rebuilds) and reduce resource waste. For 
+instance, twins can optimise energy usage in remote facilities 
+(ensuring generators run at optimal load and coordinating 
+renewable energy sources with demand). They can also minimise 
+unnecessary travel, if you can inspect virtually, you avoid flying a 
+helicopter to an oil rig or driving to a pipeline pump station, 
+cutting carbon emissions. At scale, this means a smaller envi -
+ronmental footprint for maintaining infrastructure. Policymakers 
+focused on decarbonisation can leverage this: they could provide 
+incentives (such as tax breaks or innovation grants) to infra -
+structure operators who implement digital twins proven to save 
+energy or reduce emissions. Additionally, digital twins can help 
+with circular economy principles. By tracking the condition of 
+materials and components, they facilitate refurbishing or recy -
+cling infrastructure parts at end‐of‐life rather than scrapping 
+them blindly. For example, a twin might reveal that certain 
+modules of a Mars habitat can be safely reused for another 
+mission, informing sustainable mission design [77, 78].
+5.3|Data Governance, Standards, and 
+Interoperability
+Effective digital twin ecosystems require robust data gover -
+nance. Twins integrate data across sectors. Consider a remote 
+mining twin that might benefit from satellite weather data or a 
+space habitat twin that might need inputs from an Earth‐based 
+medical database for astronaut health. Sharing such data raises 
+issues of privacy, security, and interoperability. Strategically, 
+there is a need for standards to allow different digital twins 
+(maybe owned by various entities) to connect. The UK's Infor -
+mation Management Framework (IMF) for connected digital 
+twins is a leading example, setting out semantic standards and 
+protocols for data exchange. Internationally, organisations such 
+as ISO and IEEE are working on digital twin standards (e.g., ISO 
+23247 [79] for digital twin in manufacturing). Governments can 
+accelerate this by adopting open standards in their projects and 
+requiring vendors to comply, thus avoiding vendor lock‐in and 
+siloed systems. Interoperability is especially crucial in remote 
+scenarios involving multiple stakeholders: for instance, a polar 
+observatory's twin might need to interface with a national 
+climate twin, or a lunar base twin might integrate data from 
+modules built by different countries. A common framework 
+(akin to the internet protocols for data) ensures all these twins 
+can ‘talk’ to each other in a secure, meaningful way. Trust 
+frameworks (such as the Gemini Principles emphasising trust, 
+security, and public benefit) are also needed so that organisa -
+tions are willing to share data from their twins when it serves a 
+greater resilience goal [80, 81].5.4|Investment in Digital Infrastructure
+Viewing digital twins as part of infrastructure implies that na-
+tions should invest in them similarly to physical infrastructure. 
+This includes funding for high‐performance computing, 
+communication networks, and sensor deployments that make 
+twins possible. For example, to have a digital twin of the entire 
+national grid, a country may need to install thousands of extra 
+sensors and a robust fibre‐optic network to carry the data. These 
+have costs that can be justified by the benefits of preventing 
+blackouts or enabling more renewable integration via the twin's 
+insights. In remote construction, an investment might be 
+needed for satellite or 5G communications to ensure the twin of, 
+say, a remote dam can update in real‐time despite its location. 
+There is also a human capital investment: training engineers 
+and operators to work with digital twins (data analytics skills, 
+familiarity with simulation tools). Policymakers could 
+encourage curricula that blend civil engineering with data sci-
+ence and perhaps create exchange programs between aerospace 
+experts and civil infrastructure experts to cross‐pollinate 
+knowledge on twins [75, 82].
+5.5|Public‐Private Collaboration and Knowledge 
+Sharing
+Many digital twin successes have come from one‐off projects 
+(e.g., JWST, Rio Tinto's mine), and often that knowledge is not 
+widely disseminated. To avoid reinventing the wheel, there is a 
+need for better knowledge sharing. Governments and industry 
+bodies can organise forums or working groups specifically on 
+digital twins for extreme environments, where lessons learnt 
+can be discussed. NASA, for instance, might share methodolo -
+gies with mining companies on how they validate twin accu -
+racy, or vice versa (mining might share how they manage twin 
+operations with intermittent comms, which could help space 
+missions). Public‐private partnerships can also de‐risk the initial 
+development of digital twins for new domains, as Japan did with 
+Komatsu, and as the EU does via Horizon Europe funding for 
+digital twin pilots. By co‐funding these initiatives, the public 
+sector ensures the results are openly available to benefit all 
+(e.g., requiring open results or software tools from the projects). 
+One strategic recommendation is establishing a ‘Digital Twin 
+Extreme Environments Consortium’ globally, involving space 
+agencies, military engineers (who build in extreme places such 
+as Afghanistan mountains or ocean floors), civil engineers, and 
+tech companies, to develop best practices and perhaps open‐ 
+source toolkits for twins [83, 84].
+5.6|Regulatory and Legal Considerations
+As digital twins begin to inform and even automate decisions on 
+physical systems, questions arise about liability and regulation. 
+If a digital twin recommends a certain action (e.g., an AI in the 
+twin shuts down a pipeline to prevent damage) and that action 
+causes financial loss or fails to prevent an accident, who is 
+responsible, the operator or the software developer? Regulatory 
+frameworks will need updating to account for AI‐driven and 
+digital twin‐driven operations. Verification and validation of 
+14 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 15 =====\n\ntwins (especially those used for safety‐critical decisions) might 
+need regulatory oversight, similar to how aircraft simulators are 
+certified. We might see requirements for independent audits of 
+important digital twins (for instance, a twin that manages a 
+nuclear power plant or a large dam) to ensure their models are 
+accurate and secure from cyber threats. Policymakers should 
+start to address these issues proactively, possibly by updating 
+infrastructure regulations to mention digital operational sys-
+tems, and ensuring any automation from twins remains ‘human 
+in the loop’ until clear guidelines are established [85, 86].
+5.7|Ethical and Social Implications
+With increased monitoring (such as sensors everywhere feeding 
+twins), there could be privacy issues, especially if the infra -
+structure involves communities (smart city twins, etc.). Even in 
+remote construction, consider that a twin might monitor 
+workers via wearables for safety (common in modern con-
+struction). Policies must ensure that the data collected is used 
+ethically and with consent. Additionally, workforce implica -
+tions: some fear that heavy automation via digital twins could 
+reduce certain jobs (such as on‐site inspectors or equipment 
+operators). Policymakers should accompany twin rollouts with 
+retraining programs so that those workers can transition to new 
+roles such as twin supervisors, analysts, or robot operators. 
+These roles are often safer and higher‐skilled. The narrative 
+should be straightforward that digital twins augment human 
+decision‐making rather than replace it; this framing can help 
+with public acceptance, particularly in government projects 
+[87, 88].
+In conclusion, on policy, embracing digital twin technology for 
+space and remote construction aligns with broader objectives of 
+building resilient, sustainable, and smart infrastructure. Countries that move early to integrate twins into their infra -
+structure strategy may gain a significant advantage in managing 
+the impacts of climate change and in carrying out ambitious 
+projects (such as space exploration or Arctic development) 
+safely. The transformative potential of twins justifies treating 
+data and simulations as critical infrastructure themselves. As 
+one report succinctly put it, connected digital twins are tools to 
+understand the complexities of interconnected systems and pro-
+vide better insights for decisions . In our context, those inter -
+connected systems span Earth and space. By making digital 
+twins a strategic priority, policymakers ensure that as we push 
+the frontiers, building cities on the Moon or wind farms at the 
+poles, we do so with eyes wide open, informed by the best vir-
+tual foresight technology can offer.
+6|Future Trends and Emerging Technologies
+Looking ahead, the landscape of digital twins for construction in 
+extreme environments is set to evolve rapidly, propelled by 
+advances in related technologies. Several emerging trends are 
+likely to shape the next 5–10 years, making digital twins even 
+more powerful and indispensable (Figure 7):
+6.1|Artificial Intelligence (AI) and Machine 
+Learning Integration
+AI is poised to become the ‘brain’ of digital twin systems, 
+handling complex predictions and autonomous decision‐ 
+making. Currently, many twins use relatively deterministic 
+physics models and rule‐based thresholds for alerts. In the 
+future, machine learning algorithms (trained on the vast data 
+that twins accumulate) will identify patterns and optimise op-
+erations in ways humans might not notice. For example, an AI 
+FIGURE 7|Emerging technologies driving next‐generation digital twin capabilities in construction and infrastructure. (Developed by the author 
+for this paper).
+Digital Twins and Applications, 2026 15 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 16 =====\n\nmight analyse years of data from a Martian habitat twin and 
+discover subtle signs that precede an airlock failure, then pro-
+actively adjust maintenance schedules. AI‐driven twins could 
+also run countless simulation scenarios (Monte Carlo simula -
+tions) automatically and use reinforcement learning to improve 
+control strategies for robots or processes. NASA indicates that as 
+AI/ML mature and integrate, ‘the digital twin will play a more 
+central role in space missions, especially in remote operations and 
+complex system management’, essentially because AI can help 
+handle non‐deterministic, unexpected situations autonomously. 
+We can envision a Mars base twin that has an AI assistant 
+continuously optimising life support settings for efficiency and 
+longevity, or a pipeline twin that uses ML to accurately predict 
+corrosion growth under varying conditions far better than 
+manual models. However, with AI comes the need for trans -
+parency. An ongoing area of research will be explainable AI for 
+digital twins, ensuring that when an AI in the loop suggests a 
+critical action (such as ‘evacuate habitat Section 3’), it can 
+explain which sensor readings or model inferences led to that 
+suggestion [3, 89].
+6.2|Advanced Robotics and Swarm Automation
+The future of construction in extreme environments will likely 
+involve robotic teams rather than single machines. Swarm ro-
+botics, large numbers of smaller robots working collaboratively, 
+draw inspiration from social insects and promise redundancy 
+and efficiency. Digital twins will be crucial for coordinating and 
+monitoring swarms. Researchers are already exploring how 
+digital twin platforms can handle communication and task 
+allocation among robot swarms. A digital twin can act as the 
+central hive mind, aggregating data from all robots and then 
+sending back optimised instructions to each. For instance, in 
+building a lunar structure, a swarm of 50 small rovers could 
+continuously feed their position and status into the twin; the 
+twin runs an algorithm to decide which rover should dig where 
+or carry which block, and updates the plan in real‐time as 
+conditions change (such as one rover goes offline). This dy-
+namic reconfiguration through the twin increases resilience, 
+and even if several robots fail, the twin adapts the swarm's tasks 
+so that construction continues. We already see early imple -
+mentations: NASA has concepts for swarms assembling struc -
+tures in orbit (e.g., swarms of free‐flying bots building a large 
+antenna), and Europe has done lab tests with micro‐robots 
+assembling blocks, guided by a central computer vision system 
+(a form of twin). As swarm tech grows, standards might emerge 
+for ‘swarm‐twin interfaces’. Additionally, robotics advance -
+ments such as soft robots or shape‐shifting robots will provide 
+new data to twins (imagine a flexible robot whose shape can 
+change; its twin must incorporate a physics model for that 
+flexibility). The twin will thus evolve to handle more complex 
+robot kinematics and collaborative behaviours [47, 90].
+6.3|Extended Reality (XR) and Human‐Twin 
+Interaction
+The way humans interact with digital twins will become more 
+immersive and intuitive. We expect much greater use of Virtual Reality (VR), Augmented Reality (AR), and Mixed Reality to 
+visualise and control twins. In a VR environment, an engineer 
+could virtually ‘walk through’ a lunar habitat's twin, inspecting 
+systems as if present on the Moon. Already, companies such as 
+Unity and NVIDIA's Omniverse are developing 3D platforms for 
+digital twins that support VR viewing of factory twins or city 
+twins. In construction, this means project stakeholders (even 
+policymakers) could put on VR goggles and experience a remote 
+project's status via its twin, improving communication and 
+understanding. AR, on the other hand, will assist on‐site crews. 
+For example, a maintenance technician at a remote site could 
+wear AR glasses that overlay the digital twin's info onto what 
+they see, showing which buried cable segment exactly needs 
+repair or highlighting an anomaly in a structure that is invisible 
+to the naked eye but detected by the twin. In space, astronauts 
+might rely on AR fed by the twin to perform repairs (there is 
+talk of using Microsoft's HoloLens on the ISS for this type of 
+guidance). XR also opens up multi‐user collaboration in the 
+twin—teams across the globe can meet ‘inside’ the digital twin 
+model to discuss changes or issues, almost similar to a virtual 
+conference at the construction site. This will be incredibly 
+useful for international projects (e.g., a multinational Moon base 
+programme) to make collective decisions efficiently [92, 93].
+6.4|Smart Materials and IoT Sensor Proliferation
+The fidelity and utility of digital twins depend on data, which 
+relies on sensors. We anticipate both an increase in the quantity 
+of sensors (cheaper, smaller IoT devices scattered through 
+structures) and the quality of sensors (new types that can 
+measure things we could not before). Smart materials are ma-
+terials that have built‐in sensing or actuation. For example, 
+concrete can sense its own strain or ‘self‐heal’ cracks with 
+embedded microcapsules. When such materials are used, their 
+behaviour can be directly integrated into the twin. If a habitat is 
+built from smart composite panels that change colour under 
+stress (as a crude sensor), cameras can feed that info to the 
+twin's structural model to indicate stress distribution. More 
+advanced: self‐healing materials might tell the twin how much 
+of their healing capacity is left, so the twin knows when the 
+material might need external intervention. By incorporating 
+these, the twin becomes more accurate and can even simulate 
+the active response of materials. A digital twin with smart ma-
+terial feedback could potentially initiate repairs, for example, 
+send a current to a smart rebar grid to heat and heal cracks as 
+soon as the twin detects micro‐cracking. Thus, the line between 
+the twin and the physical asset blurs as materials become part of 
+the cyber‐physical loop.
+Furthermore, tiny energy‐harvesting sensors could be sprinkled 
+in places previously unmonitored (such as deep in a glacier 
+supporting a structure or throughout a spacecraft's skin). This 
+proliferation of IoT will feed the twin big data, which loops back 
+to the need for AI to make sense of it. An exciting development 
+is satellite IoT constellations, low earth orbit satellites that 
+collect data from remote IoT sensors anywhere on Earth. This 
+means even the most isolated construction site can pipe data to 
+its twin in the cloud in near real‐time without having to build 
+local comms infrastructure. It is a synergy of space tech aiding 
+terrestrial twins [65, 94].
+16 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 17 =====\n\n6.5|Federated and Scaled Digital Twin 
+Ecosystems
+We touched on connected twins, and the future likely holds not 
+just individual twins, but large ecosystems or federations of 
+twins. For example, a ‘Mars colony twin’ might consist of many 
+sub‐twins (life support, habitat structures, power grid, rover 
+fleet) that all interface. Managing such complexity will require 
+hierarchical or distributed twin architectures. Techniques such 
+as agent‐based modelling could allow each sub‐twin to be an 
+agent that communicates with others. The Gemini Principles in 
+the UK foresee an ‘ecosystem of connected digital twins’ where 
+data flows securely between domains. Imagine a scenario in 
+2040: multiple lunar bases by different countries exist; each has 
+its digital twin. For global safety, these twins might share certain 
+data (such as the location of all active rovers to avoid interfer -
+ence or environmental readings). Thus, an Internet of Digital 
+Twins might emerge, analogous to today's Internet of com -
+puters. Policies and technology will need to allow selective, on‐ 
+demand connectivity. For example, a twin can request info from 
+another twin about a shared resource (such as water usage in a 
+shared crater). Cloud platforms are already gearing up for this 
+kind of thing, for example, Microsoft Azure and AWS have 
+‘digital twin’ services aiming to host multiple twin instances 
+that can connect via APIs. On Earth, smart cities might link 
+their twins for mutual benefit (a twin of a power plant linking 
+with the city twin to manage distribution, etc.). All of this points 
+to scale: from single assets to system‐of‐systems twins, covering 
+entire operations or even regions [72, 96].
+6.6|Increased Autonomy and Closed‐Loop 
+Construction
+Ultimately, the goal in very remote or dangerous environments is 
+fully autonomous construction, machines building with minimal 
+human intervention. Digital twins will serve as the central control 
+system for such autonomy. A futuristic example: a crewless 
+mission lands on Mars with robotic builders and supplies. A 
+digital twin of the entire mission (hosted maybe on an orbiting 
+satellite for computational power) orchestrates the construction 
+of a habitat before humans arrive. It processes data, commands 
+robots, and deals with surprises (similar to a dust storm) by re‐ 
+planning, essentially acting as an AI site foreman. Although 
+this level of autonomy might be a couple of decades out, the 
+components are being put in place: AI planning, robust hardware, 
+and high‐fidelity simulations to validate actions. The twins would 
+constantly simulate and verify the robots' work as they pro-
+gressed, making corrections on the fly. Success in such an 
+endeavour would rewrite construction manuals and would likely 
+trickle back to Earth for automated construction in hazardous 
+sites (imagine the cleanup of a radioactive site entirely by 
+autonomous robots guided by a twin) [15, 97].
+6.7|Quantum Computing and High‐Fidelity 
+Physics
+Looking even further, as quantum computing matures, it could 
+vastly improve the simulation aspect of digital twins. Complex physics (fluid dynamics, material quantum effects, etc.) that are 
+too slow to simulate in real‐time today might become tractable. 
+This means twins could incorporate much more detailed phys -
+ics, for example, precisely simulating how lunar dust will levi-
+tate and coat surfaces during rocket landings (a very complex 
+plasma physics problem) to design better dust mitigation mea -
+sures for habitats. High‐fidelity twins may also allow real‐time 
+optimisation (such as shape changes to structures in response 
+to loads). If smart materials allow structures to adapt, a 
+quantum‐enhanced twin could compute the optimal structural 
+reconfiguration in real‐time during, say, an earthquake, and 
+instruct the structure to adjust accordingly. Although specula -
+tive, this hints at a future where the line between simulation 
+and reality is extremely thin. The twin is so accurate and so 
+tightly coupled that it essentially becomes the control system for 
+the structure continuously [98, 99].
+In summary, the future of digital twins in space and remote 
+construction is deeply intertwined with other cutting‐edge tech. 
+AI will make twins smarter; robotics will make them more ac-
+tion‐oriented; XR will make them more user‐friendly; smart 
+materials and IoT will make them richer in data; and connec -
+tivity will make them more collaborative. All these trends 
+reinforce each other. Importantly, this future is not just about 
+technology for its own sake. It serves a vision of creating 
+infrastructure that is self‐aware, self‐optimising, and self‐ 
+healing to the greatest extent possible. That vision is particu -
+larly pertinent in environments where human intervention is 
+costly or impossible.
+7|Conclusion
+Digital twin technology is transitioning from a novel concept to 
+a practical necessity for tackling some of the most challenging 
+construction and infrastructure projects faced by humanity. In 
+extreme environments, whether the airless plains of the Moon, 
+the dusty Martian horizon, the crushing depths of the ocean, or 
+the frigid expanse of polar tundra, digital twins provide a critical 
+bridge between the physical and the digital, between presence 
+and remoteness, between the known and the unknown. This 
+article has examined how digital twins function as high‐fidelity 
+virtual counterparts to physical systems, and how they are being 
+applied to re‐imagine construction and maintenance in envi -
+ronments where traditional approaches fall short. By enabling 
+continuous monitoring, simulation‐driven planning, and even 
+remote control of assets, digital twins amplify our ability to 
+build and sustain resilient infrastructure in places we cannot 
+always be.
+For multidisciplinary engineers and policymakers alike, the 
+message is clear: embracing digital twins is a strategic move 
+towards smarter, safer, and more sustainable infrastructure. The 
+case studies from NASA, ESA, JAXA, SpaceX, and global in-
+dustry leaders demonstrate that digital twins are already pre-
+venting failures, improving efficiencies, and saving costs in pilot 
+projects around the world. The next step is scaling these suc-
+cesses through supportive policies, standardisation of best 
+practices, and continued research and development. Policy -
+makers have a role in incentivising the integration of digital 
+twins into critical infrastructure and ensuring the frameworks 
+Digital Twins and Applications, 2026 17 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 18 =====\n\n(legal, educational, technical) are in place to support them. 
+When planning a lunar base or a new Arctic highway today, 
+considering the digital twin is as important as considering the 
+physical design; it should be baked into the project from 
+inception as an essential component, not an afterthought.
+Looking forward, as technology continues to advance, the syn-
+ergy of digital twins with AI, robotics, XR, and novel materials 
+will unlock capabilities that today might seem similar to science 
+fiction, fully autonomous construction sites, ecosystems of 
+interconnected twins optimising entire cities or planets, and 
+perhaps even digital twins of humans (astronaut avatars) 
+working side by side with physical robots. Each of these de-
+velopments will further reduce the gap between what is imag -
+inable and what is achievable in extreme environment 
+construction. The transformative potential is immense: we will 
+be able to ‘live’ in these distant or inhospitable environments 
+virtually, solving problems and refining designs in real‐time, 
+and then confidently execute those solutions in the physical 
+world.
+In conclusion, digital twins are not just a tool but a paradigm 
+shift in engineering and infrastructure management. They 
+embody the convergence of the digital revolution with the age‐ 
+old practice of building in the physical world. For extreme 
+environment construction, this convergence offers a lifeline, a 
+way to proceed with ambition but also with caution, informed 
+by data and foresight. As we embark on building out the final 
+frontier of space and securing the most remote corners of Earth, 
+digital twins will be our reliable partners, illuminating the path, 
+predicting the pitfalls, and helping us create structures that 
+stand the test of time and nature. The journey is just beginning, 
+but the trajectory is set: the future of construction, especially 
+where it is hardest, will be co‐created by engineers and their 
+digital twins. By harnessing this technology wisely, we can turn 
+bold visions, lunar habitats, underwater colonies, and resilient 
+polar networks into reality, sustainably, and resiliently, for the 
+benefit of all.
+Author Contributions
+Ehsan Noroozinejad Farsangi: conceptualization, investigation, 
+writing – original draft, methodology, visualization, writing – review 
+and editing, formal analysis, project administration, data curation, su-
+pervision, resources.
+Acknowledgements
+During the preparation of this manuscript, the author employed the 
+Gen‐AI large‐language‐model system solely for grammar, wording, and 
+readability improvements. The tool was not used to generate ideas, 
+concepts, methodological frameworks, data analyses, or substantive 
+content. All intellectual contributions, including the study design, 
+theoretical development, analyses, and conclusions, originated entirely 
+from the author. Following AI‐assisted language refinement, the author 
+thoroughly reviewed and edited the text and accepts full responsibility 
+for the accuracy, integrity, and originality of the final manuscript in 
+accordance with the publisher's generative AI guidelines.
+Funding
+The author has nothing to report.Conflicts of Interest
+The author declares no conflicts of interest.
+Data Availability Statement
+The data that support the findings of this study are available from the 
+corresponding author upon reasonable request.
+References
+1.V. V. Tuhaise, J. H. M. Tah, and F. H. Abanda, “Technologies for 
+Digital Twin Applications in Construction,” Automation in Construction 
+152 (2023): 104931, https://doi.org/10.1016/j.autcon.2023.104931 .
+2.N. Gratius, Z. Wang, M. Y. Hwang, et al., “Digital Twin Technologies 
+for Autonomous Environmental Control and Life Support Systems,” 
+Journal of Aerospace Information Systems 21, no. 4 (2024): 332–347, 
+https://doi.org/10.2514/1.I011320 .
+3.W. Liu, M. Wu, G. Wan, and M. Xu, “Digital Twin of Space Environ -
+ment: Development, Challenges, Applications, and Future Outlook,” 
+Remote Sensing 16, no. 16 (2024): 3023, https://doi.org/10.3390/rs1616 
+3023 .
+4.L. Pinello, L. Brancato, M. Giglio, F. Cadini, and G. F. De Luca, 
+“Enhancing Planetary Exploration Through Digital Twins: A Tool for 
+Virtual Prototyping and HUMS Design,” Aerospace 11, no. 1 (2024): 73, 
+https://doi.org/10.3390/aerospace11010073 .
+5.J. Walther, R. L. Johns, H. Kolvenbach, V. T. Bickel, and M. Hutter, 
+“Autonomous Construction of Lunar Infrastructure With In‐Situ Boul -
+ders,” Frontiers in Space Technologies 5 (2024): 1345337, https://doi.org/ 
+10.3389/frspt.2024.1345337 .
+6.M. Nasim, A. Rajabifard, Y. Chen, and B. Samali, “A Demonstration 
+of a Digital Twin Framework for Structural Health Monitoring: Appli -
+cation to Bridge Infrastructures,” Journal of Infrastructure Intelligence 
+and Resilience 5, no. 1 (2025): 100184, https://doi.org/10.1016/j.iintel. 
+2025.100184 .
+7.F. Chen, H. Wei, J. Tang, et al., “Digital Twin Based Predictive 
+Diagnosis Approach for Submarine Suspended Pipelines,” International 
+Journal of Pressure Vessels and Piping 214 (2025): 105451, https://doi. 
+org/10.1016/j.ijpvp.2025.105451 .
+8.J. Sha, J. Leng, H. Mao, J. Pei, and K. Diao, “Research Progress in 
+Predictive Maintenance of Offshore Platform Structures Based on Dig-
+ital Twin Technology,” Journal of Marine Science and Application 24, no. 
+5 (2025): 1–23, https://doi.org/10.1007/s11804‐025‐00649‐w .
+9.A. Colagrossi, S. Silvestrini, A. Brandonisio, and M. Lavagna, “A 
+Digital Twin Approach for Spacecraft On‐Board Software Development 
+and Testing,” Aerospace 13, no. 1 (2026): 55, https://doi.org/10.3390/ae 
+rospace13010055 .
+10.S. Henao‐Garcia, M. Kapteyn, and K. E. Willcox, “Federated Digital 
+Twins for Space Systems,” in AIAA SCITECH 2026 Forum (American 
+Institute of Aeronautics and Astronautics, 2026), 1420.
+11.M. Grieves and J. Vickers, “Digital Twin: Mitigating Unpredictable, 
+Undesirable Emergent Behavior in Complex Systems,” in Trans -
+disciplinary Perspectives on Complex Systems (Springer, 2017), 85–113, 
+https://doi.org/10.1007/978‐3‐319‐38756‐7_4 .
+12.Siemens Digital Industries Software, “Apollo 13: The First Digital 
+Twin,” Simcenter Blog (2019), https://blogs.sw.siemens.com/simcente 
+r/apollo‐13‐the‐first‐digital‐twin/ .
+13.M. Liu, S. Fang, H. Dong, and C. Xu, “Review of Digital Twin About 
+Concepts, Technologies, and Industrial Applications,” Journal of 
+Manufacturing Systems 58 (2021): 346–361, https://doi.org/10.1016/j. 
+jmsy.2020.06.017 .
+14.NASA, “Digital Twins and Living Models at NASA,” NASA Tech -
+nical Reports Server (2021), https://ntrs.nasa.gov/citations/20210023699 .
+18 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 19 =====\n\n15.NASA, “Construction Technology for Moon and Mars Exploration,” 
+(2025), https://www.nasa.gov/directorates/stmd/nasa‐enables‐constru 
+ction‐technology‐for‐moon‐and‐mars‐exploration/ .
+16.C. Boje, A. Guerriero, S. Kubicki, and Y. Rezgui, “Towards a Se-
+mantic Construction Digital Twin: Directions for Future Research,” 
+Automation in Construction 114 (2020): 103179, https://doi.org/10.1016/ 
+j.autcon.2020.103179 .
+17.Z. Yang, C. Tang, T. Zhang, Z. Zhang, and D. T. Doan, “Digital 
+Twins in Construction: Architecture, Applications, Trends and Chal -
+lenges,” Buildings 14, no. 9 (2024): 2616, https://doi.org/10.3390/buildi 
+ngs14092616 .
+18.E. Noroozinejad Farsangi, A. O. Shehata, M. Rashidi, N. Ghas -
+sempour, and S. Mirjalili, “Transitioning From BIM to Digital Twin to 
+Metaverse,” Frontiers in Built Environment 10 (2024): 1486423, https:// 
+doi.org/10.3389/fbuil.2024.1486423 .
+19.P. Sun and X. Liu, “Research on Remote Operation and Mainte -
+nance Based on Digital Twin Technology,” Machines 13, no. 2 (2025): 
+151, https://doi.org/10.3390/machines13020151 .
+20.A. Fuller, Z. Fan, C. Day, and C. Barlow, “Digital Twin: Enabling 
+Technologies, Challenges and Open Research,” IEEE Access 8 (2020): 
+108952–108971, https://doi.org/10.1109/ACCESS.2020.2998358 .
+21.Q. Qi, F. Tao, T. Hu, et al., “Enabling Technologies and Tools for 
+Digital Twin,” Journal of Manufacturing Systems 58 (2021): 3–21, 
+https://doi.org/10.1016/j.jmsy.2019.10.001 .
+22.M.‐E. Iliuță, M.‐A. Moisescu, E. Pop, A.‐D. Ionita, S.‐I. Caramihai, 
+and T.‐C. Mitulescu, “Digital Twin—A Review of the Evolution From 
+Concept to Technology and Its Analytical Perspectives on Applications 
+in Various Fields,” Applied Sciences 14, no. 13 (2024): 5454, https://doi. 
+org/10.3390/app14135454 .
+23.G. Khalaf, M. Itani, and S. Sharafeddine, “A UAV‐Aided Digital 
+Twin Framework for IoT Networks With High Accuracy and Synchro -
+nization,” arXiv preprint (2025), https://doi.org/10.48550/arXiv.2504. 
+15967 .
+24.C. J. Kim, J. Jo, M. Y. Yang, and H. S. Shin, “Architecture Devel -
+opment of Digital Twin‐Based Wire Arc Directed Energy Deposition,” 
+International Journal of Precision Engineering and Manufacturing 
+(2025), https://doi.org/10.1007/s40684‐025‐00747‐8 .
+25.A. Mohammadkhorasani, H. Mashayekhi, J. Dutta, and L. M. Khoa, 
+“Enhancing Digital Twin's Accuracy Through Bidirectional Communi -
+cation and Human‐in‐the‐Loop Interaction,” SSRN Electronic Journal 
+(2025), https://doi.org/10.2139/ssrn.5099627 .
+26.M. G. Kapteyn and K. E. Willcox, “From Physics‐Based Models to 
+Predictive Digital Twins via Interpretable Machine Learning,” arXiv 
+preprint (2020), https://doi.org/10.48550/arXiv.2004.11356 .
+27.M. G. Kapteyn and K. E. Willcox, “Predictive Digital Twins: Where 
+Dynamic Data‐Driven Learning Meets Physics‐Based Modeling,” in 
+Data‐Driven Modeling for Additive Manufacturing of Metals, eds. M. 
+Sanayei, I. F. C. Smith, and M. Feng (Springer, 2020), 1–9, https://doi. 
+org/10.1007/978‐3‐030‐61725‐7_1 .
+28.C. Sun and V. G. Shi, “PhysiNet: A Combination of Physics‐Based 
+Model and Neural Network Model for Digital Twins,” arXiv preprint 
+(2021), https://doi.org/10.48550/arXiv.2106.14790 .
+29.National Institute of Standards and Technology, “Enhancing Digital 
+Twins With Advances in Simulation and Artificial Intelligence,” NIST 
+(2023), https://www.nist.gov/publications/enhancing‐digital‐twins‐adva 
+nces‐simulation‐and‐artificial‐intelligence‐opportunities .
+30.S. M. M. Sajadieh and S. D. Noh, “From Simulation to Autonomy: 
+Reviews of the Integration of Artificial Intelligence and Digital Twins,” 
+International Journal of Precision Engineering and Manufacturing 12, no. 
+5 (2025): 1597–1628, https://doi.org/10.1007/s40684‐025‐00750‐z .
+31.International Association for Automation and Robotics in Con-
+struction (IAARC), “Bi‐Directional Communication Bridge for State Synchronization Between Digital Twin Simulations and Physical Con-
+struction Robots,” in Proceedings of the 37th International Symposium on 
+Automation and Robotics in Construction (ISARC 2020) (2020), https:// 
+par.nsf.gov/servlets/purl/10282926 .
+32.S. Kaewunruen, J. Sresakoolchai, and J. Zhang, “Birmingham’s 
+Digital Twins Revolutionize Bridge Lifecycle Management,” Sustainable 
+Construction Review (2025), https://sustainableconstructionreview.com/ 
+2025/03/30/birminghams‐digital‐twins‐revolutionize‐bridge‐lifecycle‐ 
+management/ .
+33.R. Sacks, I. Brilakis, E. Pikas, H. S. Xie, and M. Girolami, “Con -
+struction With Digital Twin Information Systems,” Data‐Centric Engi -
+neering 1 (2020): e14, https://doi.org/10.1017/dce.2020.16 .
+34.B. D. Allen, “Digital Twins and Living Models at NASA,” in Digital 
+Twin Summit (November 2021), https://ntrs.nasa.gov/api/citations/ 
+20210023699/downloads/ASME%20Digital%20Twin%20Summit%20Key 
+note_final.pdf .
+35.R. K. Soman, K. Farghaly, G. Mills, and J. Whyte, “Digital Twin 
+Construction With a Focus on Human Twin Interfaces,” Automation in 
+Construction 170 (2025): 105924, https://doi.org/10.1016/j.autcon.2024. 
+105924 .
+36.G. Lampropoulos, X. Larrucea, and R. Colomo‐Palacios, “Digital 
+Twins in Critical Infrastructure,” Information 15, no. 8 (2024): 454, 
+https://doi.org/10.3390/info15080454 .
+37.O. Bongomin, M. C. Mwape, N. S. Mpofu, et al., “Digital Twin 
+Technology Advancing Industry 4.0 and Industry 5.0 Across Sectors,” 
+Results in Engineering 26 (2025): 105583, https://doi.org/10.1016/j.rine 
+ng.2025.105583 .
+38.M. A. Rahman, M. F. Shahrior, K. Iqbal, and A. A. Abushaiba, 
+“Enabling Intelligent Industrial Automation: A Review of Machine 
+Learning Applications With Digital Twin and Edge AI Integration,” 
+Automation 6, no. 3 (2025): 37, https://doi.org/10.3390/automation603 
+0037 .
+39.European Space Agency, “Building a Lunar Base with 3D Printing,” 
+ESA (2013), https://www.esa.int/Enabling_Support/Space_Engineeri 
+ng_Technology/Building_a_lunar_base_with_3D_printing .
+40.NASA, “Digital Lunar Exploration Sites Unreal Simulation Tool 
+(DUST),” NASA Technical Reports Server (2023), https://ntrs.nasa.gov/a 
+pi/citations/20220014707/downloads/DUST_IEEE2023Paper.pdf .
+41.Buendea, “Buendea Supports NASA Advanced Operations Concepts 
+Lab With Cesium Moon Terrain,” Cesium (2025), https://cesium.com/ 
+blog/2025/04/08/buendea‐supports‐nasa‐with‐cesium‐moon‐terrain/ .
+42.Komatsu Ltd, “Komatsu to Develop Technologies for Outer Space 
+Construction,” Komatsu (2021), https://www.komatsu.com.au/compa 
+ny/news‐media/news/outer‐space‐autonomous‐construction .
+43.Komatsu Ltd, “Komatsu Selected for Development of Innovative 
+Technologies for Outer Space Autonomous Construction,” Komatsu 
+(2021), https://www.komatsu.jp/en/newsroom/2021/20211118 .
+44.Umeå University, “Digital Twin for AI‐Controlled Lunar Robotics 
+(AILUR),” (2025), https://www.umu.se/en/research/projects/digital‐twi 
+n‐for‐ai‐controlled‐lunar‐robotics‐ailur/ .
+45.NASA, “Lunar Base Construction Planning,” NASA Technical Re-
+ports Server (2022), https://ntrs.nasa.gov/api/citations/20220005192/do 
+wnloads/Lunar%20Construction%20Planning%20v2%20RPM.pdf .
+46.European Space Agency, “Luna’s Virtual Leap Towards the Moon,” 
+ESA (2024), https://www.esa.int/Science_Exploration/Human_and_Ro 
+botic_Exploration/LUNA_s_virtual_leap_towards_the_Moon .
+47.European Space Agency, “Lunar Robotic Construction With Raw 
+Regolith,” ESA Activities Portal (2024), https://activities.esa.int/40001 
+46486 .
+Digital Twins and Applications, 2026 19 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 20 =====\n\n48.O. Piñal and A. Arguelles, “Mixed Reality and Digital Twins for 
+Astronaut Training,” Acta Astronautica 219 (2024): 376–391, https://doi. 
+org/10.1016/j.actaastro.2024.01.034 .
+49.European Space Agency, “Luna’s Virtual Leap Towards the Moon,” 
+ESA (2025), https://www.esa.int/Science_Exploration/Human_and_Ro 
+botic_Exploration/LUNA_s_virtual_leap_towards_the_Moon .
+50.Rishan Solutions, “NASA’s Use of XR for Astronaut Training,” 
+(2025), https://rishandigital.com/extended‐reality‐xr‐ar‐vr‐mr/nasas‐use 
+‐of‐xr‐for‐astronaut‐training/ .
+51.British Antarctic Survey, “Digital Twins of the Polar Regions,” 
+British Antarctic Survey (2021), https://www.bas.ac.uk/project/digital‐ 
+twins‐of‐the‐polar‐regions/ .
+52.National Science Foundation, “Monitoring Arctic Permafrost With 
+Satellites, Supercomputers, and Deep Learning,” NSF News (2022), 
+https://www.nsf.gov/news/monitoring‐arctic‐permafrost‐satellites .
+53.Science Policy Canada, “Building Resilience Into Northern Infra -
+structure Through Climate Tech and Digitalization,” Science Policy 
+Canada (2023), https://sciencepolicy.ca/posts/building‐resilience‐into‐ 
+northern‐infrastructure‐through‐climate‐tech‐and‐digitalization/ .
+54.TechnipFMC, “Technipfmc’s Subsea Digital Twin Empowers a 
+Robust Digital Ecosystem,” TechnipFMC News (2021), https://www.te 
+chnipfmc.com/en/media/news/2021/07/how‐technipfmc‐s‐subsea‐digi 
+tal‐twin‐empowers‐a‐robust‐digital‐ecosystem/ .
+55.B. Q. Chen, P. M. Videiro, and C. Guedes Soares, “Opportunities 
+and Challenges to Develop Digital Twins for Subsea Pipelines,” Journal 
+of Marine Science and Engineering 10, no. 6 (2022): 739, https://doi.org/ 
+10.3390/jmse10060739 .
+56.National Subsea Centre, “Spotlight: Digital Twin Technology for 
+Subsea Maintenance,” National Subsea Centre (2023), https://www.na 
+tionalsubseacentre.com/news‐events/news/2023/november/spotlight‐di 
+gital‐twin‐technology‐for‐subsea‐maintenance/ .
+57.Metallurgical Systems, “Mining Digital Twins – A Comprehensive 
+Guide,” (2023), https://metallurgicalsystems.com/mining‐digital‐twin/ .
+58.P. Nobahar, C. Xu, P. Dowd, and R. S. Faradonbeh, “Exploring 
+Digital Twin Systems in Mining Operations: A Review,” Green and 
+Smart Mining Engineering 1, no. 4 (2024): 474–492, https://doi.org/10. 
+1016/j.gsme.2024.09.003 .
+59.Worley, “Transforming Mining Operations With Digital Twin 
+Technology,” Worley Insights (2024), https://www.worley.com/en/insi 
+ghts/our‐thinking/digital‐and‐technology/transforming‐mining‐opera 
+tions‐with‐digital‐twin‐technology .
+60.Bentley Systems, “Digital Twins Drive Better Outcomes Across the 
+Rail Asset Lifecycle,” Bentley Systems (2022), https://www.bentley.com/ 
+wp‐content/uploads/ebook‐digital‐twins‐rail‐asset‐lifecycle‐en.pdf .
+61.Encardio, “Digital Twins: Blueprint for Tomorrow's Infrastructure 
+Management,” Encardio Blog (2023), https://www.encardio.com/blog/di 
+gital‐twins‐the‐blueprint‐infrastructure‐management .
+62.J. Bi, P. Wang, W. Zhang, K. Bao, and L. Qin, “Research on the 
+Construction of a Digital Twin System for the Long‐Term Service 
+Monitoring of Port Terminals,” Journal of Marine Science and Engi -
+neering 12, no. 7 (2024): 1215, https://doi.org/10.3390/jmse12071215 .
+63.D. Yu and Z. He, “Digital Twin‐Driven Intelligence Disaster Pre-
+vention and Mitigation for Infrastructure: Advances, Challenges, and 
+Opportunities,” Natural Hazards 112, no. 1 (2022): 1–36, https://doi.org/ 
+10.1007/s11069‐021‐05190‐x .
+64.Twinview, “Digital Twins in Disaster Management: Preparedness 
+and Response Strategies,” Twinview Insights (2023), https://www.twi 
+nview.com/insights/digital‐twins‐in‐disaster‐management‐preparedne 
+ss‐and‐response‐strategies .65.Toobler, “Digital Twin in Disaster Management: Comprehensive 
+Guide,” Toobler Blog (2024), https://www.toobler.com/blog/digital‐twin‐ 
+in‐disaster‐management .
+66.M. Zhu and J. Jin, “Data‐Driven Urban Digital Twins and Critical 
+Infrastructure Under Climate Change: A Review of Frameworks and 
+Applications,” Urban Planning 10 (2025): 10109, https://doi.org/10. 
+17645/up.10109 .
+67.A. Bucaioni, J. Axelsson, M. Behnam, and E. Ferko, “Digital Twins 
+for Essential Services,” Future Generation Computer Systems 176 (2026): 
+108147, https://doi.org/10.1016/j.future.2025.108147 .
+68.G. J. Pierce, J. D. Heeren, and T. R. Hill, “Orion SysML Model, 
+Digital Twin, and Lessons Learned for Artemis I,” in INCOSE Interna -
+tional Symposium, Vol. 33, No. 1 (John Wiley & Sons, July 2023), 
+290–304, https://doi.org/10.1002/iis2.13022 .
+69.European Space Agency, “Destination Earth,” https://destination‐ea 
+rth.eu/ .
+70.V. Maiwald, M. Bauerfeind, S. Fälker, B. Westphal, and C. Bach, 
+“About Feasibility of SpaceX's Human Exploration Mars Mission Sce-
+nario With Starship,” Scientific Reports 14, no. 1 (2024): 54012, https:// 
+doi.org/10.1038/s41598‐024‐54012‐0 .
+71.ispace, Inc., “ispace Announces Results of the “HAKUTO‐R” 
+Mission 1 Lunar Landing,” (May 26, 2023), https://ispace‐inc.com/ne 
+ws‐en/?p=4691 .
+72.Centre for Digital Built Britain, “The Gemini Principles,” (2018), 
+https://www.cdbb.cam.ac.uk/system/files/documents/TheGeminiPrinci 
+ples.pdf .
+73.SmartICE Monitoring & Information Inc, “SmartICE: Sea Ice 
+Monitoring & Information Inc,” (2025), https://smartice.org/ .
+74.C. Harclerode, “Smart LNG Operations With a Digitally Integrated 
+and Enabled Supply Chain,” Gas Processing & LNG 59, no. 10 (October 
+1, 2020), https://gasprocessingnews.com/articles/2020/10/smart‐lng‐ope 
+rations‐with‐a‐digitally‐integrated‐and‐enabled‐supply‐chain/ .
+75.W. Wang, Q. Zaheer, S. Qiu, et al., Digital Twin Technologies in 
+Transportation Infrastructure Management (Springer, 2024), 1–222.
+76.D. Diana, P. Anindita, and A. A. Mukti, “AI‐Driven Digital Twin for 
+Predictive Maintenance in Urban Infrastructure: Enhancing Structural 
+Resilience and Sustainability,” Civil Engineering Science and Technology 
+1, no. 1 (2025): 63–74, https://cest.stekom.ac.id/index.php/cest/article/ 
+view/5/9 .
+77.S. S. Kamble, A. Gunasekaran, H. Parekh, V. Mani, A. Belhadi, and 
+R. Sharma, “Digital Twin for Sustainable Manufacturing Supply Chains: 
+Current Trends, Future Perspectives, and an Implementation Frame -
+work,” Technological Forecasting and Social Change 176 (2022): 121448, 
+https://doi.org/10.1016/j.techfore.2021.121448 .
+78.G. Singh, S. Singh, Y. Daultani, and M. Chouhan, “Measuring the 
+Influence of Digital Twins on the Sustainability of Manufacturing 
+Supply Chain: A Mediating Role of Supply Chain Resilience and Per-
+formance,” Computers & Industrial Engineering 186 (2023): 109711, 
+https://doi.org/10.1016/j.cie.2023.109711 .
+79.ISO 23247‐1, Automation Systems and Integration – Digital Twin 
+Framework for Manufacturing – Part 1: Overview and General Principles 
+(International Organization for Standardization, 2021).
+80.Digital Twin Consortium, “Digital Twin System Interoperability 
+Framework,” (2021), https://www.digitaltwinconsortium.org/pdf/Digita 
+l‐Twin‐System‐Interoperability‐Framework‐12072021.pdf .
+81.A. J. Berre and R. Walshe, “Digital Twins and Standards,” European 
+Big Data Value Forum (2022), https://european‐big‐data‐value‐forum. 
+eu/wp‐content/uploads/2022/10/Digital‐Twins‐and‐Standards‐v‐1‐0.pdf .
+82.Q. Gu, Z. Song, Y. I. Sun, and X. Yu, “Digital Infrastructure In-
+vestment and Corporate Debt Concentration: Evidence From a Quasi‐ 
+20 of 21 Digital Twins and Applications, 2026
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+\n\n\n===== PAGE 21 =====\n\nNatural Experiment,” Pacific‐Basin Finance Journal 86 (2024): 102429, 
+https://doi.org/10.1016/j.pacfin.2024.102429 .
+83.T. A. Aben, W. van der Valk, J. K. Roehrich, and K. Selviaridis, 
+“Managing Information Asymmetry in Public–Private Relationships 
+Undergoing a Digital Transformation: The Role of Contractual and 
+Relational Governance,” International Journal of Operations & Produc -
+tion Management 41, no. 7 (2021): 1145–1191, https://doi.org/10.1108/ijo 
+pm‐09‐2020‐0675 .
+84.L. Tolstolesova, I. Glukhikh, N. Yumanova, and O. Arzikulov, 
+“Digital Transformation of Public‐Private Partnership Tools,” Journal of 
+Risk and Financial Management 14, no. 3 (2021): 121, https://doi.org/10. 
+3390/jrfm14030121 .
+85.Bird & Bird, “Legal Implications of Digital Twins in the Supply 
+Chain,” (2020), https://www.twobirds.com/en/insights/2020/global/le 
+gal‐implications‐of‐digital‐twins‐in‐the‐supply‐chain .
+86.Fenwick Elliott, “The Challenges and Legal Implications of Digital 
+Twins,” (2020), https://www.fenwickelliott.com/research‐insight/annua 
+l‐review/2020/challenges‐legal‐implications‐digital‐twins .
+87.M. Braun, “Ethics of Digital Twins: Four Challenges,” Journal of 
+Medical Ethics 48, no. 9 (2022): 579–580, https://doi.org/10.1136/mede 
+thics‐2021‐107675 .
+88.D. Helbing and J. Argota Sanchez‐Vaquerizo, “Digital Twins: Po-
+tentials, Limitations, and Ethical Issues. Preprint, Version 0.17,” (2022), 
+https://www.researchgate.net/publication/35857 .
+89.NASA, “Why Does the World (and NASA) Need Digital Twins?,” 
+Science@NASA (2024), https://science.nasa.gov/biological‐physical/why 
+‐does‐the‐world‐and‐nasa‐need‐digital‐twins/ .
+90.NASA, “Swarming Robot Design, Construction and Software 
+Implementation,” NASA Technical Reports Server (2015), https://ntrs.na 
+sa.gov/api/citations/20150000229/downloads/20150000229.pdf .
+91.NASA, “Leverage the Power of Swarming Robotics to Help NASA 
+Locate Resources,” NASA (2024), https://www.nasa.gov/wp‐content/u 
+ploads/2024/09/20‐swarming‐robotics‐spec‐sheet‐508.pdf .
+92.Autodesk, “Extended Reality in Construction: A Guide to AR, VR, & 
+MR,” Autodesk Construction Blog (2024), https://www.autodesk.com/blo 
+gs/construction/extended‐reality‐construction‐ar‐vr‐mr/ .
+93.NVIDIA, “Experience Digital Twins in XR With NVIDIA Omniverse 
+Spatial Streaming,” NVIDIA Developer Blog (2025), https://developer.nvi 
+dia.com/blog/experience‐digital‐twins‐in‐xr‐with‐nvidia‐omniverse‐spa 
+tial‐streaming/ .
+94.Intuz, “Digital Twin in IoT: Real‐Time Monitoring With Smart 
+Sensors,” (2022), https://www.intuz.com/blog/digital‐twin‐in‐iot .
+95.Toobler, “How Digital Twins and IoT Work Together [With 
+Example],” (2024), https://www.toobler.com/blog/digital‐twin‐iot .
+96.Centre for Digital Built Britain, “Gemini Papers: What Are Con-
+nected Digital Twins?,” (2021), https://www.cdbb.cam.ac.uk/files/gemi 
+ni_papers_‐_what_are_connected_digital_twins.pdf .
+97.Autodesk, “Robot‐Made Mars Habitat Could Bring Sustainable 
+Construction to Earth,” (2021), https://www.autodesk.com/design‐ma 
+ke/articles/mars‐habitat .
+98.D. Jaschke, A. Pagano, S. Weber, and S. Montangero, “Ab‐Initio 
+Tree‐Tensor‐Network Digital Twin for Quantum Computer Bench -
+marking in 2D,” Quantum Science and Technology 9, no. 3 (2024): 
+035055, https://doi.org/10.1088/2058‐9565/ad5585 .
+99.J. Khumsikiew, R. Netthong, and B. Yingngam, “Research Ad-
+vancements in Quantum Computing and Digital Twins,” in Digital 
+Twins for Smart Cities and Villages (Elsevier, 2025), 103–125.
+Digital Twins and Applications, 2026 21 of 21
+ 29952182, 2026, 1, Downloaded from https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/dgt2.70027, Wiley Online Library on [05/09/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

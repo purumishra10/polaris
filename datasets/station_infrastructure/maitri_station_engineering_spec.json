@@ -1,0 +1,56 @@
+{
+  "station_id": "MAITRI",
+  "status": "Operational since 1989 (Maitri-II planned for 2029)",
+  "coordinates": {
+    "lat": -70.7668,
+    "lon": 11.7308,
+    "elevation_m": 117
+  },
+  "population": {
+    "winter": 25,
+    "summer_nominal": 50,
+    "summer_max": 65
+  },
+  "current_station_architecture": {
+    "foundation": "Elevated steel stilts on bed rock",
+    "construction_year": 1988,
+    "water_supply": "Priyadarshini Lake pump line (heated trace pipes)",
+    "heating": "Boilers + electrical backup"
+  },
+  "maitri_ii_plant_specs": {
+    "design_life_years": 40,
+    "population_capacity": {
+      "winter": 40,
+      "summer": 140
+    },
+    "power_plant": {
+      "num_generators": 6,
+      "unit_rating_kva": 125,
+      "total_capacity_kva": 750,
+      "system_type": "Combined Heat & Power (CHP) with waste-heat loop",
+      "specific_fuel_consumption_l_per_kwh": 0.28
+    },
+    "fuel_farm": {
+      "fuel_type": "JET A-1 / Arctic Grade Diesel",
+      "total_capacity_liters": 600000,
+      "day_tanks_capacity_liters": 15000,
+      "intake_method": "Automated intake from ISO tank containers",
+      "distribution_lines": [
+        "Powerhouse",
+        "Helipad",
+        "Workshop Garage",
+        "Emergency Shelter"
+      ]
+    },
+    "aviation": {
+      "helipad_rating": "Kamov Ka-32 / Mi-8 Heavy Lift",
+      "hangar_capacity": "1 Helo + Ground Support Equipment"
+    },
+    "environmental_design_limits": {
+      "max_wind_kmh": 200,
+      "prevailing_wind_dir": "SE",
+      "annual_mean_temp_c": -9.7,
+      "extreme_min_temp_c": -44.0
+    }
+  }
+}

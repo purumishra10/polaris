@@ -1,0 +1,1143 @@
+\n\n===== PAGE 1 =====\n\n167 Polar Record 53 (269): 167–185 (2017). © Cambridge University Press 2017. doi: 10.1017/S0032247416000747
+A history of McMurdo Station through its architecture
+Georgina A. Davis
+College of Architecture, Texas A&M University, College Station, TX 77840, USA
+(georgina.davis@gmail.com )
+Received May 2016; ﬁrst published online 30 January 2017
+ABSTRACT. McMurdo Station, Antarctica, is a US Federal research facility operated year-round by the National
+Science Foundation (NSF). Its primary mission is to support scientiﬁc research, but it also provides logistical air and
+ground support for South Pole Station, seasonal ﬁeld sites and nearby stations operated by other countries. It is thelargest station in Antarctica, supporting up to 1,200 people. While McMurdo Station has a long scientiﬁc legacy,
+the facility also has an interesting architectural and engineering history that spans 60 years and has its antecedents
+in the ‘heroic age’ of exploration (1898–1916) and the Little America expeditions (1929–1958). Here, I describe thehistory of the built environment of McMurdo Station to clarify how it evolved from a temporary air station in the late
+1950s to its current role as the ﬂagship research facility of the US Antarctic Research Program (USAP). This historical
+review may provide insights that are useful as the station continues to transform and evolve, allowing it to continue itsscientiﬁc mission into the 21st century.
+Introduction
+Nearly every description of Antarctica begins with a list
+of the continent’s extremes: temperature, wind speed,
+average altitude and relative humidity. It boasts of no
+early human history and therefore has no cultural artefacts,traditions or memory of armed conﬂict. Unlike the Arctic,
+Antarctica remained isolated from early humans, covered
+in perpetual ice and surrounded by the tempestuousSouthern Ocean. Although Antarctica has a rich and
+colourful recent history, it barely spans 200 years. With
+no local building materials or agriculture, everything mustbe imported. As with space travel, being in Antarctica
+is something humans can only do with great effort and
+logistical support, for the landscape, while striking, isboth desolate and unforgiving. The same beauty captured
+in countless photographs over the last century can be a
+dangerous distraction from the fact that, if cut off fromoutside world, people face grim prospects and no chance
+of long-term survival. However, as with space travel, we
+have advanced from small, cramped enclosures to larger,
+modern research facilities. The focus today has shifted
+from mere survival and ‘getting by’ to one of long-termoccupation (that is creating a sense of place in an alien
+environment and making it sustainable).
+The US government’s McMurdo Station, located on
+Ross Island in Antarctica, is the largest and one of the
+most remote research facilities on the continent. Each
+year it serves as an important laboratory and logisticalhub for hundreds of scientists from around the world
+conducting research on and around Ross Island and as
+far away as South Pole station (1350 km or 729 nauticalmiles away). More like a small town than any other
+Antarctic station, McMurdo was established in the 1950s
+under the direction of the US Navy (USN); later it wastransferred to the NSF. Today the station supports a
+summer population of approximately 1,200 and a winter
+population of about 200 civilian support personnel and
+a few scientists. The station’s design, construction and
+renovations have evolved over half a century with asuccession of master plans and single building renovations
+and replacements.
+For those unfamiliar with the history of McMurdo
+Station, as one of the oldest, continuously operational
+stations on the continent, the choices behind the station’s
+current design and the geopolitical and scientiﬁc mo-
+tivations for maintaining its presence have not always
+been clear. The purpose of this article is to combinearchitectural information from many sources to create a
+previously unavailable historical record of how building
+types and technology have changed at McMurdo Stationas it progressed from a small military camp of temporary
+huts to a permanent research station housing hundreds
+of people year-round. As such, it should be useful whencreating and evaluating future designs for the station.
+Early explorers and the built environment
+Ross Island is named for Captain James Clark Ross who
+ﬁrst visited the area aboard the HMS Erebus and HMS
+Terror in 1841. He named the sound along the west coast
+of the island, which is frozen most of the year, after
+his lieutenant on board Terror , Archibald McMurdo. The
+east coast of Ross Island is locked in thick, permanentice. Ross never set foot on the island but named the two
+volcanic peaks Mount Erebus and Mount Terror after his
+vessels (Neider 1974 : 17). In Greek mythology, Erebus
+was the gatekeeper to the underworld, a ﬁtting name for
+the smouldering sentinel he discovered at the edge of the
+great ice barrier, known today as the Ross Ice Shelf.
+The continent of Antarctica remained relatively un-
+explored for ﬁve more decades except for whalers and
+sealers who ﬂocked to the rich coastal waters in searchof fur seal skins and oil from elephant seals and whales.
+The ﬁrst wave of Antarctic exploration, generally known
+as the ‘heroic age’ began in 1895. At this time, there were
+still lands around the world to be explored, claimed and
+conquered; even the North Pole had not yet been attained.Those drawn to the South Pole went in search of adventure,
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 2 =====\n\n168 DAVIS
+Fig. 1. The ﬁrst building in Antarctica, at Cape Adare, Victoria Land, built in 1889, is
+an example of a Scandinavian-style Antarctic hut. Reprinted with permission of David L.Harrowﬁeld.
+glory and, to an extent, scientiﬁc recognition. The name
+itself, ‘heroic age’, bestows upon those early journeys a
+great sense of romantic adventure, and when reading the
+ﬁrst-hand accounts of these men it becomes clear that they
+found it and much more.
+These explorers sailed to the southern continent and
+established base camps along the coast that allowed small,
+exploratory teams to penetrate deeper into this strange,inhospitable land. Over time, the coast of Antarctica
+became an icy time capsule for the few surviving buildings
+and memorials from this period, all in various stages ofdisrepair, but mostly well preserved by the cold, dry air and
+the efforts of preservationists. People working at today’s
+modern Antarctic stations, complete with power, heat andnearly every modern convenience, including the internet,
+can visit these historic sites as tourists. These buildings
+are often labelled ‘monuments to the human spirit’ despitetheir humble classiﬁcation as ‘huts’.
+These historical huts offer insight into the past and
+show what was humanly possible even under the most
+extreme and remote conditions. Importantly, they also
+reveal problems that would again plague the buildingsused in next wave of Antarctic exploration: site selection,
+transport of materials, ease of construction, extreme
+temperatures, high winds and blowing snow, ventilation,privacy, segregation and thermal comfort. Pearson ( 1992 )
+categorised the huts into three styles: Scandinavian,
+British and Australian; each with its own characterist-ics, design successes and shortcomings. Each provides
+valuable information that helped pave the way for future
+explorers to survive the climate and the long, dark winters.
+Scandinavian-style Antarctic huts had heavy plank
+walls with cellulose-based insulation, gabled roofs withlofts, no veranda, oil-burning lamps and a spatial organ-
+isation that did not separate sailors from ofﬁcers. Two
+examples of this style include the huts built by Carsten
+Borchgrevink in 1889 and Roald Amundsen in 1910
+(Figs 1 and 2). Borchgrevink’s camp at Cape Adare is
+now considered the ﬁrst building in Antarctica.
+British-style huts, lashed down with ropes, had timber
+frames clapped with weatherboarding and insulation,gabled roofs without lofts, protected entrances without a
+veranda, acetylene lighting and a spatial organisation that
+separated the ofﬁcers from the sailors. Two examples ofthis style include the huts built by Ernest Shackleton in
+1908 and Robert Falcon Scott in 1911 ( Figs 3 and4).
+Australian-style huts had timber frames insulated with
+felt or cork, a pyramidal roof over a large square area,
+a veranda on three sides, framing posts sunk into the
+ground and a spatial organisation that separated the partyleaders from the other personnel. Two examples of this
+style include the huts built by Scott in 1901 and Douglas
+Mawson in 1911 ( Figs 5 and6).
+These three styles of huts each have their strengths
+and weaknesses, but it is clear that maintaining abalance between comfortable temperatures and healthy
+ventilation rates was one of the challenges faced by
+these expeditions. Only one hut, Amundsen’s Framheim,successfully achieved this balance, but did so in part
+by being subnivean with a working (if somewhat
+temperamental) ventilation system. Amundsen placedgreat importance on proper ventilation not only on his
+ship ( Fram ) but in their winter quarters (Framheim). He
+considered it a necessity for comfort and health, blamingreported health woes during other expeditions on poor
+ventilation (Amundsen 1913 : 199). Even so, there was
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 3 =====\n\nARCHITECTURE OF MCMURDO STATION 169
+Fig. 2. Amundsen’s base, Framheim, at the Bay of Whales was built in 1911 and is an
+example of a British-style Antarctic hut. Photo from The South Pole by Roald Amundsen
+1913 : 206.
+Fig. 3. Shackleton’s hut at Cape Royds, Ross Island, was built in 1908 and is an example of
+a British-style Antarctic hut. (Photo by author, 2009).
+Fig. 4. Scott’s hut at Cape Evans, was constructed in 1911 and is an example of a British-
+style Antarctic hut. (Photo by author, 2009).
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 4 =====\n\n170 DAVIS
+Fig. 5. Scott’s Australian-style 1901 Discovery hut, Hut Point, Ross Island (foreground), and
+McMurdo Station (background) (Photo by D. Williams, 2009).
+Fig. 6. Mawson’s hut at Cape Denison, at the head of Commonwealth Bay, was built in 1911
+and is an example of an Australian-style Antarctic hut. (image shows enclosed veranda).
+still thermal stratiﬁcation, a problem that persists in
+McMurdo today (mostly in older buildings).
+Both Pearson ( 1992 ) and Harrowﬁeld ( 1995 )o f f e r
+comprehensive reviews of Antarctica’s ﬁrst structures,
+looking not only at their historical importance and preser-
+vation but also construction methods, inspiration, lifespan,and their individual merits and drawbacks according
+to accounts from the men who lived in them. With
+this information in hand, it is possible to gain a better
+perspective of why these various huts differ in appearance
+and degrees of success.Naval air facility McMurdo Sound (1956–1961)
+Small Antarctic expeditions from the US were not un-
+common between 1914 and 1940, but it was not until
+after World War II (WWII) that activity on the southern
+continent began to escalate. In the mid-1950s, the USbegan investing an enormous amount of time, energy and
+money in establishing a continuous Antarctic presence;
+it was in part a strategic military response to the SovietUnion during the Cold War in the years immediately
+following WWII (Collis and Stevens 2004 : 4; Belanger
+2006 ). The prize was a presence at the geographical South
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 5 =====\n\nARCHITECTURE OF MCMURDO STATION 171
+Pole, which was ﬁnally achieved in 1956. The logistics for
+this operation were only possible with an impressive show
+of manpower, air and naval support, and the construction
+and maintenance of a critical logistical hub located along
+the coast: Little America V on the Ross Ice Shelf.
+For many years the geopolitics of Antarctica were
+unsettled, with a number of countries jostling for posi-
+tion. Until the Antarctic Treaty was signed in 1959 and
+went into effect in 1961, there were no internationallyrecognised laws governing the continent, including the
+presence of the military, the use of nuclear energy and
+testing, or mineral rights. The Treaty, signed initially bytwelve countries, helped set a precedent that the continent
+would remain peaceful and devoted to scientiﬁc pursuits,
+such as the International Geophysical Year (IGY) fromJuly 1957 to December 1958.
+Admiral Richard Byrd, a naval ofﬁcer and a veteran of
+Arctic exploration, had led early expeditions to Antarctica,establishing temporary ‘Little America’ bases from the
+late 1920s until the outbreak of WWII. These helped pave
+the way for eventual long-term occupation by the US post-
+war Antarctic expeditions to explore and establish more
+permanent bases. Byrd helped to organise the ﬁrst of theseoperations, Operation Highjump (1946–1947), which:
+‘… was then (and remains) by far the largest Antarctic
+expedition, with more than 4,700 naval and marinepersonnel, 44 observers, 13 ships, and a number of
+aircraft …’ (OPP 1997 : 17).
+One of the goals
+1was to determine the feasibility of
+establishing a semi-permanent ice base, Little America
+IV , for scientiﬁc research during the IGY (Hoffman
+1974 : 1). After more aerial photographs of the coastline
+were collected during a second expedition (Operation
+Windmill, 1947–1948) – an effort that aided in the ﬁnal
+decision of where to locate a permanent station – Byrdled the ﬁrst Operation Deep Freeze in 1955, which in
+December established Little America V and six other
+stations (that is, Byrd, South Pole, Ellsworth, Wilkes andHalley), including the ﬁrst buildings of the Naval Air
+Facility, McMurdo Sound (NAF McMurdo).
+NAF McMurdo and other bases erected as a part of
+the IGY were essentially temporary military ﬁeld camps
+(Collis and Stevens 2004 : 5). They supported scientiﬁc
+and logistical operations. Documents from the ﬁrst years
+of Operation Deep Freeze indicate NAF McMurdo was
+neither a prominent research station nor a high-prioritylogistical hub (NRC 1957 ). It was important as an
+emergency landing point between other American bases,
+but Little America V was better positioned in relationto the South Pole and, being on the edge of the Ross
+Ice Shelf, it was easier to access by ship. It and other
+stations were supplied with more scientiﬁc equipment andaccommodated more scientists.
+2
+Then in 1961, changing snow and ice conditions
+made Little America V unusable for wheeled aircraft(Belanger 2006 : 35), and snow accumulation threatened
+the structural safety of the station (Tyree, in Dempewolff
+1961 : 106). NAF McMurdo, built on the rocky shoresof Ross Island, began to look more feasible for long-
+term occupation.
+3The focus shifted away from Little
+America. No longer just an airﬁeld, NAF McMurdo was
+renamed McMurdo Station in 1961 (Lagerbom n.d.; NRC
+1957 ).
+The 1956 layout for NAF McMurdo was a military grid
+roughly aligned along two parallel ‘main streets’, with a
+parade ground on one end and a makeshift chapel on the
+other (Collis and Stevens 2004 :3 )( Fig. 7 ). There were
+roughly a dozen buildings accommodating approximately
+130 men. Here, as with most other remote ﬁeld stations, the
+buildings were separated to reduce the threat of spreadingﬁre, but were still close enough to allow men to move
+conveniently among them in cold weather and to be seen
+easily in low-visibility conditions. The resultant layoutwas a variation of the more typical subnivean naval station,
+which tended to be physically connected, branching off a
+single, long axis corridor.
+This corridor in McMurdo Station was not a pro-
+tected structure, but an open ‘street’. Unlike subnivean
+stations, which become buried within a matter of months,
+McMurdo was built on solid, exposed ground, a tiny speck
+on the steep shores of a massive volcanic island. In theearly days of the station, the Army and US Naval Civil
+Engineering Laboratory (NCEL) manuals directed users
+to orient the longitudinal axis of buildings parallel to stormwinds and perpendicular to east and northeast prevailing
+winds to prevent (or reduce) snow accumulation against
+entrances (Sherwood 1964a ;1964 b; US Department of the
+Army 1957 ). It appears that this guideline was generally
+followed, and either by chance or by manpower, the grade
+of the coastline was nearly perpendicular to the prevailingwind direction.
+Just as in some historic huts, NAF McMurdo barracks
+(Fig. 8 ), socialisation areas and even latrines were
+segregated by rank; for example, in the galley, ofﬁcers
+ate separately from chiefs and lower-ranked men. Collis
+and Stevens describe the facility as essentially a ‘…pragmatic …’ naval establishment with ‘… tidy …’ rows
+of Quonset huts and prefabricated buildings (Collis and
+Stevens 2004 : 3). There were also three separate bars for
+socialising. Scientists were able to move freely between
+all of these places, including an unofﬁcial fourth bar setup by the pilots and crew who ﬂew the ﬂights in and out
+of McMurdo Station. These class distinctions no longer
+exist ofﬁcially, but people still tend to create their owninformal groups and status symbols.
+Despite the high costs of perceived ‘non-essential’
+buildings, the USN still understood (and researched) theneed for immediate access to reasonably comfortable
+quarters and more than basic survival conditions for the
+men and ofﬁcers (Sherwood 1964a : 1). Rear Admiral
+Dufek noted this when reﬂecting on his years leading
+Operation Deep Freeze. Writing of lessons learned during
+his ﬁrst year, he wrote that while preparing for the secondyear of the operation, he decided that:
+‘[f]irst to go up would be the barracks and mess hall.
+Last year’s experience taught us that the sooner the
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 6 =====\n\n172 DAVIS
+Fig. 7. (Left) Layout of NAF McMurdo Sound (NRC 1957 : plate XI). (Right) Sky view of the McMurdo Sound
+Naval Air Facility in 1957.
+Fig. 8. Barrack J–24 ﬂoor space with ten bunks in the barracks and eightmen assigned. McMurdo Station, Antarctica. Operation Deep Freeze 1964(Photo PH2 D.C. Armstrong). Courtesy of the US National Archives, College
+Park, MD, accessed March 2012.
+men begin to live comfortably, the faster the rest of the
+work would go’ (Wilson 1956 : 109).
+This is good advice in any setting, but it becomes
+even more urgent under extreme circumstances such as
+extremely cold temperatures.
+The earliest structures built by the USN on Ross Island
+were metal Quonset and panelised huts. Like early historic
+huts, they were prefabricated and designed to be easily
+transported and assembled. Designed for military defenceforces working in different climates, these buildings were
+also easily modiﬁed to speciﬁc site conditions or needs
+of the programme. Quonset huts in particular were wellsuited to the demanding weather conditions in the Ant-
+arctic provided they could be ﬁtted with extra insulation;at the end of WWII and the Korean War (1950–1953)
+there was a surplus of these structures. Soon to follow
+was another type of hut, a boxy structure known as a T-5, an Arctic prefabricated panelised wood hut. It arrived
+in palletised modules and could be assembled quickly
+and customised. These types of structures made up themajority of the station’s ﬁrst buildings.
+The Quonset hut, an icon of ‘portable architecture’,
+was born out of the need for easy, quick housing forsoldiers during WWII ( Fig. 9 ). Named for its original
+place of construction (Quonset Point, Maryland), the
+Quonset hut was designed and built by George A. Fullerand Company. It not only provided soldiers with a
+dry, comfortable shelter, but one that could be easily
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 7 =====\n\nARCHITECTURE OF MCMURDO STATION 173
+Fig. 9. A Quonset hut in McMurdo Station with a vestibule entrance addition. Photo by
+author, 2009.
+constructed or dismantled by ten unskilled men in one
+day and could be adapted to different climates (for
+example, by adding a vestibule). Basing their design
+on the British Nissen hut from WWI, the designers,
+architect Otto Brandenberger and engineer Peter Dejong,
+vastly improved on the design, making it lighter, easier toassemble and much more comfortable. Different people
+over the years contributed to its improvement, making it
+even lighter, simpler and more watertight. The originalQuonset hut used paper insulation between metal panels
+and a thin layer of Masonite mounted to wooden secondary
+beams, called purlins. This, along with a wooden platformﬂoor, was an improvement over the Nissen hut, which
+used only an air space for insulation, generally rested
+on exposed ground, were complicated to assemble andrequired many small parts. Because of the war effort, the
+design, construction and improvements to the Quonset hut
+occurred quickly, with the ﬁrst design shipped merely twomonths after the commission. The Quonset hut proved
+easy to modify with changes applied quickly on the factory
+ﬂoor.
+However, one early complaint with the Quonset hut
+was the wasted space from the curved walls. Within a year
+of the initial design, Brandenberger modiﬁed the curved
+walls to increase efﬁciency. This time, the arch (now
+two sections instead of three) rested on a 1.2 m verticalwall, providing more usable space. He made the overall
+system lighter as well. Shortly thereafter the design was
+altered by the Stran-Steel Division of the Great Lakes SteelCorporation, when it took over major production from the
+factory at Quonset Point. They removed the vertical walls,
+expanded the footprint, and created a new framing systemthat eliminated the need for bolts (Decker and Chiei 2005 ).
+It also relied more on stock metal that did not need to be
+modiﬁed in a factory. This helped alleviate the demandfor steel, which was in short supply during the war.
+A special type of Quonset hut known as the Jamesway
+(created by the James Manufacturing Company of FortAtkins, Wisconsin) was a hybrid structure with featuresof both a fabric tent and a metal Quonset hut ( Fig. 10 ).
+It was a multipurpose building, sometimes acting as a
+bunkhouse. The Jamesway had wooden ribs covered by an
+insulated fabric, which lowered demand for steel. Similar
+to a Quonset hut, a Jamesway could be built to whatever
+length was needed, the limiting factor in the cold desertconditions of Antarctica being ﬁre safety precautions and
+logistical mobility (Sherwood 1965 ).
+4It was lightweight
+(544 kg) and easy for the Army Air Corps to transport anduse in polar conditions. With few metal components and
+little need for work that required the removal of mittens
+or gloves, it was easy to erect. The covering was alsoﬁre resistant and vermin proof (very important in the
+Antarctic). A bonus came with the fact that the packing
+crates doubled as the ﬂoor (Decker and Chiei 2005 : 149).
+Performing best as a temporary shelter, there are few
+Jamesways left in McMurdo; however, they have been
+used for decades in ﬁeld camps.
+Similar to the Quonset hut, the plain, boxy T-5 hut was
+easy to transport, erect and modify for different purposes.
+In Antarctica, the T-5 served as a quick, no-frills buildingthat could be assembled by a handful of men with only a
+few common tools: three hammers, three screwdrivers,
+one wrench, a 30 m measuring tape and a level. The
+structural system was 1.22 x 2.44 m plywood insulated
+panels and steel or timber roof trusses, which meant thatthe structure required no load-bearing interior walls and
+was thus very ﬂexible. It also meant that interior walls
+could be quickly and cheaply made of plywood or evensimply a drawn curtain (NRC 1957 : 36). These buildings
+generally had a snow load capacity of 244 kg m
+−2and a
+wind load of 100 mph (Sherwood 1964a :3 ) .
+The T-5, designated as a standard design in 1955,
+was a 6.10 m wide by 14.60 m long structure that could
+be tailored to speciﬁc needs (that is, a different modulesize). It was relatively lightweight and transportable on
+an LC-130 aircraft. The wall panels weighed 45 kg and
+came in three types: plain, window and door. These wereinterchangeable, allowing extra ﬂexibility with layout
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 8 =====\n\n174 DAVIS
+Fig. 10. Byrd Surface Camp, Antarctica. Jamesway tent under construction during the Deep
+Freeze 1980 season. (Note the ﬂooring.) Photographer: Jeff Hilton. Date: Nov. 6, 1979.
+Naval Photographic Center, Naval District, Washington, D.C. Ofﬁcial U.S. Navy Photograph.
+and window location ( Fig. 11 ). There were also ﬂoor
+and roof panels. Its designation as an ‘Arctic’ building
+stems from its purpose to provide ‘… comfortable living
+conditions in ambient temperatures as low at -54 °C’ (US
+Department of the Army 1957 : 3). The entire building was
+sealed with a ‘surface mounted wedge clip’ (see Sherwood
+1964b : 8) which ‘… provided maximum rigidity with
+minimum heat loss …’, at least at the joint connections(NRC 1957 : 36).
+The interior of the T-5 was generally long and rect-
+angular, with small, square windows about 163 cm aboveﬂoor level. There was no built-in daylight control (many
+of these structures ended up in the subnivean tunnels of
+stations located on an ice shelf). Windows were ﬁxedand comprised of two triple-glazed 0.32 cm plastic plates
+that were sandwiched between another 0.16 cm layer of
+plastic. Wall panels had a ‘stressed cover’, consisting of0.64 cm thick exterior grade plywood glued to a frame
+and lined on the inside (the warm side) with aluminium
+foil on Kraft paper, extending up the side of the frame toform a cup, which was then ﬁlled with ﬁbreglass insulation
+(US Department of the Army 1957 : 6). Floor panels were
+similar but made of slightly thicker plywood (weighing 59
+kg per panel). All interior surfaces and walls were covered
+in ‘… attractive ﬁre-resistant paint’ (NRC 1957 : 36).
+Heat usually came from a 20.5 kW/h military model,
+fully assembled space heater. There was a roof jack
+and a special roof panel for it to vent. Additionally,below each window there were small slots, regulated with
+rotary covers, intended to help with the ventilation of the
+building. This building type was probably not intendedto stay in service for over 50 years, but in McMurdo
+a few of them have. One of the ﬁrst buildings on Ross
+Island (besides Scott’s Discovery hut) was a T-5 Arctic
+panelised building (Dufek 1957 ). Its fate is unknown, butBuilding 78, a T-5 building from 1960, is still actively
+used.
+5The T-5 Arctic hut served well as an easy-to-
+transport, easy-to-erect building, well insulated and very
+adaptable. With partitions it could be converted into a
+dormitory, recreational area, hospital, ofﬁce, movie room,galley, whatever was needed; that is the beauty of the
+convertible (that is, ﬂexible) building.
+Performance studies conducted on these buildings by
+the NCEL (for example, Sherwood 1964a ; Hoffman 1974 )
+indicate the USN’s concern for the Antarctic mission but
+relative lack of experience in extremely cold climates(compared with countries such as Norway and Russia).
+The report begins by stating that:
+‘[c]omfortable living conditions in polar regions areessential for high morale and consequent productive-
+ness of a work force’ (Sherwood 1964a :1 ) .
+In the rest of the report the implication for these
+modular, well-insulated buildings was that they would
+also be economical and energy efﬁcient, but the fact that
+occupant comfort is mentioned so prominently at thebeginning may indicate an awareness of how it affects
+productivity and health, especially in such cold, conﬁned
+conditions.
+A further study in 1964 led to modiﬁcations to the T-
+5 to make it more comfortable as a barracks. Changesincluded better noise control, more single-occupancy
+bedrooms, higher ceilings and larger, double-occupancy
+rooms. There were also improvements to the constructionand assembly of the structure (Sherwood 1964b ). The
+result was a modiﬁed and improved T-5 structure, a:
+‘… prefabricated, straight-sided, frameless woodenbuilding with load-bearing walls and a 1:10 gable roof
+supported on trusses’ (Sherwood 1964b ).
+Its basic length was 17 m, but as usual it could be
+adjusted in 1.2 m increments. The ﬂoor was also slightly
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 9 =====\n\nARCHITECTURE OF MCMURDO STATION 175
+Fig. 11. An Arctic T -5 building, a prefabricated, panelised, wood structure.
+McMurdo Sound Air Facilities (Avionics Shop, 1961) 20 ʹ×52 ʹ×12 ʹassembly
+diagram. Courtesy of the National Archives in College Park, MD, accessed
+March 2012.
+thicker because it used a thicker layer of plywood. The
+entire kit weighed 14,387 kg as shipped and could be
+transported by plane.
+Successfully tested in Barrow, Alaska, the T-5 and
+modiﬁed T-5 proved their ability in the ﬁeld and wereused extensively in the early years in McMurdo. However,
+as the mission (Operation Deep Freeze) became more
+focused on long-term occupation (that is, continuing polit-ical presence, scientiﬁc research and logistical supportfor South Pole Station), the use of new T-5 structures
+ceased and they were replaced with a steel-frame version, a
+structure and siding system known as Robertson Buildings
+(Fig. 12 ).
+Robertson buildings are a:‘… steel clad three-inch insulated panel without any
+metal fasteners extending through it … [with a] coated-
+steel vapor-barrier at its interior side [to prevent]moisture penetration’ (Hoffman 1974 : 5-1).
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 10 =====\n\n176 DAVIS
+Fig. 12. The medical dispensary around 1968, an example of a Robertson Building. The
+front door has changed, but this building has stood since 1961 (USN 1968 : 36).
+They are just as unremarkable in appearance as the T-5
+designs but were better insulated and, as was mentioned,more ﬂexible when it came to the customisation of the
+interior design, as was needed for the increasingly wide
+range of activities occurring at the station. Crucially,they were still easy to assemble and were built from
+prefabricated parts both for the steel skeleton and the
+insulating panel siding.
+Manufactured by the H.H. Robertson Company of
+Pittsburgh, Pennsylvania, this type of building can still
+be seen today, either as relics of the past (for example,the medical building) or as updated versions of newer
+buildings (for example, the three-storey dormitories). In
+the 1974 NCEL Engineering manual, the building system
+is described as thus:
+‘The panel used at McMurdo Station [was] the H-Type Q-Panel, [which was] insulated with 3 inches of
+ﬁberglass and contain[ed] no metal fasteners [that ex-
+tended] through the panel. A coated-steel vapor-barrieron the interior side prevent[ed] moisture penetration.
+[The manufacturer] stat[ed] that at -50 °F outside and
+70°F inside, condensation should not form even with
+a relative humidity of 80%” (Hoffman 1974 :5 - 1 ) .
+It should be noted that the insulation used was galbes-
+tos, a product also manufactured by the H.H. RobertsonCompany.
+‘Galbestos panels consist of two metal sheets with
+an intervening layer of insulating ﬁber glass. Thetrade name derives from the treatment of the metal
+surfaces, which by a special process are galvanized
+and impregnated with asbestos ﬁbers’ (Barber 1968 :
+140).
+So popular was the Robertson Building that the NCEL
+manual notes that only two buildings being replaced orbuilt at the time were not of this design: an old aircraft
+hangar and the USARP
+6administration building (the
+future NSF Chalet), with its wood structure chosen for
+its ‘… more pleasing architectural style’ (Hoffman 1974 :
+5-1). Today the remaining Robertson buildings are used aswarehouses and are showing their age, with the exception
+of the three-storey dormitories, which were built in the
+late 1980s with a more modern, asbestos-free sidingsystem.
+Although some people still have an afﬁnity for the
+distinctive shape of the Quonset hut today, the earliestbuildings used in McMurdo Station were made neither
+to last nor to leave a lasting impression. Their exteriors
+are unremarkable to those unfamiliar with their history.
+Their mission was to provide a heated shelter for the men
+participating in Operation Deep Freeze, and be easy totransport, erect and disassemble. Today we characterise
+these structures as drafty, crowded and offering little or no
+privacy, but at the time they served their purpose well. Withthe success of the ﬁrst IGY , the US decided to extend its
+Antarctic mission beyond 1959 and replace the temporary
+facility at McMurdo with a more permanent one (Hoffman1974 : 2). Prior to this decision there were few facilities
+for conducting scientiﬁc research at NAF McMurdo,
+which mostly served as a base for aircraft servicing otherstations or nearby ﬁeld camps. In 1959 a small biology
+laboratory appeared (the McMurdo biological laboratory,
+later renamed the Eklund Biological Center).
+After a few years it became clear that the station
+needed a plan for its upkeep and expansion. To accomplish
+this, the USN ordered the NCEL to create a long-range
+development plan (LRDP) so that the current, short-term
+facility would be able to aid scientiﬁc efforts on-site andat remote stations, mainly the new station at the South
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 11 =====\n\nARCHITECTURE OF MCMURDO STATION 177
+Pole. It was the ﬁrst of several subsequent LRDPs for the
+station.
+Transition to the NSF (1961–1979)
+By 1961 most nations had begun to scale back their
+activities on the continent. In contrast, this was thebeginning of a period of growth for the recently renamed
+NAF McMurdo Sound (Collis and Stevens 2004 :4 ) .
+In 1961 the USN issued a plan for the station titledPreliminary study for reconstruction and improvement of
+U.S. naval air facility, McMurdo, Antarctica . According
+to the document, the station would grow to 58 buildings,accommodating up to 1,500 people in the summer and 500
+in winter; it would be large but compact, with facilities
+close to those with related functions, and would includea central, all-purpose building in the centre and buildings
+for various scientiﬁc ﬁelds (DMJM 2003 : 3–4; Klein and
+others 2008 ). The addition of a nuclear power plant in 1962
+helped provide power and potable water for the growing
+population. Unfortunately, Klein and others ( 2008 ) note
+that with the exception of a station core building and a few
+warehouses, most recommendations in the 1962 plan did
+not come to pass.
+Around 1969, the ﬁrst large building constructed, the
+steel-framed, 6,316 m
+2station core facility practically
+named ‘Building 155’ dominated the centre of the station,replacing several smaller structures and providing access
+to food, housing and recreation in one building ( Fig. 13 ).
+It maintained the line of the two main streets but alsochanged the dynamics of the layout, with its large mass
+creating a barrier in the middle of the station. With or
+without the guidance of a LRDP, McMurdo Station hadgrown in scope and scale. At this time there was still
+a distinct military feel to the station despite a growing
+scientiﬁc programme. Ofﬁcers and enlisted men, along
+with scientists, still ate in segregated areas in the ‘galley’,
+purchased snacks in the ‘Ship’s store’, and slept onthe second ‘deck’ of Building 155. Terms like this still
+decorate the lexicon of the station, and in a way even
+today it feels like McMurdo is still transitioning from itshistoric naval roots. Here, change often comes slowly.
+While most accounts list the year 1972 as the time
+when control of the station was handed over to theNSF, it was actually a series of events spanning several
+decades, not a single point in time. There is no clear-
+cut date for the handover; the transition away from themilitary leading the way and supporting the scientists was
+not ofﬁcially completed until 1998, and today there are
+still Air National Guard pilots who ﬂy LC-130s and theAirforce ﬂies C-17s on and off of the continent. The reason
+for the shift away from the Department of Defense (DOD)
+involvement appears to have been monetary. Each newprivate contractor has since taken on more responsibilities,
+including logistics, planning, hiring and the development
+of LDRPs. For these reasons, there is little evidence of
+a dramatic change in the way architectural, engineering
+or planning projects were handled at McMurdo Station in1972.As early as 1960, according to the NSF, the Bureau of
+the Budget (now the Ofﬁce of Management and Budget,
+OMB) released a directive known as ‘Circular A-51,
+Planning and conduct of the United States program for
+Antarctica ’, granting the NSF power to:
+‘…continue to exercise the principal coordinating andmanagement role in the development and carrying out
+of an integrated U.S. scientiﬁc program for Antarctica’
+(NSF 1996 ).
+Major logistical operations at the stations were still
+handled by the DOD.
+During this period, scientists at McMurdo Station lived
+and worked in the company of service personnel. All
+support, ground transportation, medical services, search
+and rescue (SAR) and accommodation were providedby the USN. The barracks, galley and clubs were still
+segregated by rank, although scientists moved freely
+among these places. Then in the late 1960s the USN andNSF began to explore the idea of shifting the support role
+to private contractors. In 1968, the ﬁrst private contractor,
+Holmes and Narver (H&N) (a subsidiary of Ashland Oil
+Company), was hired to help oversee the station. The ﬁrst
+project they undertook in McMurdo was the erection ofthe NSF ‘Chalet’, the ofﬁcial NSF building at the station
+(Fig. 14 ).
+A 1970 memorandum reviewed by President Richard
+Nixon and signed by Secretary of State Henry Kissinger
+directed the NSF to continue its active presence in the
+Antarctic as stated in the 1960 A-51 Circular, but also tobegin (ofﬁcially), a transfer of the responsibilities of the
+Antarctic programme from the DOD to the NSF. These
+responsibilities included the continued use of governmentagencies for logistical support where a mutual agreement
+could be reached, but also the use of commercial (private)
+support when cost-effective on a ‘mutually acceptablereimbursement or nonreimbursement basis’ (NSF 1996 :2 ;
+National Security Council 1970 : 2). These changes were
+ordered to be ﬁnalised by 1972. The memorandum putthe NSF in charge of the programme, and it was up to
+the NSF to decide whether to use government logistical
+support or look towards private contractors. As it turned
+out, working with the private sector was much more cost-
+effective.
+For several years after the NSF took over, much
+support was still provided by the USN although there was
+an increased reliance on private contractors. It was theNCEL, not H&N, that in 1974 released an engineering
+manual for McMurdo Station (see also Easton 1969 ). The
+manual was intended to serve as a record of informationgathered from years of research and experience which the
+USN had acquired. It described:
+‘… the terrain and environmental features in thevicinity of McMurdo Station … and present[ed]
+engineering methods and operational procedures for
+working within these natural constraints’ (Hoffman1974 :1 ) .
+The manual included information on subjects ranging
+from working and building on the ice shelf to the properties
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 12 =====\n\n178 DAVIS
+Fig. 13. (Top) Building 155, now painted blue, after a wind event, August 2010.
+Photo by author, 2010. (Bottom) Layout of Station around 1968 showing a half-built Building 155 (blue lines, added by author, show ﬁnal extent) (USN 1968 :
+24).
+Fig. 14. The NSF chalet in November 1972 (Photo PH2 David M. Dyer). Courtesy of the US
+National Archives, College Park, MD.
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 13 =====\n\nARCHITECTURE OF MCMURDO STATION 179
+of snow and permafrost, to the design and maintenance
+of station buildings. There are even results of the NCEL
+report on Portland cement in Antarctica. Also included
+was a brief history of the founding of the Naval Air
+Facility and its new designation as a permanent Antarctic
+station. This was not, however, a master plan. As theﬁrm that later designed the science lab for McMurdo
+wrote:
+‘[A]lthough technically successful in its purpose toestablish a building standard for the station, the manual
+was not intended to address a comprehensive plan for
+the station’s development. The functional needs of thebuilding inhabitants, infrastructure, and esthetics were
+given a low priority, as can be seen in the expanding
+chaotic collection of metal building forms connectedby elevated utility lines and pipes that ﬁnally resulted
+from the implementation of the manual in the absence
+of a station master plan’ (Ferraro 2010 : Ch. 7).
+It was instead a record of hard-won knowledge about
+building and working in McMurdo Station and served as
+documentation of the often complex chain of events that
+led to the station’s current state.
+Pushing the station towards a more permanent pres-
+ence, it also recommended a transition to a metal version
+of the T-5 (that is, the Robertson Building), which also
+allowed greater variation in the interior designs thanthe previous T-5 model. By 1968 they were considered
+the ‘principal Antarctic structure, [having] been used to
+satisfy a wide variety of needs’ (USN 1968 : 36). The
+dormitory that came to be known as Hotel California
+(1968) was steel-framed with insulated metal siding
+and rooﬁng, steel-framed heavy-timber ﬂoors and wood-framed gypsum board interior partitions. At the time of
+its construction, this building was considered an upgrade
+from the Jamesways that often served as housing, andit was another example of how the change to metal
+buildings was another step towards making the station
+more permanent.
+The 1974 NCEL report changed the face of McMurdo
+Station; however, as it was an engineering proposal
+and not a long-term comprehensive plan for a scientiﬁc
+community, the station continued to operate but did not
+age well. As one of the architects who designed the CraryScience Laboratory later noted:
+[t]he station’s complexion became an affront to the
+serene beauty of the Antarctic and an embarrassmentto the United States when the news media began to
+report on the status of the continent’s environment’
+(Ferraro 2010 : Ch. 7).
+So despite its growth, McMurdo Station was still
+being treated like a collection of buildings. There was
+a need to look at the station as a whole and createa LRDP that also took into account the design and
+evaluation of the buildings not only from an engineering
+standpoint but from a more comprehensive architecturalone: energy efﬁciency alongside human comfort, design
+and productivity.McMurdo Station: 1979–present
+It was not until 1979, near the end of their 12-year
+contract, that H&N released a master plan, the Long range
+development plan ,Antarctica , which focused on replacing
+existing small, temporary structures in McMurdo with
+larger, more efﬁcient ones and consolidating buildings inalready developed areas (DMJM 2003 ). Under this plan,
+changes to the station could be implemented over the
+course of ten years or more.
+New buildings would include for the ﬁrst time both
+attention to utility connections and personal privacy. With
+the backing of the NSF, science facilities, badly in needof renovation, were improved as well (Ferraro 2010 :C h .
+8). Additionally, the main power and water plants were
+moved from a location on Observation Hill to locationscloser to the ocean, although it is not clear why. There has
+been some discussion of a gravity-feed system that takes
+advantage of natural topography would improve reliability
+of water delivery for ﬁre suppression systems (Augustine
+and others 2012 : 214), but current systems rely solely on
+pumps. According to Klein and others:
+‘[S]tation development since 1979 has generally fol-
+lowed this long-range plan (Klein and others 2008 :
+16).
+Yet, the reality remains that while a few facilities
+were consolidated according to the LRDP, the organiclayout persisted and was reinforced through the improved
+deﬁnition of existing circulation routes (DMJM 2003 :
+3–4). However, the move away from a military-stylestation towards one focused on science was clear, and it
+was soon reﬂected in the types of buildings constructed
+(more permanent) and how funds were distributed (biasedtowards science efforts instead of maintenance). Slowly,
+the rigid lines of the old naval station blurred. The fading
+visibility of the military plan:
+‘[A]lso points to the demilitarization of the US Antarc-
+tic presence: McMurdo was initially constructed as aNaval Air Facility, but in a continent in which science
+rather than military might guarantees territorial inﬂu-
+ence, the station’s military foundations, as well as itscontentious use of military personnel in Antarctica, are
+increasingly downplayed’ (Collis and Stevens 2004
+:
+246).It is not clear whether subsequent contract holders
+acted on a mandate from the NSF or independently to
+publish master plans, but nearly all produced ambitiousplans or updates for McMurdo Station. However, lack
+of a comprehensive budget repeatedly undercut all these
+proposals. Over the next 10–20 years McMurdo developedas needs arose and budgets allowed. The layout gradually
+moved away from a grid and towards a more organic layout
+based on the topography of the site, although overall the
+patch of ground that is today’s station has been graded
+extensively (Planning for tomorrow 1993: 4). Buildingssites were chosen where it was convenient, or wherever
+a patch of relatively ﬂat ground could be created (DMJM
+2003 : 3–4). Natural features, a steep slope towards the
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 14 =====\n\n180 DAVIS
+coast and the icy craters on all other sides, seem to be the
+only barriers to expansion.
+Even today, US stations in Antarctica are not budgeted
+all at once, but as needed. Unfortunately, the budgets
+rarely include funds for maintenance. Rather, buildings
+and stations must make do until a lack of maintenanceimpedes scientiﬁc endeavours. Only then are improve-
+ments funded. New buildings are generally built one at
+a time and years apart. In one rare instance, the new SouthPole Station was completely replaced with one massive
+Congressional appropriation. This is not the norm and at
+McMurdo it has not happened since the original IGY andsubsequent decision to make the station permanent.
+After H&N the next contract was awarded to ITT
+Antarctic Services (based in New Jersey) from 1980–1990. During this time, McMurdo underwent a number
+of new construction projects, including a new power plant
+(which housed diesel generators), a replacement to thevehicle maintenance facility (VMF) that was destroyed
+by ﬁre, and four three-storey dormitories (Buildings 206–
+209). No documents from this contractor could be found,
+so it is unclear which buildings (if any) were designed
+by ITT and which were projects slated for constructionbefore ITT assumed the contract.
+Between 1990 and 2000, Antarctic Support Associates
+(ASA), a joint venture between H&N and EG&G (knownas a US defence contractor), held the Antarctic contract.
+It was during this time that the USN formally pulled
+out of the Antarctic. In 1993, after 42 years servingthe US Antarctic Program (USAP), it announced its
+decision to withdraw. On 20 February 1998, a ceremony
+in Christchurch, New Zealand, commemorated the ofﬁcialend (although the USN still provided some ﬂight support
+until the end of the 1998–1999 season) (NSF 1998 ).
+By this time the role of the contractors had increased.
+Along with the NSF, ASA oversaw the completion of sev-
+eral projects, some of which had been outlined in the 1979
+LRDP (for example, new dormitory facilities), and mostprominently, the new science laboratory – the scientiﬁc
+heart of the station – the Crary Science and Engineering
+Center (1987–1993). In 1995 ASA released an update
+to the H&N LRDP. Known simply as the 1995 Update
+to the LRDP , this report re-emphasised consolidation,
+functionality, footprint reduction and replacing inefﬁcient
+older structures. It is considered more of a facilities
+replacement plan than a ‘city development plan’ (OPP2003 : 2). Considering the way Antarctic infrastructure
+projects are funded, it could be considered a pragmatic
+approach.
+Raytheon Polar Services took over the Antarctic con-
+tract in 2000. In 2003, it issued its own update to the LRDP,
+a report compiled by DMJM.
+7This document covers land
+use, facilities development, utilities development, site de-
+velopment, vehicle and pedestrian circulation, and design
+controls. Aside from being the only easily accessibleLRDP document, it appears to take into consideration
+comfort and ‘human factors’ more than any previous
+proposal, and it includes what might be the ﬁrst seriousdiscussion of the need for improved energy efﬁciency.
+While paying the most attention to building upgrades
+and energy saving measures, the authors of the document
+attempted to create guidelines for new buildings, including
+more single-room dormitories. The authors explicitly state
+that:
+‘… energy wastefulness impacts comfort levels and
+operating costs’ (DMJM 2003 : 3–24).
+Phrases such as ‘productivity and spirit of community’
+and ‘quality of life’ were used in an assessment of current
+conditions at the station. The DMJM authors list several
+other observations made during their initial site visit thatare unusual for this type of document, including:
+‘(1) McMurdo’s ‘remote outpost’ feel combines ‘as-
+pects of a mining town, military base, and collegecampus’;
+(2) Although it is a remote, old USN base, it is still a
+community of science and support people, and thereare ways to improve the feel and wayﬁnding systems
+on the station;
+(3) Logistics are the ‘life blood’ of the station and it
+is imperative to provide for the people that make this
+possible;(4) The station has developed in an inefﬁcient and
+haphazard manner;
+(5) Many of the buildings are some of the original onesfrom the 1950s and 1960s; and
+(6) In part because of the aging buildings but also
+because they require excessive travel between them,the station is not energy efﬁcient’ (DMJM 2003 : 1–2).
+These observations are more architectural than in any
+previous report.
+The same year as the release of the DMJM docu-
+ment, OPP released a housing report (OPP 2003 )a l s o
+emphasising human comfort as essential to the futuresuccess of the station. The report was a response to ‘a
+request contained in the House Committee on Appro-
+priations Report 1-7-740 accompanying the FY 2003Appropriations Bill for Veterans Affairs and Housing
+and Urban Development, and Independent Agencies’
+regarding the upgrade of housing facilities at McMurdo
+Station, Antarctica (OPP 2003 ). Identiﬁed in the report as
+one of the highest housing priorities is a 40% increase insingle-occupancy rooms, highlighting the importance of
+privacy for everyone working at the station. The presumed
+increase in site footprint and the cost of providing moreprivate rooms has so far been a barrier for this goal.
+In 2012, a new push for the actual realisation of these
+dormitory facilities was proposed, although it appearsthese plans involve a reconﬁguration of existing rooms,
+not a series of new buildings.
+Additionally, Raytheon oversaw an energy study con-
+ducted by RSA Engineering, Anchorage, Alaska, in
+2008 (RSA 2008 ) (issued just before the ﬁrst stages
+of the Ross Island Wind Energy Farm). It proposed toreduce overall energy consumption and improve employee
+living and working conditions (RSA 2008 ). Many of
+their recommendations address the building envelope,
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 15 =====\n\nARCHITECTURE OF MCMURDO STATION 181
+Fig. 15. The Science Support Center (SSC) built in 2004 (Photo by author, 2009).
+including improved windows. The report stated that while
+all federally funded buildings must comply with standards
+that reference the ASHRAE Standard 90.1-2004 and
+the IECC-2004/2006, existing buildings in McMurdowill not be able to meet these requirements; rather, the
+RSA recommendations employ the standards only as a
+‘reference when providing wholesale retroﬁts in lighting,thermal or plumbing systems of buildings’ (RSA 2008 :
+7). Since new buildings are not prescribed, there is no
+mention of actually meeting these standards for an entirebuilding.
+The RSA recommendations included: 1) adding new,
+insulated metal panels to the walls and roofs of pre-1973 buildings to reduce heat loss at much as 70%; 2)
+installing new vinyl windows to reduce heat loss, improve
+daylighting and provide additional escape routes; 3) in-stalling Solatube lighting systems for reduced dependence
+on artiﬁcial light in certain buildings; and 4) replacing old
+wooden doors with insulated steel doors with relites toimprove the building envelope and to provide a little extra
+daylighting.
+In effect, the 2008 study was not a LRDP, but a list
+of short- and long-term projects aimed at reducing fuel
+and water consumption. It was possibly commissionedbecause of an increasingly volatile energy market. A few
+projects in the report were completed, such as the new
+generator building and the improved heat trace system(to keep ﬂuids in pipes above ground from freezing).
+The proposed integration of the Scott Base wind turbines,
+completed in 2010, is now a reality.
+Today the buildings in McMurdo Station have not
+changed radically in appearance; that is, despite several
+building types there is no visual focal point, and nobuilding that does not fall into the ‘mining town’ aesthetic.
+Projects are generally funded one at a time, so the few
+modern buildings (built within the last 20 years) areoutweighed by dozens of older buildings.
+The newest arrival at the station is the 3,716 m
+2Science
+Support Center (SSC) ( Fig. 15 ). An Arctic entry below
+a distinctive porch covering leads into a double-height
+lobby with many windows providing daylight into themain staircase. A front ofﬁce, walled-off from the lobbybehind a large window, also beneﬁts from some of this
+daylight. The L-shape of the SSC affords more access to
+windows throughout the building. In addition, the building
+has solid ﬂoors made from concrete slabs resting on asteel frame (off the ground). Form-wise, it may seem
+like an unremarkable building but, if compared with the
+limitations of a Quonset or T-5 hut from the 1950s, itdemonstrates how much construction and engineering
+techniques have evolved and how design issues, once
+thought to be details or luxuries, are now receiving moreattention.
+Future of the station
+Expanding one’s scope, it is possible to ﬁnd innovation
+and inspiration from non-US Antarctic bases,
+8as well as
+from other US reports on facilities located in extremely
+cold regions. These designs and ideas could be adapted
+for McMurdo, even though it is larger than all other
+Antarctic bases and is no longer a military-run station. For
+instance, in their document called the Uniﬁed facilities
+criteria (UFC) for Arctic and sub-Arctic buildings ,t h e
+DOD considered (among other things) the differences
+between multiple versus composite-building concepts formilitary buildings.
+First, noting that multi-building stations are often the
+result of remote sites, the UFC document points out thatthese more organic layouts suffer from large physical
+footprints (including extensive heat and power distribution
+infrastructure) and high heat loss from multiple exteriorwalls and roofs, which necessitate large capacity heating
+systems. However, these losses may be deemed acceptable
+if one considers adaptability and ﬁre safety to be a highpriority. Multi-building stations can be ﬂexible when it
+comes to building on uneven terrain and in terms of
+heating, ventilation and air conditioning (HV AC) systems(if there are small structures that do not require mechanical
+ventilation); smaller buildings also do not require complex
+foundations. Additionally, the authors of the document
+add that:
+‘[i]n cold weather there are psychological advantagesin being able to get away from living and working
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 16 =====\n\n182 DAVIS
+areas by walking in the covered passageways’
+(DOD 2004 : 1-1).
+However, the authors of the UFC document also
+acknowledge that composite-building stations have their
+advantages such as: 1) a lower surface-to-volume ratio
+(lower heating demand), 2) lower construction costs(fewer roofs and foundations) and 3) easier maintenance.
+Composite structures also beneﬁt from centralised heat-
+ing (fewer distribution lines) and ampliﬁed savings formultistorey buildings. On the downside, there is a great
+risk from ﬁre spreading (so greater protection is required)
+and less ﬂexibility when it comes to standardised build-ing systems. The authors of the document recommend
+moving noisy, odorous activities (for example, diesel
+power supply) to a separate structure for the sake ofhealth and morale of the station occupants. Although
+the authors of this document recommend the composite-
+building approach, they also indicate that it is best forremote and small installations. McMurdo Station outgrew
+this label decades ago.
+Lockheed Martin (now Leidos) currently holds the
+civilian support contract for McMurdo Station, and it is
+continuing the tradition of issuing a station report. In 2013,Lockheed commissioned an architectural ﬁrm to create a
+new plan, to guide (or completely reorganise) the station
+over the coming decades. The proposed master plan buildson the extensive 2012 report, issued by the USAP Blue
+Ribbon Panel, about the future science and logistics plans
+for all of the US Antarctica stations. The authors of the2012 report observed that, despite science being the main
+reason for maintaining a presence in the Antarctic, the
+supportive logistical effort requires nearly nine times theamount of time and money; the report likened the 1:9 ratio
+to that of the mass of an iceberg below and above water.
+The panel noted that:
+‘US activities in Antarctica are very well managed
+but suffer from an aging infrastructure, lack of a
+capital budget, and the effects of operating in anextremely unforgiving environment’ (Augustine and
+others 2012 :7 ) .
+In McMurdo these problems are highly visible, ran-
+ging from old, drafty buildings to scattered and nearly
+derelict warehouses, to an outdated inventory system.Therefore, it may not be a surprise that the architectural
+ﬁrm’s proposal, rather than once again recommending
+small ﬁxes, instead recommends replacing nearly everybuilding in McMurdo over the course of several years.
+As the title of the 2012 report, More and better science
+in Antarctica through increased logistical effectiveness ,
+indicated, the members of the panel found that the majority
+of problems, including both the overall cost and simultan-
+eous ability to accommodate scientists are the result ofout-of-date logistics and a crumbling infrastructure; this
+was often the result of diverted funding going towards
+science as long as the logistics and infrastructure couldsurvive another season. The report noted that if there is a
+choice between ‘… repairing a roof or conducting science,
+science usually prevails’ (Augustine and others 2012 :7 ) .However, at some point this becomes a self-defeating
+policy.
+The panel focused on streamlining logistics and up-
+dating parts of all three US Antarctic stations. The goal
+was to reduce the percentage of the budget spent on
+support and logistics that would in turn provide morefunding for Antarctic science grants. Some improvements
+included the need to restore the US polar ocean ﬂeet,
+to decrease the number of LC-130 ﬂights to McMurdoand the Amundsen-Scott Base, and to decrease the con-
+tractor personnel by 20%. This might bring McMurdo
+Station’s peak population close to or under 1,000people.
+Regarding McMurdo Station speciﬁcally, the panel
+acknowledged the haphazard arrangement of the stationbut also concluded that there was no better location
+(logistically) and that an investment in a new station
+the size of McMurdo Station located elsewhere wouldreach $220–300 million (Augustine and others 2012 : 12;
+Leshner 2016 ). Rather, improvements to the station could
+help make up for any of the less-than-optimal conditions.
+Of the ten main recommendations, three relate directly
+to architecture and engineering. Naturally, one of theseis to increase the energy efﬁciency of the station and
+its use of renewable energy, with the panel pushing for
+more wind turbines, a way to incinerate solid waste andwaste oil for extra heat, and improved insulation in several
+key buildings. The second recommendation focuses on
+reducing operational costs through an updated master planof the station as well as an improvement to dormitory
+facilities (for example, the reduction of the spread of
+communicable disease in these buildings).
+These recommendations are all important because the
+third recommendation is that the scientiﬁc programme is
+to be continued at the existing station. Although the panelcountered this by adding that:
+‘[D]espite a workforce that takes great initiative in
+doing what it can with the available resources, [s]implyworking harder doing the same things that have been
+done in the past will not produce efﬁciencies of the
+magnitude [needed] in the future; not only must change
+be introduced into how things are done, but what is
+being done must also be re-examined’ (Augustine andothers 2012 : 21).
+With a new contract holder at the helm of logistical
+support, this may be an ideal time to do just this: look atthe fundamentals of how and what at McMurdo Station,
+the largest facility on the continent.
+Therefore, a sustainable future for McMurdo Station
+will hinge on the resolution of fundamental problems
+that have developed over several decades of budgeting
+challenges and neglect. A number of these problemsexist in the realm of architecture and speciﬁcally within
+the intersection of design, energy efﬁciency, health and
+comfort. Other nations have proved that smaller scaleinstallations are capable of providing safe, comfortable
+and energy efﬁcient scientiﬁc research stations. McMurdo
+Station, however, is a different challenge because it is more
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 17 =====\n\nARCHITECTURE OF MCMURDO STATION 183
+like a town than any of these smaller stations, which tend
+to have a more intimate feel to them.
+It was with these problems and recommendations in
+mind that the design ﬁrm engaged by Lockheed Martin,
+OZ Architecture of Colorado, proposed a LRDP for
+McMurdo Station in 2013 that was the latest in thesuccession of LRDPs from the USN and a list of private
+contractors. Their initial vision for the station took an old
+idea – consolidation – to a new extreme, with nearly everyfunction of the station contained in one massive structure.
+Excluded were the VMF, hospital, the helicopter hangar
+and dive locker, the generator warehouse, and water andwastewater treatment plants. In this proposal, the NSF
+Chalet would be transformed into the new coffee house.
+The new SSC was to be converted into a facility for ﬁeldstaging and cargo handling, possibly replacing the Berg
+Field Center (BFC) and food warehouse, a Robertson
+Building and an old two-storey Quonset hut. Finally, allcurrent dormitories would be demolished and rebuilt as
+appendages on the single large building. A few station
+buildings would be connected by surface (structured) or
+elevated (overhead) walkways.
+In addition to footprint consolidation and increased
+energy efﬁciency, the OZ proposal mentioned several
+design aspects such as visual clutter, pedestrian safety and
+an increased use of multipurpose rooms. In this proposal,the look of the station, while not visually distinct, was
+more modern and presumably more energy efﬁcient. In
+a radically different approach to station design, multiplebuildings are combined into one large complex, separated
+by ﬁre walls: all recreational, commissary, ofﬁce and
+housing functions. This is useful especially during thewinter, but massing such a large building carries with it
+special challenges.
+A second version of this LRDP (made public in the
+spring of 2016) pulled back on this extreme consolidation
+in favour of a more moderate one. In this new design,
+the single large central facility is now spread into threeinterconnected parts but is still connected (and heavily
+protected with ﬁre walls). These three structures are
+phased and timed to be constructed around the current
+Building 155 without interrupting operations. When ap-
+propriate, Building 155 will be demolished, leaving alarge, open space (apparently a loading dock area). The
+current three-storey dormitories remain, but are renovated,
+with two more of the same style added at the north end. (Itis not clear how many rooms will be single occupancy.)
+At least two of these buildings would be connected by
+elevated walkways to the central facility and each buildingis connected to each other.
+This bold, new LRDP is in its infancy, and its success
+will hinge on budgets. Convincing the US Congress toprovide funding will be essential, just as it was for the new
+South Pole Station. Although science is the overt mission
+of McMurdo Station, the strategic presence it gives theUS on the continent and the logistical support it provides
+for access to the interior will undoubtedly be important
+considerations in securing support as the station enters the21st century. The architectural history of the station will,
+one hopes, guide future design and engineering decisions
+for the built environment that will make McMurdo more
+productive and efﬁcient, and contribute to the quality of
+life for its inhabitants.
+Summary
+The wealth of information embedded in the history of the
+buildings on Ross Island is a valuable resource for those
+seeking to improve the living and working conditionsthrough the built environment. Unfortunately, until now, a
+publicly available, single source of architectural inform-
+ation has not existed. Demands on human habitationshave grown from those of a few dozen explorers to
+several hundred scientists and contract employees. During
+this time the buildings have advanced from importedwooden huts with little or no ventilation control, to
+imported steel-framed structures with massive HV AC
+systems. The complexities presented by this station arecompounded by its remoteness, size and architectural
+legacy. Approaching a new, comprehensive design is
+daunting. Therefore, it is important to be prepared with
+knowledge of the speciﬁc challenges and cold-region best
+practices (that is, the mechanical and structural demandsof a remote cold desert, ways to promote energy efﬁciency
+without sacriﬁcing occupant comfort, and the effects
+of isolated environments on human behaviour). Thereare many parameters to apply to new developments at
+McMurdo Station, but they are beyond the scope of this
+article.
+9An architectural history of the station is one
+tool. Understanding and documenting the history of the
+station’s architectural evolution should remain a priority
+for any current and future plans.
+Acknowledgements
+This article was adapted from my doctoral dissertation at
+Texas A&M University. I would like to acknowledge DrJeff Haberl and other members of my dissertation com-
+mittee who provided valuable comments and suggestions.
+This article also beneﬁted from the comments of two
+anonymous reviewers and Dr R.W. Davis. I would also
+like to thank the helpful staff in the Cartographic Sectionat the National Archives at College Park, MA.
+Financial support
+This work was supported in part by the L.T. Jordan
+Fellows Program (2008–2009), the William W. CaudillResearch Fellowship (2008–2009), a travel grant from the
+Texas A&M University Ofﬁce of Graduate Studies and
+assistantships provided by Texas A&M University.
+Notes
+1. Collis, citing the USN’s Development Project (1946–
+1947), notes that other goals of Operation Highjumpincluded ‘training personnel and testing material,
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 18 =====\n\n184 DAVIS
+consolidating and extending US sovereignty over Ant-
+arctica areas, investigating possible base sites and
+extending scientiﬁc knowledge in general’ and also
+‘prepar[ing] the US military to ﬁght the Soviet Union inpolar conditions’. Speciﬁed instructions included ‘de-
+velop[ing] techniques for establishing and maintaining
+air bases on the ice, with particular attention to … laterapplicability … [in] Greenland’ (Collis and Stevens
+2004 : 2). Camp Century is the most relevant example
+of a USN Base in Greenland.
+2. In the NRC document, NAF McMurdo Sound is de-
+scribed as ‘The Naval Air Facility … serves primarily as
+the base of operation for the air-lift to the Amundsen-
+Scott South Pole Station and the long-range air supplyof Byrd Station. It is used extensively for aircraft
+maintenance and support and as a communications
+and meteorological center’ (NRC 1957 :3 ) .
+3. The site of Little America V , an ice port known as
+Kainan Bay, was eventually determined to be too
+unstable to support long-term resupplying. In contrast,the relatively ice-free tip of the peninsula at Hut Point
+(where Scott’s Discovery Hut still stands), boasts a
+natural harbour (Winter Quarters Bay) and proximityto both a permanent ice shelf and seasonal sea ice
+thick enough to support large cargo planes (Hoffman
+1974 :1 ) .
+4. Logistical mobility is a term used to describe the ease
+with which something can be frequently disassembled
+and moved easily, something required in snow-drifted
+ﬁeld camps.
+5. Now an aerobics room (the ‘Gerbil Gym’), it was once
+the ‘Acey Deucy’, the enlisted men’s bar and hangout.
+6. USARP became USAP around 1986/1987.7. DMJM (Daniel, Mann, Johnson & Mendenhall) Design
+was a transportation-related engineering ﬁrm, ac-
+quired in 1984 by Ashland Oil & Reﬁning Company;of which H&N was a subsidiary. In 1990, Ashland was
+reconﬁgured and AECOM was created, an architec-
+tural design and engineering ﬁrm that includes DMJM.AECOM worked with British architects on the newHalley VI Station.
+8. For more information see Davis, G. 2015. A study
+of remote, cold regions habitation and design recom-mendations for new dormitory buildings in McMurdo
+Station, Antarctica. Unpublished dissertation. College
+Station: Texas A&M University.
+9. A discussion of how other design parameters could
+be included can be found in: Davis, G. 2015. A
+Study of Remote, Cold Regions Habitation and DesignRecommendations For New Dormitory Buildings in
+McMurdo Station, Antarctica . (Doctoral Dissertation).
+Texas A&M University, College Station, TX.
+References
+Amundsen, R. 1913. The South Pole: an account of the
+Norwegian Antarctic expedition in the ‘Fram’, 1910–1912 .
+(Volume 1). (A.G. Chater, Translator). New Y ork: Lee Keedick.
+Augustine, N.R., D. Hartill, T. Allen, G. Jugie, C.E. Dorman,
+L.J. Lanzerotti, H.W. Ducklow, D.J. McNabb, B. Gordon,
+R.E. Spearing, R.K. Harrison and D.H. Wall. 2012. More
+and better science in Antarctica through increased logisticaleffectiveness . Report of the US Antarctic Program Blue
+Ribbon Panel. Washington: White House Ofﬁce of Science
+and Technology Policy and the National Science Foundation.Barber, D.W. 1968. Construction report Deep Freeze 68. Antarc-
+tic Journal of the United States 3 (4): 139–142.
+Belanger, D.O. 2006. Deep Freeze: the United States, the Inter-
+national Geophysical Y ear, and the origins of Antarctica’s ageof science . Boulder: University Press of Colorado.
+Collis, C. and Q. Stevens. 2004. Modern colonialism in Ant-
+arctica: the coldest battle of the Cold War. In: Lehman, G.and D. Nichols (editors). Proceedings of the 7th Australasian
+urban history/planning history conference , Geelong, VIC:
+Deakin University, Australia: 72–95.
+Decker, J. and C. Chiei (editors). 2005. Quonset hut: metal
+living for a modern age . New Y ork: Princeton Architectural
+Press.
+Dempewolff, R.E. 1961. Civilization comes to Antarctica. Popular
+Mechanics 115 (5): 104–109, 224, 226.
+DoD (Department of Defense). 2004. Uniﬁed facilities criteria
+(UFC): Arctic and sub-Arctic construction buildings . Technical
+Manual TM 5–852–9 March 1988 (updated January 2004).
+Washington: Department of Defense. URL: http://www.wbdg.
+org/ccb/DOD/UFC/ufc_3_130_07.pdf , (accessed 1 August
+2013).
+DMJM. 2003. McMurdo Station long–range development plan
+June 2003 update . Washington: National Science Foundation
+Ofﬁce of Polar Programs.
+Dufek, G.J. 1957. Operation Deep Freeze . New Y ork: Harcourt,
+Brace and World.
+Easton, R. 1969. The Naval Civil Engineering Laboratory’s polar
+engineering program. Antarctic Journal of the United States
+4 (3): 73–76.
+Ferraro, J.J. 2010. Development of a remote station architec-
+ture: McMurdo Station, Antarctica . Honolulu: Ferraro Choi
+and Associates. URL: http://ferrarochoi.com/publications/
+development–of–a–remote–station/ , (accessed 10 January
+2011).
+Harrowﬁeld, D.L. 1995. Icy heritage . Christchurch: Antarctic Her-
+itage Trust.
+Hoffman, C.R. 1974. Engineering manual for McMurdo Station .
+Port Hueneme: Civil Engineering Laboratory.
+Klein, A., M.C. Kennicutt II, G.A. Wolff and others. 2008. The
+historical development of McMurdo Station, Antarctica, anenvironmental perspective. Polar Geography 31 (3–4): 119–
+144.
+Lagerbom, C. n.d. America, Antarctica, and the American
+Polar Society. URL: http://www.americanpolar.org/polar–
+compendium/aps–history/ , (accessed 7 October 2011).
+Leshner, A.I. 2016. Don’t forget the infrastructure. Science 352
+(6286): 631.
+NRC (National Research Council). 1957. Antarctic program of
+the United States national committee for the InternationalGeophysical Y ear, 1957–58 . Publication 553. Washington:
+National Academy of Sciences.
+National Security Council. 1970. National Security Decision
+Memorandum 71 . Washington: National Security Council.
+URL: https://fas.org/irp/offdocs/nsdm–nixon/nsdm–71.pdf
+,
+(accessed 25 December 2015).
+Neider, C. 1974. Edge of the world: Ross Island, Antarctica .N e w
+Y ork: Doubleday.
+NSF (National Science Foundation). 1996. Report on the
+US Antarctic Program, committee on fundamental sci-ence, national science and technology council . Document
+# nstc96rp (Archived). URL: https://www.nsf.gov/pubs/1996/
+nstc96rp/start.htm , (accessed 17 February 2013).
+NSF (National Science Foundation). 1998. US Navy to depart US
+Antarctic program after 42 years . Press release 98–012, 18
+February 1998.
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press\n\n\n===== PAGE 19 =====\n\nARCHITECTURE OF MCMURDO STATION 185
+OPP (Ofﬁce of Polar Programs). 1997. Report of the US Ant-
+arctic program external panel . Washington: National Science
+Foundation.
+OPP (Ofﬁce of Polar Programs). 2003. Housing and ware-
+house facilities at McMurdo Station Antarctica . Washing-
+ton: National Science Foundation. URL: http://www.nsf.gov/
+od/opp/usap_special_review/infrastructure_logistics.jsp ,( a c -
+cessed 11 January 2011).
+Pearson, M. 1992. Expedition huts in Antarctica, 1899–1937.
+Polar Record 28(167) 261–276.
+Planning for tomorrow at McMurdo Station. 1993. Antarctic
+Journal of the United States 28 (2): 4–6.
+RSA. 2008. McMurdo Station energy upgrades. Book 1 .A n -
+chorage: RSA Engineering. URL: https://www.nsf.gov/about/
+contracting/rfqs/support_ant/docs/femc_docs/mcmurdo_
+energy_study.pdf , (accessed 11 February 2009).Sherwood, G.E. 1964a. A temporary polar camp . Technical
+report Y–F015–11–104. Port Hueneme: NCEL.
+Sherwood, G.E. 1964b. Temporary polar structures: modiﬁed T -5
+barracks . Technical report Y–F015–11–149. Port Hueneme:
+NCEL.
+Sherwood, G.E. 1965. Improvements to polar camps – use of
+a 64-foot Jamesway . Technical note N–771. Port Hueneme:
+NCEL.
+US Department of the Army. 1957. Erection procedure
+for building, T -5, Arctic, prefabricated panelized, wood,20 feet x 48 feet . Washington: Department of the
+Army.
+USN (US Department of the Navy). 1968. Support for science:
+Antarctica . Washington: Department of the Navy.
+Wilson, C.E. 1956. Operation Deep Freeze: ﬁrst phase: 1955–56 .
+Paoli: Dorville Corporation.
+https://doi.org/10.1017/S0032247416000747  Published online by Cambridge University Press
