@@ -3,38 +3,10 @@ import StructuralPile from '../../components/StructuralPile'
 import FuelTank from '../../components/FuelTank'
 import Antenna from '../../components/Antenna'
 import Radome from '../../components/Radome'
-
-function MainPlatform() {
-  return (
-    <group>
-      {/* Main elevated platform */}
-      <mesh
-        position={[0, 4.1, 0]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[12, 0.45, 5]} />
-        <meshStandardMaterial
-          color="#71808a"
-          metalness={0.7}
-          roughness={0.4}
-        />
-      </mesh>
-
-      {/* Bright lower edge */}
-      <mesh position={[0, 3.85, 0]}>
-        <boxGeometry args={[11.7, 0.08, 4.7]} />
-        <meshStandardMaterial
-          color="#79c8e6"
-          emissive="#1e789c"
-          emissiveIntensity={1.4}
-          metalness={0.5}
-          roughness={0.3}
-        />
-      </mesh>
-    </group>
-  )
-}
+import GeneratorBlock from '../../components/GeneratorBlock'
+import Helipad from '../../components/Helipad'
+import InteractiveAsset from '../../components/InteractiveAsset'
+import InteractiveAsset from '../../components/InteractiveAsset'
 
 function StationModules() {
   const modules = []
@@ -104,7 +76,10 @@ function VColumns() {
   return (
     <group>
       {positions.map(([x, , z], index) => (
-        <group key={index} position={[x, 0, z]}>
+        <group
+          key={index}
+          position={[x, 0, z]}
+        >
           <StructuralPile
             position={[-0.25, 0, 0]}
             height={3.8}
@@ -117,7 +92,11 @@ function VColumns() {
 
           <mesh
             position={[0, 2.15, 0]}
-            rotation={[0, 0, index % 2 === 0 ? -0.12 : 0.12]}
+            rotation={[
+              0,
+              0,
+              index % 2 === 0 ? -0.12 : 0.12,
+            ]}
           >
             <boxGeometry args={[0.15, 3.5, 0.15]} />
             <meshStandardMaterial
@@ -194,42 +173,15 @@ export default function BharatiStation({
         scale={1}
       />
 
-      {/* Small generator/utility block */}
-      <mesh
+      {/* Microgrid generator */}
+      <GeneratorBlock
         position={[6.5, 1.3, -2]}
-        castShadow
-      >
-        <boxGeometry args={[2.2, 2.4, 2]} />
-        <meshStandardMaterial
-          color="#46535c"
-          metalness={0.75}
-          roughness={0.35}
-        />
-      </mesh>
+      />
 
       {/* Helipad */}
-      <group position={[7, 0.08, 4.8]}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[2.4, 2.4, 0.12, 32]} />
-          <meshStandardMaterial
-            color="#4e5e67"
-            metalness={0.35}
-            roughness={0.75}
-          />
-        </mesh>
-
-        <mesh
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 0.07, 0]}
-        >
-          <ringGeometry args={[1.75, 1.88, 32]} />
-          <meshStandardMaterial
-            color="#b7dbe7"
-            emissive="#24586d"
-            emissiveIntensity={0.7}
-          />
-        </mesh>
-      </group>
+      <Helipad
+        position={[7, 0.08, 4.8]}
+      />
     </group>
   )
 }
