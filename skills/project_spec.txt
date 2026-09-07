@@ -1,0 +1,128 @@
+PROJECT BRIEF: POLARIS — DIGITAL TWIN FOR INDIAN ANTARCTIC RESEARCH STATIONS
+
+- Initiative: Smart India Hackathon (SIH) 2026 · Problem Statement ID: PS 26060.
+- Stations Covered: Bharati (coastal promontory, 69°24'S, 76°11'E) and Maitri (inland oasis, 70°46'S, 11°44'E), separated by ~3,100 km of Antarctic terrain.
+- Primary Objective: Build a complete, closed-loop Digital Twin platform enabling remote mission managers at NCPOR (Goa, India) to monitor microgrids, thermal balance, fuel reserves, and cryospheric conditions, detect anomalies in real time, and dispatch mission-critical mitigation actions over a satellite link.
+
+SYSTEM TOPOLOGY & PORT ALLOCATION:
+1. Antarctica Edge Gateway / Mock Server -> http://localhost:8001 (FastAPI)
+   - Runs local physical world ODE simulation clock (2s tick).
+   - Endpoints: GET /edge/raw-telemetry, POST /edge/scenario/inject, POST /edge/controls.
+2. Polaris Digital Twin Engine / HQ -> http://localhost:8000 (FastAPI)
+   - Ingests from 8001 with 500ms simulated satellite latency.
+   - Runs Scikit-learn Isolation Forest + SOP rules engine.
+   - Streams to frontend via WebSocket: ws://localhost:8000/ws/telemetry.
+   - Proxies: POST /api/station/controls, POST /api/scenario/inject.
+3. Command Center UI -> http://localhost:5173 (React 18 + Vite + Tailwind v3.4 + R3F v8)
+
+CANONICAL TELEMETRY SCHEMA (Strict JSON Contract across all tiers):
+{
+  "station_id": "BHARATI" | "MAITRI",
+  "timestamp": "ISO8601-UTC-String",
+  "source": "synthetic",
+  "confidence": "modeled",
+  "ambient": { "temp_c": float, "wind_speed_knots": float, "solar_flux_w_m2": float },
+  "thermal": { "internal_temp_c": float, "chp_thermal_output_kw": float, "aux_heater_kw": float, "heat_loss_kw": float },
+  "microgrid": { "total_load_kva": float, "essential_load_kva": float, "science_load_kva": float, "comfort_load_kva": float, "chp_capacity_kva": float },
+  "fuel": { "tank_level_liters": float, "burn_rate_lph": float, "days_of_autonomy": float },
+  "controls": { "science_instruments_online": bool, "summer_wing_isolated": bool, "hatch_lockdown": bool, "aux_generator_active": bool },
+  "link_status": { "type": "C-band/LEO", "latency_ms": int, "health": "ONLINE" | "DEGRADED" },
+  "risk": { "anomaly_score": float, "is_anomaly": bool, "severity": "NOMINAL" | "ADVISORY" | "CRITICAL", "prescribed_actions": string[] }
+}
+
+FRONTEND SHARED STATE (Zustand Store):
+All UI developers (Dev 3, 4, 5, 6) must read/write to a single global Zustand store:
+- `telemetry`: Latest StationTelemetry object
+- `selectedStation`: "BHARATI" | "MAITRI"
+- `selectedSubsystem`: "GENERATOR" | "FUEL_FARM" | "RADOME" | "HABITAT" | null
+- `isThermalView`: boolean (toggled by Dev 6 shader and Dev 3 UI button)
+
+VALID SCENARIO KEYS (Used for Pitch Demos):
+- "BLIZZARD_80KT"
+- "RESUPPLY_DELAY"
+- "POLAR_NIGHT"
+
+ROLES AND RESPONSIBILTIES FOR EACH DEV MEMBER
+The following are the roles and responsibilities assigned for each dev member. Keep in mind the entire project's scope using these roles.
+
+ROLE: DEV 1 — ANTARCTICA EDGE SIMULATOR & PHYSICS ENGINE (Port 8001)
+
+YOUR RESPONSIBILITIES:
+1. Build a standalone FastAPI service simulating the on-site station server at Bharati/Maitri running on port 8001.
+2. Implement a background numerical simulation loop (ticking every 1-2 seconds) based on first-principles physics:
+   - Heat Loss: Heat loss = U_area * (T_internal - T_ambient) * (1 + 0.05 * sqrt(wind_speed_knots)).
+   - Thermal Balance: Internal temperature delta derived from (CHP thermal generation + aux heaters - Heat Loss) / Thermal_Capacitance.
+   - Microgrid Load: Total load (kVA) = Essential (180 kVA) + Science (120 kVA if active) + Comfort (60 kVA, or 20 kVA if summer wing isolated).
+   - Fuel Mass Balance: JET A1 burn rate (L/h) = (Total Load * 0.22) + (Aux Heater * 0.10). Days of autonomy = tank_level / (burn_rate * 24).
+3. Expose REST endpoints:
+   - GET /edge/raw-telemetry: Returns un-enriched, raw physical sensor readings matching the schema.
+   - POST /edge/scenario/inject: Accepts payload {"scenario_type": "BLIZZARD_80KT" | "RESUPPLY_DELAY" | "POLAR_NIGHT", "duration_seconds": int}. Alters physical parameters dynamically (e.g., wind speed ramps to 80+ kts, ambient drops to -38°C, or fuel level drops to critical threshold).
+   - POST /edge/controls: Receives operator control payloads from HQ (science shed, hatch lock, wing isolate, aux generator) and applies them directly to the station actuators, altering the physics loop instantly.
+4. Ensure the service runs completely headless without dependencies on scikit-learn or the HQ backend.
+
+ROLE: DEV 2 — DIGITAL TWIN ENGINE, SATELLITE INGESTION & AI CORE (Port 8000)
+
+YOUR RESPONSIBILITIES:
+1. Build the main Polaris Digital Twin backend in FastAPI running on port 8000.
+2. Satellite Ingestion Pipeline:
+   - Implement an asynchronous worker (using httpx) that continuously polls http://localhost:8001/edge/raw-telemetry every 2 seconds.
+   - Inject simulated polar satellite dynamics: artificial network latency (400–800 ms round trip) and network metadata in `link_status`.
+   - Proxy operator control commands from POST /api/station/controls down to the edge server via POST http://localhost:8001/edge/controls.
+3. Machine Learning Anomaly Detection (Non-LLM):
+   - Write an offline training script using Scikit-learn to train an Isolation Forest model on 5,000 baseline rows of normal polar operating states across [ambient_temp, wind_speed, total_load, chp_heat, fuel_burn]. Save as a .joblib file.
+   - Load the model in memory. On every tick, compute anomaly scores and classify status (Nominal vs. Anomaly).
+4. Standard Operating Procedure (SOP) Deterministic Prescription Engine:
+   - Feed telemetry and anomaly flags through an Antarctic emergency rule matrix:
+     * Structural Risk: Wind > 60 knots -> Severity: CRITICAL -> "ACTION: Engage exterior hatch structural airlock sequence", "ACTION: Stow external weather sensors".
+     * Thermal Collapse: Internal temp < 16°C -> Severity: CRITICAL -> "ACTION: Spin up Standby Auxiliary Generator".
+     * Fuel Starvation: Days of autonomy < 30 days -> Severity: CRITICAL/ADVISORY -> "ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde)", "ACTION: Isolate unoccupied summer residential modules".
+5. Client Communication Layer:
+   - Maintain active WebSocket connections at ws://localhost:8000/ws/telemetry to push full, enriched StationTelemetry JSON objects to the frontend every tick.
+   - Expose fallback GET /api/telemetry and POST /api/scenario/inject proxying to port 8001.
+
+ROLE: DEV 3 — MISSION CONTROL STATE, WEBSOCKETS & ALERT MITIGATION UI
+
+YOUR RESPONSIBILITIES:
+1. Scaffold the React + Vite frontend application with Tailwind CSS and Zustand (or React Query) for global state management.
+2. Establish a resilient WebSocket consumer connecting to ws://localhost:8000/ws/telemetry with auto-reconnect and a fallback to polling GET /api/telemetry.
+3. Station Navigation & Mode Switcher:
+   - Build a top-level station switcher (Bharati coastal promontory vs. Maitri inland oasis(currently unoperational, set default to bharati)) and an operational mode toggle (Real-time Synced vs. Stress-Test Simulation).
+   - Display satellite link status badge (latency in ms, C-band connection health).
+4. Anomaly Alert & Prescriptive Mitigation Drawer:
+   - Create a prominent alert header indicating current severity (NOMINAL: Green, ADVISORY: Amber, CRITICAL: Pulsing Red) with the raw Isolation Forest anomaly score.
+   - Display the list of prescribed SOP actions returned by the backend.
+   - Implement one-click "Approve & Execute Mitigation" action buttons for each prescription (e.g., "Shed Science Payloads", "Lock Down Hatches", "Isolate Summer Wing").
+   - Connect these buttons to dispatch POST requests to http://localhost:8000/api/station/controls, updating the state in real time.
+5. Scenario Injection Control Panel (For Hackathon Pitch Demos):
+   - Build an operator utility tray to inject test disasters on the fly: "Trigger 80-Knot Blizzard", "Simulate Sea-Ice Resupply Delay", "Initiate Polar Night Transition".
+   - Wire this tray to call POST http://localhost:8000/api/scenario/inject.
+
+ROLE: DEV 4 — TELEMETRY ANALYTICS, MICROGRID & FUEL DASHBOARD
+
+YOUR RESPONSIBILITIES:
+1. Build the data visualization dashboard cards using Recharts, Chart.js, or Better Stack UI libraries, styled with a high-density, mission-control dark theme.
+2. Fuel & Autonomy Gauge Component:
+   - Prominently display "Days of Autonomy Remaining" as a primary hero countdown metric.
+   - Visualize remaining JET A1 fuel farm levels (liters), active burn rate (L/h), and burn trajectory against the scheduled resupply date.
+3. Microgrid & Power Generation Breakdown:
+   - Create real-time area or stacked bar charts showing generator load distribution: Essential vs. Science (MARA radar, ionosondes) vs. Comfort loads against the 600 kVA CHP rated threshold.
+   - Display electrical power vs. thermal cogeneration output in kW.
+4. Thermal Dissipation & Environment Monitor:
+   - Display external weather conditions (ambient temperature, wind speed in knots, solar irradiance).
+   - Build a dual-line chart plotting internal habitat temperature vs. external ambient temperature, demonstrating envelope insulation efficiency and thermal loss spikes during high wind.
+5. Synthetic & Data Integrity Indicators:
+   - Ensure every telemetry widget includes operational metadata tags: `source: synthetic` and `confidence: modeled` to meet the digital twin specifications.
+
+ROLE: DEV 5 — 3D SPATIAL TWIN CORE & STATION ARCHITECTURE (Three.js / React Three Fiber)
+
+YOUR RESPONSIBILITIES:
+1. Implement a 3D canvas viewport using React Three Fiber (`@react-three/fiber`) and `@react-three/drei`.
+2. Construct architectural low-poly representations for the two Antarctic stations:
+   - Bharati: Aerodynamic two-story envelope housing modular ISO containers elevated on structural micro-piles (coastal promontory setting with rock and sea-ice boundary).
+   - Maitri: Main elevated steel-stilt building, adjacent summer container huts, and fuel tank farm situated on bare rocky oasis terrain near Priyadarshini Lake.
+3. Scene Environment & Camera Controls:
+   - Configure OrbitControls with sensible panning, zoom clamps, and polar angle limits to keep the station grounded.
+   - Set up polar daylight and night lighting rigs (directional sun with dynamic azimuth and elevation reflecting polar day vs. polar night).
+4. Station Subsystem Selection & Hotspots:
+   - Use `@react-three/drei`'s `<Html>` component to overlay interactive 3D pins directly anchored to station subsystems: CHP Generator Block, JET A1 Fuel Farm, Science Radome/Antennas, and Residential Quarters.
+   - Clicking a pin or 3D mesh should highlight the component and emit an event to the UI dashboard to focus that subsystem's telemetry cards.
