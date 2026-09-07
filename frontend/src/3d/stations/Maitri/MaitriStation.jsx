@@ -5,7 +5,7 @@ import Antenna from '../../components/Antenna'
 import Radome from '../../components/Radome'
 import GeneratorBlock from '../../components/GeneratorBlock'
 import Helipad from '../../components/Helipad'
-
+import { maitriAnchors } from './maitriAnchors'
 function MainBuilding() {
   return (
     <InteractiveAsset id="STRUCTURE">
