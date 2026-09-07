@@ -24,12 +24,7 @@ export default function StationScene() {
     <Canvas
       shadows
       dpr={[1, 2]}
-      camera={{
-        position: [18, 13, 20],
-        fov: 42,
-        near: 0.1,
-        far: 150,
-      }}
+      camera={{position:[24,16,27], fov:45, near:.1, far:180}}
       onPointerMissed={() => {
         usePolarisStore
           .getState()
@@ -60,14 +55,14 @@ export default function StationScene() {
         far={10}
       />
 
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.08}
-        minDistance={9}
-        maxDistance={42}
-        maxPolarAngle={Math.PI / 2.05}
-        target={[0, 3, 0]}
-      />
+<OrbitControls
+  enableDamping
+  dampingFactor={0.08}
+  minDistance={11}
+  maxDistance={55}
+  maxPolarAngle={Math.PI / 2.05}
+  target={[0, 3.2, 0]}
+/>
     </Canvas>
   )
 }
