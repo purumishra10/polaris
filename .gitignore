@@ -1,4 +1,7 @@
-.venv/
-**/__pycache__/
-*.pyc
 .env
+.venv/
+__pycache__/
+*.pyc
+*.log
+infra/postgres/data/
+scripts/_inspect_sources.py
