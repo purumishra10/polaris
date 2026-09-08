@@ -1,7 +1,7 @@
 {
-  "name": "frontend",
+  "name": "polaris-command-center",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,17 +13,24 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/postprocessing": "^2.19.1",
+    "lucide-react": "^0.462.0",
     "n8ao": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "recharts": "^2.12.7",
     "three": "^0.185.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@types/node": "^20.14.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "autoprefixer": "^10.4.19",
     "oxlint": "^1.79.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.3",
     "vite": "^8.2.2"
   }
 }
