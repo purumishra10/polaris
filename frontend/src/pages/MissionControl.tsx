@@ -21,6 +21,7 @@ import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
 import { usePolarisStore } from '../store/usePolarisStore'
 import StationScene from '../3d/StationScene'
+import CinematicBrief from '../intelligence/CinematicBrief'
 
 interface Props {
   onNavigate: (route: 'home' | 'mission-control' | 'analytics') => void
@@ -288,8 +289,9 @@ export default function MissionControl({ onNavigate }: Props) {
           </div>
 
           {/* 3D Canvas */}
-          <div className="w-full h-[380px] sm:h-[440px]">
+          <div className="relative w-full h-[380px] sm:h-[440px]">
             <StationScene />
+            <CinematicBrief />
           </div>
 
           {/* Bottom 3D Subsystem Selection Strip */}
@@ -301,10 +303,10 @@ export default function MissionControl({ onNavigate }: Props) {
 
             <div className="flex flex-wrap gap-2">
               {[
-                { id: 'GENERATOR', label: 'CHP Microgrid Block' },
-                { id: 'FUEL_FARM', label: 'JET A1 Fuel Farm' },
-                { id: 'RADOME', label: 'MARA Science Radome' },
-                { id: 'HABITAT', label: 'Elevated Habitation Pods' },
+                { id: 'MICROGRID', label: 'CHP Microgrid Block' },
+                { id: 'FUEL', label: 'JET A1 Fuel Farm' },
+                { id: 'COMMUNICATIONS', label: 'MARA Science Radome' },
+                { id: 'STRUCTURE', label: 'Elevated Habitation Pods' },
               ].map((sub) => (
                 <button
                   key={sub.id}

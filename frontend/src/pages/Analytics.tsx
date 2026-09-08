@@ -169,7 +169,7 @@ export default function Analytics({ onNavigate }: Props) {
           </div>
 
           {/* 3D Canvas Viewport */}
-          <div className="w-full h-[280px] sm:h-[320px]">
+          <div className="relative w-full h-[280px] sm:h-[320px]">
             <StationScene />
           </div>
 
@@ -178,10 +178,10 @@ export default function Analytics({ onNavigate }: Props) {
             <span className="text-slate-500 text-[11px]">CLICK 3D PIN OR SELECT SUBSYSTEM:</span>
             <div className="flex flex-wrap gap-1.5">
               {[
-                { id: 'FUEL_FARM', label: 'Fuel Farm' },
-                { id: 'GENERATOR', label: 'CHP Generator' },
-                { id: 'RADOME', label: 'MARA Radome' },
-                { id: 'HABITAT', label: 'Habitat Living' },
+                { id: 'FUEL', label: 'Fuel Farm' },
+                { id: 'MICROGRID', label: 'CHP Generator' },
+                { id: 'COMMUNICATIONS', label: 'MARA Radome' },
+                { id: 'STRUCTURE', label: 'Habitat Living' },
               ].map((sub) => (
                 <button
                   key={sub.id}
