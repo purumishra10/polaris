@@ -34,14 +34,18 @@ export default function StationScene() {
       <Canvas
         key={selectedStation}
         shadows
-        dpr={[1, 2]}
+        dpr={[1, 1.75]}
         eventSource={orbitRoot}
         eventPrefix="client"
-        gl={{ antialias: true }}
+        gl={{
+          antialias: true,
+          powerPreference: 'high-performance',
+          logarithmicDepthBuffer: false,
+        }}
         camera={
           isBharati
-            ? { position: [82, 54, 68], fov: 42, near: 0.1, far: 720 }
-            : { position: [0, 15.5, 38], fov: 38, near: 0.1, far: 320 }
+            ? { position: [82, 54, 68], fov: 42, near: 0.5, far: 4200 }
+            : { position: [0, 15.5, 38], fov: 38, near: 0.3, far: 2000 }
         }
         onCreated={({ camera }) => {
           if (isBharati) {
