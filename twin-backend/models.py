@@ -10,6 +10,8 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
+from typing import List, Optional
+
 StationId = Literal["BHARATI", "MAITRI"]
 Severity = Literal["NOMINAL", "ADVISORY", "CRITICAL"]
 LinkHealth = Literal["ONLINE", "DEGRADED"]
@@ -82,8 +84,9 @@ class LinkStatus(BaseModel):
 class Risk(BaseModel):
     anomaly_score: float
     is_anomaly: bool
-    severity: Severity
-    prescribed_actions: list[str] = Field(default_factory=list)
+    severity: str  # "NOMINAL" | "ADVISORY" | "CRITICAL"
+    prescribed_actions: List[str]
+    citations: List[SOPCitation] = []
 
 
 class StationTelemetry(RawTelemetry):
@@ -160,3 +163,17 @@ class TwinHealthResponse(BaseModel):
     last_ingest_utc: Optional[str]
     connected_clients: int
     consecutive_edge_failures: int
+
+class SOPCitation(BaseModel):
+    document_title: str
+    clause: str
+    source_path: str
+    mandated_action: str
+    excerpt: str
+
+class RiskAssessment(BaseModel):
+    anomaly_score: float
+    is_anomaly: bool
+    severity: str  # "NOMINAL", "ADVISORY", "CRITICAL"
+    prescribed_actions: List[str]
+    citations: List[SOPCitation] = []
