@@ -20,7 +20,7 @@ function PistenBully({ x, z, rotation = 0 }) {
           color="#142430"
           metalness={0.2}
           roughness={0.15}
-          emissive="#c9a56a"
+          emissive="#3a5060"
           emissiveIntensity={0.12}
         />
       </mesh>

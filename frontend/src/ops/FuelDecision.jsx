@@ -1,7 +1,8 @@
 import LiveValue from '../analysis/LiveValue'
 import { SOP } from './decisions'
+import VoyageSlider from './VoyageSlider'
 
-export default function FuelDecision({ decision, onResupply }) {
+export default function FuelDecision({ decision, onResupply, delayDays, onDelay }) {
   const days = Math.max(0, decision.days ?? 0)
   const cap = 180
   const pct = Math.min(100, (days / cap) * 100)
@@ -42,15 +43,24 @@ export default function FuelDecision({ decision, onResupply }) {
         <div>
           <span>DECISION</span>
           <b>
-            {decision.starve
-              ? 'Fuel shorter than the remaining window'
-              : days < SOP.FUEL_ADVISORY_DAYS
-                ? 'Below 30-day SOP floor'
-                : 'Above SOP floor'}
+            {decision.missWindow
+              ? 'Ship delay misses the sea window'
+              : decision.starve
+                ? 'Fuel shorter than the remaining window'
+                : days < SOP.FUEL_ADVISORY_DAYS
+                  ? 'Below 30-day SOP floor'
+                  : 'Above SOP floor'}
           </b>
         </div>
       </div>
-      {onResupply && (decision.starve || decision.band !== 'NOMINAL') && (
+      {onDelay && (
+        <VoyageSlider
+          delayDays={delayDays}
+          onChange={onDelay}
+          decision={decision}
+        />
+      )}
+      {onResupply && (decision.starve || decision.band !== 'NOMINAL' || decision.missWindow) && (
         <button type="button" className="fuel-slip" onClick={onResupply}>
           INJECT RESUPPLY DELAY
         </button>

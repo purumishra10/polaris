@@ -160,18 +160,90 @@ export function daysUntilWindowClose(station, date, mode = 'SEA') {
   }
 }
 
-export function fuelDecision(telemetry, station, date) {
+export function addUtcDays(date, days) {
+  const next = new Date(date.getTime())
+  next.setUTCDate(next.getUTCDate() + days)
+  return next
+}
+
+/** Ship is this many days behind the expedition clock. */
+export function voyageClock(date, delayDays = 0) {
+  return addUtcDays(date, -Number(delayDays || 0))
+}
+
+export function voyageImpact(date, delayDays = 0) {
+  const delay = Math.max(0, Number(delayDays) || 0)
+  const clock = voyageClock(date, delay)
+  const ship = shipTrack(clock)
+  const bharatiSea = daysUntilWindowClose('BHARATI', date, 'SEA')
+  const maitriSea = daysUntilWindowClose('MAITRI', date, 'SEA')
+  const miss = (sea) =>
+    Boolean(delay && sea && ((sea.open && delay > sea.days) || !sea.open))
+  return {
+    delayDays: delay,
+    clock,
+    ship,
+    bharatiHeli: shipNearby('BHARATI', clock),
+    maitriHeli: shipNearby('MAITRI', clock),
+    bharatiSea,
+    maitriSea,
+    bharatiMiss: miss(bharatiSea),
+    maitriMiss: miss(maitriSea),
+    source: 'AL/02 voyage · 43-ISEA 15 Mar hard exit · delay is a what-if',
+  }
+}
+
+export function applyVoyageOverlay(telemetry, station, date, delayDays = 0) {
+  if (!telemetry) return telemetry
+  const impact = voyageImpact(date, delayDays)
+  const nearby = station === 'MAITRI' ? impact.maitriHeli : impact.bharatiHeli
+  const missed = station === 'MAITRI' ? impact.maitriMiss : impact.bharatiMiss
+  const voyage = {
+    delay_days: impact.delayDays,
+    heli: nearby ? 'OPEN' : 'LOCKED',
+    miss_window: missed,
+  }
+  if (!impact.delayDays) {
+    return { ...telemetry, voyage }
+  }
+  const reasons = [...(telemetry.lockouts?.reasons ?? [])].filter(
+    (line) => !String(line).startsWith('Voyage +'),
+  )
+  reasons.push(
+    `Voyage +${impact.delayDays} d — ship modeled ${impact.delayDays} days earlier on the Cape Town track.`,
+  )
+  if (missed) {
+    reasons.push('Delayed arrival is after the published sea-window close.')
+  }
+  return {
+    ...telemetry,
+    voyage,
+    lockouts: {
+      ...telemetry.lockouts,
+      heli: nearby ? telemetry.lockouts?.heli ?? 'OPEN' : 'LOCKED',
+      reasons,
+    },
+  }
+}
+
+export function fuelDecision(telemetry, station, date, delayDays = 0) {
   const days = Number(telemetry?.fuel?.days_of_autonomy ?? 0)
   const sea = daysUntilWindowClose(station, date, 'SEA')
   const air = daysUntilWindowClose(station, date, 'AIR')
+  const impact = voyageImpact(date, delayDays)
   let band = 'NOMINAL'
   if (days < SOP.FUEL_CRITICAL_DAYS) band = 'CRITICAL'
   else if (days < SOP.FUEL_ADVISORY_DAYS) band = 'ADVISORY'
   const next = [sea, air]
     .filter((item) => item && item.open)
     .sort((a, b) => a.days - b.days)[0] ?? sea
+  const waitDays = impact.delayDays
+  const miss = station === 'MAITRI' ? impact.maitriMiss : impact.bharatiMiss
   const starve =
-    next && next.open && days < next.days && days < SOP.FUEL_ADVISORY_DAYS
+    (next && next.open && days < next.days && days < SOP.FUEL_ADVISORY_DAYS) ||
+    (waitDays > 0 && days < waitDays + SOP.FUEL_CRITICAL_DAYS) ||
+    miss
+  if (miss && band === 'NOMINAL') band = 'ADVISORY'
   return {
     days,
     band,
@@ -179,7 +251,15 @@ export function fuelDecision(telemetry, station, date) {
     air,
     next,
     starve: Boolean(starve),
-    source: 'SOP floors 30/15 d · windows AL/02 + 43-ISEA',
+    delayDays: waitDays,
+    missWindow: Boolean(miss),
+    otherHeli:
+      station === 'BHARATI' ? impact.maitriHeli : impact.bharatiHeli,
+    thisHeli: station === 'BHARATI' ? impact.bharatiHeli : impact.maitriHeli,
+    source:
+      waitDays > 0
+        ? `SOP 30/15 d · ship +${waitDays} d · AL/02 + 43-ISEA`
+        : 'SOP floors 30/15 d · windows AL/02 + 43-ISEA',
   }
 }
 

@@ -31,6 +31,8 @@ import FuelDecision from '../ops/FuelDecision'
 import PolarCalendar from '../ops/PolarCalendar'
 import InstrumentRail from '../ops/InstrumentRail'
 import MapDesk from '../ops/MapDesk'
+import PlantToggle from '../ops/PlantToggle'
+import LockoutBacktest from '../ops/LockoutBacktest.jsx'
 import { exportSitrep } from '../ops/exportSitrep'
 import {
   fuelDecision,
@@ -156,6 +158,10 @@ export default function AnalysisDesk() {
   const liveNow = usePolarisStore((state) => state.liveNow)
   const hudTab = usePolarisStore((state) => state.hudTab)
   const setHudTab = usePolarisStore((state) => state.setHudTab)
+  const plantMode = usePolarisStore((state) => state.plantMode)
+  const setPlantMode = usePolarisStore((state) => state.setPlantMode)
+  const voyageDelayDays = usePolarisStore((state) => state.voyageDelayDays)
+  const setVoyageDelay = usePolarisStore((state) => state.setVoyageDelay)
 
   const [openSection, setOpenSection] = useState(null)
   const [doc, setDoc] = useState('knowledge')
@@ -214,7 +220,15 @@ export default function AnalysisDesk() {
   const clockDate = opsDate(telemetry)
   const polarNow = polarState(selectedStation, clockDate)
   const access = windowStatus(selectedStation, clockDate)
-  const fuelOps = fuelDecision(telemetry, selectedStation, clockDate)
+  const fuelOps = fuelDecision(
+    telemetry,
+    selectedStation,
+    clockDate,
+    voyageDelayDays,
+  )
+  const occNow = telemetry?.occupancy ?? facts.winter
+  const fuelTag = telemetry?.plant?.tag ?? (replayOn ? 'MODELED' : 'SYNTHETIC')
+  const climateTag = replayOn ? 'IMD / HISTORICAL' : 'SYNTHETIC DRIFT'
 
   return (
     <section className="analysis-desk">
@@ -247,7 +261,7 @@ export default function AnalysisDesk() {
               className="metric-card live-metric"
               onClick={() => setHudTab('climate')}
             >
-              <span>AMBIENT</span>
+              <span>AMBIENT · {climateTag}</span>
               <strong>
                 <LiveValue value={temp} digits={1} suffix="°C" />
               </strong>
@@ -261,7 +275,7 @@ export default function AnalysisDesk() {
               className="metric-card live-metric"
               onClick={() => setHudTab('climate')}
             >
-              <span>WIND</span>
+              <span>WIND · {climateTag}</span>
               <strong>
                 <LiveValue value={wind} digits={1} suffix=" kt" />
               </strong>
@@ -271,7 +285,7 @@ export default function AnalysisDesk() {
               <Spark data={chartData} dataKey="wind" color="#e8c48a" unit="kt" />
             </button>
             <button type="button" className="metric-card live-metric">
-              <span>FUEL</span>
+              <span>FUEL · {fuelTag}</span>
               <strong>
                 <LiveValue value={fuel} digits={1} suffix=" d" />
               </strong>
@@ -281,10 +295,11 @@ export default function AnalysisDesk() {
               <Spark data={chartData} dataKey="fuel" color="#64d8a0" unit="d" />
             </button>
             <div className="metric-card live-metric">
-              <span>OCCUPANCY</span>
-              <strong>{replay?.occupancy ?? facts.winter}</strong>
+              <span>OCCUPANCY · {plantMode === 'MAITRI_II' ? 'MAITRI-II' : 'AL/02·AL/03'}</span>
+              <strong>{occNow}</strong>
               <em>
                 W {facts.winter} · S {facts.summer}
+                {plantMode === 'MAITRI_II' ? ' · II 40/140' : ''}
               </em>
             </div>
           </div>
@@ -365,8 +380,16 @@ export default function AnalysisDesk() {
             </div>
           </div>
 
+          <PlantToggle
+            mode={plantMode}
+            station={selectedStation}
+            onChange={setPlantMode}
+          />
+
           <FuelDecision
             decision={fuelOps}
+            delayDays={voyageDelayDays}
+            onDelay={setVoyageDelay}
             onResupply={() => injectScenario('RESUPPLY_DELAY').catch(() => {})}
           />
 
@@ -379,7 +402,14 @@ export default function AnalysisDesk() {
           <button
             type="button"
             className="sitrep-export"
-            onClick={() => exportSitrep({ station: selectedStation, telemetry })}
+            onClick={() =>
+              exportSitrep({
+                station: selectedStation,
+                telemetry,
+                delayDays: voyageDelayDays,
+                plantMode,
+              })
+            }
           >
             EXPORT SITREP PDF
           </button>
@@ -500,6 +530,15 @@ export default function AnalysisDesk() {
                 </div>
               </div>
 
+              <LockoutBacktest
+                onReplay={(row) => {
+                  if (row.id === '2018-08-05') replayAug2018()
+                  else if (row.clock) setClock(row.clock)
+                  injectScenario('BLIZZARD_80KT').catch(() => {})
+                  setHudTab('live')
+                }}
+              />
+
               <button
                 type="button"
                 className="gust-banner"
@@ -539,6 +578,9 @@ export default function AnalysisDesk() {
             polar={polarNow}
             windows={access}
             telemetry={telemetry}
+            delayDays={voyageDelayDays}
+            onDelay={setVoyageDelay}
+            decision={fuelOps}
             onNight={() => injectScenario('POLAR_NIGHT').catch(() => {})}
             onLive={() => liveNow()}
           />

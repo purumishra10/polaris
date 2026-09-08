@@ -32,7 +32,7 @@ function BharatiLights({ climate }) {
         shadow-camera-top={110}
         shadow-camera-bottom={-110}
         shadow-bias={-0.00035}
-        color="#fff1d2"
+        color="#e8f2fa"
       />
       <directionalLight
         position={[-70, 24, -48]}
@@ -43,7 +43,7 @@ function BharatiLights({ climate }) {
       <mesh position={climate.sun}>
         <sphereGeometry args={[6.2, 16, 16]} />
         <meshBasicMaterial
-          color="#fff6d0"
+          color="#f2f7fb"
           transparent
           opacity={Math.max(0.12, 1 - climate.dark * 0.85)}
         />
@@ -70,7 +70,7 @@ export default function BharatiEnvironment() {
       />
 
       <Suspense fallback={null}>
-        <Environment preset="sunset" />
+        <Environment preset="city" />
         <Clouds material={THREE.MeshLambertMaterial}>
           <Cloud
             position={[40, 62, -50]}

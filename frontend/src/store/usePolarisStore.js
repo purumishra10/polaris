@@ -19,8 +19,26 @@ import {
   seedStormSeries,
   applyLiveDrift,
 } from '../lib/telemetrySeries'
-import { SOP } from '../ops/decisions'
+import { SOP, applyVoyageOverlay, opsDate } from '../ops/decisions'
+import { applyPlantDoctrine } from '../ops/plantDoctrine'
 import { exportSitrep } from '../ops/exportSitrep'
+
+function decorateStation(telemetry, station, plantMode, delayDays) {
+  const date = opsDate(telemetry)
+  return applyVoyageOverlay(
+    applyPlantDoctrine(telemetry, station, plantMode, date),
+    station,
+    date,
+    delayDays,
+  )
+}
+
+function decoratePair(map, plantMode, delayDays) {
+  return {
+    BHARATI: decorateStation(map.BHARATI, 'BHARATI', plantMode, delayDays),
+    MAITRI: decorateStation(map.MAITRI, 'MAITRI', plantMode, delayDays),
+  }
+}
 
 const createTelemetry = (station) => ({
   station_id: station,
@@ -95,6 +113,12 @@ const createTelemetry = (station) => ({
     convoy: 'OPEN',
     field: 'OPEN',
     reasons: [],
+  },
+
+  occupancy: station === 'MAITRI' ? 25 : 47,
+  plant: {
+    mode: 'CURRENT',
+    tag: station === 'MAITRI' ? 'SYNTHETIC · occupancy AL/03' : 'SYNTHETIC · occupancy AL/02',
   },
 })
 
@@ -186,6 +210,8 @@ export const usePolarisStore = create((set) => ({
   hudTab: 'live',
   hoveredSubsystem: null,
   criticalAck: null,
+  voyageDelayDays: 0,
+  plantMode: 'CURRENT',
 
   connection: {
     status: 'SIMULATION',
@@ -277,7 +303,12 @@ export const usePolarisStore = create((set) => ({
       const station = state.selectedStation
       const base = state.baseline[station] ?? state.telemetry[station]
       if (base?.replay?.active) return {}
-      const drifted = applyLiveDrift(base, Date.now())
+      const drifted = decorateStation(
+        applyLiveDrift(base, Date.now()),
+        station,
+        state.plantMode,
+        state.voyageDelayDays,
+      )
       return {
         telemetry: {
           ...state.telemetry,
@@ -375,11 +406,16 @@ export const usePolarisStore = create((set) => ({
             }
           }
 
-          const nextBase = {
-            ...(state.baseline[station] ?? current),
-            ...data,
-            replay: current?.replay,
-          }
+          const nextBase = decorateStation(
+            {
+              ...(state.baseline[station] ?? current),
+              ...data,
+              replay: current?.replay,
+            },
+            station,
+            state.plantMode,
+            state.voyageDelayDays,
+          )
 
           return {
             baseline: {
@@ -442,17 +478,23 @@ export const usePolarisStore = create((set) => ({
       } catch {
         // Backend may not support clock API yet
       }
-      const reset = {
-        BHARATI: clearReplay(createTelemetry('BHARATI')),
-        MAITRI: clearReplay(createTelemetry('MAITRI')),
-      }
-      set((state) => ({
-        telemetry: reset,
-        baseline: reset,
-        series: seedAllSeries(reset),
-        hudTab: state.hudTab,
-        criticalAck: null,
-      }))
+      set((state) => {
+        const reset = decoratePair(
+          {
+            BHARATI: clearReplay(createTelemetry('BHARATI')),
+            MAITRI: clearReplay(createTelemetry('MAITRI')),
+          },
+          state.plantMode,
+          state.voyageDelayDays,
+        )
+        return {
+          telemetry: reset,
+          baseline: reset,
+          series: seedAllSeries(reset),
+          hudTab: state.hudTab,
+          criticalAck: null,
+        }
+      })
       return
     }
 
@@ -474,7 +516,12 @@ export const usePolarisStore = create((set) => ({
       ) {
         set((state) => {
           const station = state.selectedStation
-          const next = applyLocalScenario(scenario, state.telemetry[station])
+          const next = decorateStation(
+            applyLocalScenario(scenario, state.telemetry[station]),
+            station,
+            state.plantMode,
+            state.voyageDelayDays,
+          )
           return {
             telemetry: {
               ...state.telemetry,
@@ -504,18 +551,22 @@ export const usePolarisStore = create((set) => ({
   replayAug2018: () => {
     const preset = REPLAY_PRESETS[0]
     set((state) => {
-      const next = {
-        BHARATI: applyReplaySnapshot(
-          state.telemetry.BHARATI,
-          preset.snapshot,
-          'BHARATI',
-        ),
-        MAITRI: applyReplaySnapshot(
-          state.telemetry.MAITRI,
-          preset.snapshot,
-          'MAITRI',
-        ),
-      }
+      const next = decoratePair(
+        {
+          BHARATI: applyReplaySnapshot(
+            state.telemetry.BHARATI,
+            preset.snapshot,
+            'BHARATI',
+          ),
+          MAITRI: applyReplaySnapshot(
+            state.telemetry.MAITRI,
+            preset.snapshot,
+            'MAITRI',
+          ),
+        },
+        state.plantMode,
+        state.voyageDelayDays,
+      )
       return {
         selectedStation: 'BHARATI',
         selectedSubsystem: null,
@@ -544,18 +595,22 @@ export const usePolarisStore = create((set) => ({
 
     if (preset) {
       set((state) => {
-        const next = {
-          BHARATI: applyReplaySnapshot(
-            state.telemetry.BHARATI,
-            preset.snapshot,
-            'BHARATI',
-          ),
-          MAITRI: applyReplaySnapshot(
-            state.telemetry.MAITRI,
-            preset.snapshot,
-            'MAITRI',
-          ),
-        }
+        const next = decoratePair(
+          {
+            BHARATI: applyReplaySnapshot(
+              state.telemetry.BHARATI,
+              preset.snapshot,
+              'BHARATI',
+            ),
+            MAITRI: applyReplaySnapshot(
+              state.telemetry.MAITRI,
+              preset.snapshot,
+              'MAITRI',
+            ),
+          },
+          state.plantMode,
+          state.voyageDelayDays,
+        )
         return {
           selectedStation: 'BHARATI',
           selectedSubsystem: null,
@@ -585,11 +640,15 @@ export const usePolarisStore = create((set) => ({
       // Fall back to local reset
     }
 
-    set(() => {
-      const reset = {
-        BHARATI: clearReplay(createTelemetry('BHARATI')),
-        MAITRI: clearReplay(createTelemetry('MAITRI')),
-      }
+    set((state) => {
+      const reset = decoratePair(
+        {
+          BHARATI: clearReplay(createTelemetry('BHARATI')),
+          MAITRI: clearReplay(createTelemetry('MAITRI')),
+        },
+        state.plantMode,
+        state.voyageDelayDays,
+      )
       return {
         telemetry: reset,
         baseline: reset,
@@ -598,6 +657,55 @@ export const usePolarisStore = create((set) => ({
       }
     })
   },
+
+  setVoyageDelay: (days) =>
+    set((state) => {
+      const voyageDelayDays = Math.max(0, Math.min(21, Number(days) || 0))
+      const telemetry = decoratePair(
+        state.telemetry,
+        state.plantMode,
+        voyageDelayDays,
+      )
+      return {
+        voyageDelayDays,
+        telemetry,
+        baseline: telemetry,
+      }
+    }),
+
+  setPlantMode: (mode) =>
+    set((state) => {
+      const plantMode = mode === 'MAITRI_II' ? 'MAITRI_II' : 'CURRENT'
+      let map = state.telemetry
+      if (plantMode === 'CURRENT' && state.plantMode === 'MAITRI_II') {
+        const fresh = createTelemetry('MAITRI')
+        map = {
+          ...map,
+          MAITRI: {
+            ...map.MAITRI,
+            microgrid: fresh.microgrid,
+            fuel: fresh.fuel,
+            confidence: map.MAITRI?.replay?.active
+              ? map.MAITRI.confidence
+              : 'modeled',
+          },
+        }
+      }
+      const telemetry = decoratePair(
+        map,
+        plantMode,
+        state.voyageDelayDays,
+      )
+      return {
+        plantMode,
+        telemetry,
+        baseline: telemetry,
+        series: {
+          ...state.series,
+          MAITRI: pushSample(state.series.MAITRI, telemetry.MAITRI),
+        },
+      }
+    }),
 
   updateControls: async (controls) => {
     try {
@@ -663,11 +771,25 @@ export const usePolarisStore = create((set) => ({
       exportSitrep({
         station: store.selectedStation,
         telemetry: store.telemetry[store.selectedStation],
+        delayDays: store.voyageDelayDays,
+        plantMode: store.plantMode,
       })
       return
     }
     if (kind === 'close_brief') {
       store.setSelectedSubsystem(null)
+      return
+    }
+    if (kind === 'set_voyage_delay') {
+      store.setVoyageDelay(action.days)
+      store.setShowTelemetry(true)
+      store.setHudTab('map')
+      return
+    }
+    if (kind === 'set_plant_mode') {
+      store.setPlantMode(action.mode)
+      await store.setSelectedStation('MAITRI')
+      store.setHudTab('live')
     }
   },
 

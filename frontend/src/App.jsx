@@ -83,6 +83,10 @@ function App() {
     (state) => state.setHoveredSubsystem,
   )
   const setHudTab = usePolarisStore((state) => state.setHudTab)
+  const voyageDelayDays = usePolarisStore((state) => state.voyageDelayDays)
+  const setVoyageDelay = usePolarisStore((state) => state.setVoyageDelay)
+  const plantMode = usePolarisStore((state) => state.plantMode)
+  const setPlantMode = usePolarisStore((state) => state.setPlantMode)
 
   const [clockInput, setClockInput] = useState('2018-08-05T18:00')
 
@@ -323,6 +327,36 @@ function App() {
               onClick={() => injectScenario('POLAR_NIGHT')}
             >
               POLAR NIGHT
+            </button>
+          </div>
+
+          <div className="scenario-title scenario-sub">
+            EXPEDITION
+          </div>
+          <div className="scenario-buttons">
+            <button
+              type="button"
+              className={voyageDelayDays === 14 ? 'active' : ''}
+              onClick={() => {
+                setVoyageDelay(voyageDelayDays === 14 ? 0 : 14)
+                setShowTelemetry(true)
+                setHudTab('map')
+              }}
+            >
+              SHIP +14 D
+            </button>
+            <button
+              type="button"
+              className={plantMode === 'MAITRI_II' ? 'active' : ''}
+              onClick={() => {
+                const next = plantMode === 'MAITRI_II' ? 'CURRENT' : 'MAITRI_II'
+                setPlantMode(next)
+                if (next === 'MAITRI_II') setSelectedStation('MAITRI')
+                setShowTelemetry(true)
+                setHudTab('live')
+              }}
+            >
+              MAITRI-II
             </button>
           </div>
         </section>

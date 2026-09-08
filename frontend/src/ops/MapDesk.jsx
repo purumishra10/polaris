@@ -19,8 +19,10 @@ import {
   meltFrame,
   shipNearby,
   shipTrack,
+  voyageClock,
   windowStatus,
 } from './decisions'
+import VoyageSlider from './VoyageSlider'
 
 const PRYDZ_ICE = [
   [-66.2, 70.4],
@@ -65,10 +67,14 @@ export default function MapDesk({
   telemetry,
   onNight,
   onLive,
+  delayDays = 0,
+  onDelay,
+  decision,
 }) {
   const center = [NODES[station].lat, NODES[station].lon]
-  const ship = shipTrack(date)
-  const nearby = shipNearby(station, date)
+  const clock = voyageClock(date, delayDays)
+  const ship = shipTrack(clock)
+  const nearby = shipNearby(station, clock)
   const melt = meltFrame(date)
   const prydzOpen = iceOpen(date, 'PRYDZ')
   const lazarevOpen = iceOpen(date, 'LAZAREV')
@@ -94,6 +100,14 @@ export default function MapDesk({
         onNight={onNight}
         onLive={onLive}
       />
+
+      {onDelay && (
+        <VoyageSlider
+          delayDays={delayDays}
+          onChange={onDelay}
+          decision={decision}
+        />
+      )}
 
       <div className="ship-card">
         <div className="chart-legend">
@@ -212,7 +226,14 @@ export default function MapDesk({
       <button
         type="button"
         className="sitrep-export"
-        onClick={() => exportSitrep({ station, telemetry })}
+        onClick={() =>
+          exportSitrep({
+            station,
+            telemetry,
+            delayDays,
+            plantMode: telemetry?.plant?.mode,
+          })
+        }
       >
         EXPORT SITREP PDF
       </button>

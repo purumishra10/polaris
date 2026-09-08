@@ -38,10 +38,7 @@ function applyAssetLook(root, dim, faultTone) {
         material.opacity = data._polarisBaseOpacity
       }
 
-      if (faultTone && material.emissive) {
-        material.emissive.set(faultColor(faultTone))
-        material.emissiveIntensity = faultTone === 'critical' ? 0.85 : 0.45
-      } else if (material.emissive) {
+      if (material.emissive) {
         material.emissive.copy(data._polarisBaseEmissive)
         material.emissiveIntensity = data._polarisBaseEmissiveIntensity
       }

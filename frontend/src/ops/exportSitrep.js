@@ -3,10 +3,10 @@ import { jsPDF } from 'jspdf'
 import { fuelDecision, opsDate, polarState, shipNearby, windowStatus } from './decisions'
 import { INSTRUMENTS, instrumentStatus } from './decisions'
 
-export function exportSitrep({ station, telemetry }) {
+export function exportSitrep({ station, telemetry, delayDays = 0, plantMode }) {
   const date = opsDate(telemetry)
   const polar = polarState(station, date)
-  const fuel = fuelDecision(telemetry, station, date)
+  const fuel = fuelDecision(telemetry, station, date, delayDays)
   const windows = windowStatus(station, date)
   const instruments = (INSTRUMENTS[station] ?? []).map((item) => ({
     ...item,
@@ -31,7 +31,8 @@ export function exportSitrep({ station, telemetry }) {
   doc.setFontSize(10)
   const lines = [
     `Ambient ${Number(telemetry?.ambient?.temp_c ?? 0).toFixed(1)} C · wind ${Number(telemetry?.ambient?.wind_speed_knots ?? 0).toFixed(0)} kt`,
-    `Fuel ${fuel.days.toFixed(1)} d autonomy · band ${fuel.band} · ${fuel.next ? `${fuel.next.days} d to ${fuel.next.label} close` : 'no sea window'}`,
+    `Fuel ${fuel.days.toFixed(1)} d autonomy · band ${fuel.band} · ship +${delayDays} d · ${fuel.next ? `${fuel.next.days} d to ${fuel.next.label} close` : 'no sea window'}`,
+    `Plant ${plantMode ?? telemetry?.plant?.mode ?? 'CURRENT'} · ${telemetry?.plant?.tag ?? telemetry?.source ?? 'synthetic'}`,
     `Polar ${polar.phase} · ship ${shipNearby(station, date) ? 'IN BAY (heli possible)' : 'AWAY (heli locked)'}`,
     `Outdoor ${telemetry?.lockouts?.outdoor ?? '—'} · heli ${telemetry?.lockouts?.heli ?? '—'}`,
     `Access: ${windows.map((item) => `${item.id} ${item.openNow ? 'OPEN' : 'CLOSED'}`).join(' · ')}`,

@@ -20,6 +20,7 @@ export default function VoiceDock() {
     lines,
     sources,
     ragMode,
+    fallback,
     draft,
     setDraft,
     startCall,
@@ -37,9 +38,11 @@ export default function VoiceDock() {
             <span>POLARIS AI</span>
             <strong className={`voice-status status-${status}`}>{label}</strong>
           </div>
-          {ragMode && (
+          {(ragMode || fallback) && (
             <div className="voice-rag">
-              RAG {ragMode === 'pgvector' ? 'PGVECTOR' : 'KNOWLEDGE MD'}
+              {fallback || ragMode === 'local-fallback'
+                ? 'LOCAL SOP BRIEF · LLM OFF'
+                : `RAG ${ragMode === 'pgvector' ? 'PGVECTOR' : 'KNOWLEDGE MD'}`}
               {sources.length ? ` · ${sources.length} HITS` : ''}
             </div>
           )}
@@ -47,8 +50,8 @@ export default function VoiceDock() {
           <div className="voice-transcript">
             {lines.length === 0 && (
               <p className="voice-hint">
-                Give an order: show the map, fuel status, inject a blizzard, fifth of August,
-                export sitrep. I will answer and move the desk.
+                Give an order: fuel, blizzard, ship +14, Maitri-II, fifth of August,
+                export sitrep. If the sidecar dies I still brief from the desk.
               </p>
             )}
             {lines.map((line, index) => (

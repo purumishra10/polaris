@@ -31,7 +31,7 @@ function MaitriLights({ climate }) {
         shadow-camera-top={70}
         shadow-camera-bottom={-70}
         shadow-bias={-0.0004}
-        color="#f0e8d4"
+        color="#eef3f6"
       />
       <directionalLight
         position={[-48, 18, -36]}

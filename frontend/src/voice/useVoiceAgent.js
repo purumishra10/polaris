@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { VOICE_URL } from '../api/telemetry'
 import { usePolarisStore } from '../store/usePolarisStore'
+import { localVoiceTurn } from './localBrief'
 
 const SAMPLE_RATE = 16000
 
@@ -19,6 +20,7 @@ export function useVoiceAgent() {
   const [draft, setDraft] = useState('')
   const [sources, setSources] = useState([])
   const [ragMode, setRagMode] = useState('')
+  const [fallback, setFallback] = useState(false)
 
   const wsRef = useRef(null)
   const recCtxRef = useRef(null)
@@ -206,7 +208,8 @@ export function useVoiceAgent() {
 
       ws.onmessage = handleMessage
       ws.onerror = () => {
-        setError('Voice sidecar unreachable on :8002')
+        setFallback(true)
+        setError('Mic link down. Type a query — local SOP brief still works.')
       }
       ws.onclose = () => {
         teardown()
@@ -234,7 +237,19 @@ export function useVoiceAgent() {
       }
       appendLine('user', value)
       setStatus('thinking')
+      const runLocal = async (reason) => {
+        setFallback(true)
+        setError(reason)
+        const local = localVoiceTurn(value, usePolarisStore.getState())
+        appendLine('assistant', local.reply)
+        setSources(local.sources)
+        setRagMode(local.rag)
+        await usePolarisStore.getState().applyVoiceActions(local.actions)
+        setStatus('idle')
+      }
       try {
+        const controller = new AbortController()
+        const timer = window.setTimeout(() => controller.abort(), 4000)
         const response = await fetch(`${VOICE_URL.replace(/\/$/, '')}/api/voice/turn`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -242,11 +257,14 @@ export function useVoiceAgent() {
             message: value,
             history: historyRef.current,
           }),
+          signal: controller.signal,
         })
+        window.clearTimeout(timer)
         if (!response.ok) {
           throw new Error(`voice HTTP ${response.status}`)
         }
         const data = await response.json()
+        setFallback(false)
         appendLine('assistant', data.reply)
         setSources(Array.isArray(data.sources) ? data.sources : [])
         setRagMode(data.rag || '')
@@ -254,8 +272,9 @@ export function useVoiceAgent() {
         setStatus('idle')
       } catch (err) {
         console.error('[Voice] turn failed', err)
-        setError('Voice backend is down. Start voice-backend on port 8002.')
-        setStatus('idle')
+        await runLocal(
+          'Voice sidecar timed out or is down. Local SOP brief is speaking from the desk.',
+        )
       }
     },
     [appendLine],
@@ -284,6 +303,7 @@ export function useVoiceAgent() {
     lines,
     sources,
     ragMode,
+    fallback,
     draft,
     setDraft,
     startCall,
