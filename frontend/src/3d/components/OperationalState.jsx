@@ -6,24 +6,16 @@ function severityColor(severity) {
   return '#64d8a0'
 }
 
-function LockdownMarkers({ station }) {
-  const xs =
-    station === 'BHARATI'
-      ? [-18, -9, 0, 9, 18]
-      : [-10, -7, -4, -1, 2, 5, 8]
-  const y = station === 'BHARATI' ? 12.35 : 5.3
-  const z = station === 'BHARATI' ? 15.22 : 2.56
-  const width = station === 'BHARATI' ? 1.4 : 0.55
-
+function LockdownMarkers() {
   return (
     <group>
-      {xs.map((x) => (
+      {[-3.8, -1.9, 0, 1.9, 3.8].map((x) => (
         <mesh
           key={x}
-          position={[x, y, z]}
+          position={[x, 4.35, 2.55]}
           rotation={[0, 0, Math.PI / 2]}
         >
-          <boxGeometry args={[0.08, width, 0.08]} />
+          <boxGeometry args={[0.08, 0.75, 0.08]} />
           <meshStandardMaterial
             color="#ff4055"
             emissive="#ff2038"
@@ -35,20 +27,16 @@ function LockdownMarkers({ station }) {
   )
 }
 
-function FuelLevel({ level, station }) {
+function FuelLevel({ level }) {
   const normalized = Math.max(
     0,
     Math.min(1, level / 600000),
   )
-  const position =
-    station === 'BHARATI' ? [-58, 1.8, -28] : [-18, 1.5, 1.5]
-  const height = station === 'BHARATI' ? 3.2 : 2.8
-  const radius = station === 'BHARATI' ? 0.85 : 0.7
 
   return (
-    <group position={position}>
+    <group position={[-7, 1.45, -2]}>
       <mesh>
-        <cylinderGeometry args={[radius, radius, height, 32]} />
+        <cylinderGeometry args={[0.62, 0.62, 2.5, 32]} />
         <meshStandardMaterial
           color="#18232a"
           metalness={0.8}
@@ -57,13 +45,13 @@ function FuelLevel({ level, station }) {
       </mesh>
 
       <mesh
-        position={[0, -height / 2 + normalized * (height / 2), 0]}
+        position={[0, -1.25 + normalized * 1.25, 0]}
       >
         <cylinderGeometry
           args={[
-            radius * 0.85,
-            radius * 0.85,
-            Math.max(0.03, normalized * height),
+            0.53,
+            0.53,
+            Math.max(0.03, normalized * 2.5),
             24,
           ]}
         />
@@ -80,15 +68,11 @@ function FuelLevel({ level, station }) {
   )
 }
 
-function GeneratorState({ active, station }) {
-  const position =
-    station === 'BHARATI' ? [36, 1.6, -16] : [16, 1.2, 0.5]
-  const size = station === 'BHARATI' ? [2.4, 2.8, 2.2] : [2.2, 2.4, 2]
-
+function GeneratorState({ active }) {
   return (
-    <group position={position}>
+    <group position={[6.5, 1.3, -2]}>
       <mesh>
-        <boxGeometry args={size} />
+        <boxGeometry args={[2.2, 2.4, 2]} />
         <meshStandardMaterial
           color={active ? '#465b62' : '#303b42'}
           metalness={0.75}
@@ -103,7 +87,7 @@ function GeneratorState({ active, station }) {
           position={[0, 0.4, 1.1]}
           color="#64d8a0"
           intensity={3}
-          distance={station === 'BHARATI' ? 12 : 5}
+          distance={5}
         />
       )}
     </group>
@@ -112,7 +96,6 @@ function GeneratorState({ active, station }) {
 
 export default function OperationalState({
   telemetry,
-  station = 'MAITRI',
 }) {
   const severity = telemetry?.risk?.severity ?? 'NOMINAL'
 
@@ -123,13 +106,11 @@ export default function OperationalState({
 
   if (!telemetry) return null
 
-  const beaconY = station === 'BHARATI' ? 17.2 : 7.5
-  const lightDistance = station === 'BHARATI' ? 28 : 14
-
   return (
     <group>
-      <mesh position={[0, beaconY, 0]}>
-        <sphereGeometry args={[station === 'BHARATI' ? 0.22 : 0.16, 16, 16]} />
+      {/* Operational status beacon */}
+      <mesh position={[0, 7.2, 0]}>
+        <sphereGeometry args={[0.16, 16, 16]} />
 
         <meshStandardMaterial
           color={color}
@@ -139,24 +120,25 @@ export default function OperationalState({
       </mesh>
 
       <pointLight
-        position={[0, beaconY, 0]}
+        position={[0, 7.2, 0]}
         color={color}
         intensity={severity === 'CRITICAL' ? 5 : 1.5}
-        distance={lightDistance}
+        distance={10}
       />
 
+      {/* Fuel visualization */}
       <FuelLevel
         level={telemetry.fuel.tank_level_liters}
-        station={station}
       />
 
+      {/* Generator visualization */}
       <GeneratorState
         active={telemetry.controls.aux_generator_active}
-        station={station}
       />
 
+      {/* Lockdown visualization */}
       {telemetry.controls.hatch_lockdown && (
-        <LockdownMarkers station={station} />
+        <LockdownMarkers />
       )}
     </group>
   )

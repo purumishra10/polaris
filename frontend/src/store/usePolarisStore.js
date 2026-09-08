@@ -1,37 +1,41 @@
 import { create } from 'zustand'
-import { connectTelemetrySocket } from '../api/telemetry'
+import {
+  applyControls as apiApplyControls,
+  injectScenario as apiInjectScenario,
+  switchStation as apiSwitchStation,
+} from '../api/telemetry'
 
-const createTelemetry = (station) => ({
+const createDefaultTelemetry = (station) => ({
   station_id: station,
   timestamp: new Date().toISOString(),
   source: 'synthetic',
   confidence: 'modeled',
 
   ambient: {
-    temp_c: -18.4,
-    wind_speed_knots: 18,
-    solar_flux_w_m2: 120,
+    temp_c: -16.4,
+    wind_speed_knots: 24.2,
+    solar_flux_w_m2: 145.0,
   },
 
   thermal: {
-    internal_temp_c: 20,
-    chp_thermal_output_kw: 420,
-    aux_heater_kw: 0,
-    heat_loss_kw: 180,
+    internal_temp_c: 20.8,
+    chp_thermal_output_kw: 380.0,
+    aux_heater_kw: 0.0,
+    heat_loss_kw: 185.0,
   },
 
   microgrid: {
-    total_load_kva: 480,
-    essential_load_kva: 250,
-    science_load_kva: 120,
-    comfort_load_kva: 110,
-    chp_capacity_kva: 750,
+    total_load_kva: 480.0,
+    essential_load_kva: 250.0,
+    science_load_kva: 120.0,
+    comfort_load_kva: 110.0,
+    chp_capacity_kva: 600.0,
   },
 
   fuel: {
-    tank_level_liters: 520000,
-    burn_rate_lph: 145,
-    days_of_autonomy: 148,
+    tank_level_liters: 512000,
+    burn_rate_lph: 128.5,
+    days_of_autonomy: 166.0,
   },
 
   controls: {
@@ -43,277 +47,202 @@ const createTelemetry = (station) => ({
 
   link_status: {
     type: 'C-band/LEO',
-    latency_ms: 520,
+    latency_ms: 480,
     health: 'ONLINE',
   },
 
   risk: {
-    anomaly_score: 0.04,
+    anomaly_score: 0.062,
     is_anomaly: false,
     severity: 'NOMINAL',
     prescribed_actions: [],
   },
 })
 
-const createStationTelemetry = () => ({
-  BHARATI: createTelemetry('BHARATI'),
-  MAITRI: createTelemetry('MAITRI'),
-})
-
-export const usePolarisStore = create((set) => ({
+export const usePolarisStore = create((set, get) => ({
   selectedStation: 'BHARATI',
   selectedSubsystem: null,
   isThermalView: false,
-  cameraPreset: 'droneAerial',
-  cameraTick: 0,
-  flySource: 'preset',
+  linkMode: 'REALTIME', // 'REALTIME' | 'STRESS_TEST'
 
   connection: {
-    status: 'SIMULATION',
-    latency_ms: 0,
+    status: 'CONNECTING',
+    latency_ms: 480,
     last_update: null,
   },
 
-  telemetry: createStationTelemetry(),
+  telemetry: {
+    BHARATI: createDefaultTelemetry('BHARATI'),
+    MAITRI: createDefaultTelemetry('MAITRI'),
+  },
 
-  setSelectedStation: (station) =>
+  setSelectedStation: async (station) => {
+    set({ selectedStation: station })
+    try {
+      await apiSwitchStation(station)
+    } catch {
+      // Backend may be offline or in fallback mode
+    }
+  },
+
+  setSelectedSubsystem: (subsystem) => set({ selectedSubsystem: subsystem }),
+
+  setThermalView: (enabled) => set({ isThermalView: enabled }),
+
+  toggleThermalView: () => set((state) => ({ isThermalView: !state.isThermalView })),
+
+  setLinkMode: (mode) => set({ linkMode: mode }),
+
+  setConnectionStatus: (conn) =>
     set((state) => ({
-      selectedStation: station,
-      selectedSubsystem: null,
-      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'hero',
-      flySource: 'preset',
-      cameraTick: state.cameraTick + 1,
+      connection: {
+        ...state.connection,
+        ...conn,
+        last_update: new Date().toISOString(),
+      },
     })),
 
-  setSelectedSubsystem: (subsystem) =>
-    set((state) => ({
-      selectedSubsystem: subsystem,
-      flySource: subsystem ? 'asset' : state.flySource,
-      cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
-    })),
-
-  setCameraPreset: (preset) =>
-    set((state) => ({
-      cameraPreset: preset,
-      selectedSubsystem: null,
-      flySource: 'preset',
-      cameraTick: state.cameraTick + 1,
-    })),
-
-  setThermalView: (enabled) =>
-    set({
-      isThermalView: enabled,
-    }),
-
-  setTelemetry: (station, data) =>
+  // Called whenever live telemetry arrives from WebSocket or polling
+  setTelemetryPacket: (packet) => {
+    if (!packet || !packet.station_id) return
+    const station = packet.station_id
     set((state) => ({
       telemetry: {
         ...state.telemetry,
         [station]: {
           ...state.telemetry[station],
-          ...data,
+          ...packet,
+          timestamp: packet.timestamp || new Date().toISOString(),
         },
       },
-    })),
+      connection: {
+        ...state.connection,
+        latency_ms: packet.link_status?.latency_ms || state.connection.latency_ms,
+        last_update: new Date().toISOString(),
+      },
+    }))
+  },
 
-  updateTelemetry: (station, updater) =>
+  // Apply station mitigation controls
+  executeMitigation: async (actionText) => {
+    const station = get().selectedStation
+    const currentControls = get().telemetry[station]?.controls || {}
+
+    const patch = {}
+    if (actionText.includes('Hatch') || actionText.includes('hatch')) {
+      patch.hatch_lockdown = true
+    }
+    if (actionText.includes('Science') || actionText.includes('scientific')) {
+      patch.science_instruments_online = false
+    }
+    if (actionText.includes('Summer') || actionText.includes('summer')) {
+      patch.summer_wing_isolated = true
+    }
+    if (actionText.includes('Generator') || actionText.includes('auxiliary')) {
+      patch.aux_generator_active = true
+    }
+
+    // Optimistic update
     set((state) => ({
       telemetry: {
         ...state.telemetry,
-        [station]: updater(state.telemetry[station]),
-      },
-    })),
-
-  injectScenario: (scenario) =>
-    set((state) => {
-      const station = state.selectedStation
-
-      // Always start from a clean nominal state.
-      // This prevents one scenario from contaminating another.
-      const base = createTelemetry(station)
-
-      if (scenario === 'NOMINAL') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: base,
+        [station]: {
+          ...state.telemetry[station],
+          controls: {
+            ...state.telemetry[station].controls,
+            ...patch,
           },
-        }
-      }
+        },
+      },
+    }))
 
-      if (scenario === 'BLIZZARD_80KT') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
+    try {
+      await apiApplyControls(patch)
+    } catch (err) {
+      console.warn('Backend controls POST failed, operating in optimistic mode:', err)
+    }
+  },
 
-              ambient: {
-                ...base.ambient,
-                temp_c: -27.8,
-                wind_speed_knots: 80,
-                solar_flux_w_m2: 0,
-              },
+  // Inject pitch demo scenario
+  triggerScenario: async (scenarioKey) => {
+    const station = get().selectedStation
+    const base = createDefaultTelemetry(station)
 
-              thermal: {
-                ...base.thermal,
-                aux_heater_kw: 180,
-                heat_loss_kw: 390,
-              },
+    // Call live backend endpoint
+    try {
+      await apiInjectScenario(scenarioKey, 60)
+    } catch (err) {
+      console.warn('Backend scenario POST failed, applying local simulation:', err)
+    }
 
-              controls: {
-                ...base.controls,
-                science_instruments_online: false,
-                hatch_lockdown: true,
-                summer_wing_isolated: true,
-                aux_generator_active: true,
-              },
-
-              link_status: {
-                ...base.link_status,
-                health: 'DEGRADED',
-                latency_ms: 740,
-              },
-
-              risk: {
-                anomaly_score: 0.98,
-                is_anomaly: true,
-                severity: 'CRITICAL',
-                prescribed_actions: [
-                  'LOCK HATCHES',
-                  'RESTRICT OUTDOOR WORK',
-                  'ACTIVATE AUXILIARY GENERATOR',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
+    // Also update local state so UI reacts instantly
+    if (scenarioKey === 'BLIZZARD_80KT') {
+      set((state) => ({
+        telemetry: {
+          ...state.telemetry,
+          [station]: {
+            ...state.telemetry[station],
+            ambient: { temp_c: -36.5, wind_speed_knots: 84.0, solar_flux_w_m2: 15.0 },
+            thermal: { ...state.telemetry[station].thermal, internal_temp_c: 14.8, heat_loss_kw: 410.0, aux_heater_kw: 140.0 },
+            fuel: { ...state.telemetry[station].fuel, burn_rate_lph: 195.0, days_of_autonomy: 109.0 },
+            risk: {
+              anomaly_score: -0.38,
+              is_anomaly: true,
+              severity: 'CRITICAL',
+              prescribed_actions: [
+                'ACTION: Engage exterior hatch structural airlock sequence',
+                'ACTION: Stow external weather sensors',
+                'ACTION: Spin up Standby Auxiliary Generator',
+              ],
             },
           },
-        }
-      }
-
-      if (scenario === 'RESUPPLY_DELAY') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
-
-              fuel: {
-                ...base.fuel,
-                days_of_autonomy: 62,
-                burn_rate_lph: 180,
-              },
-
-              controls: {
-                ...base.controls,
-                summer_wing_isolated: true,
-              },
-
-              risk: {
-                anomaly_score: 0.71,
-                is_anomaly: true,
-                severity: 'ADVISORY',
-                prescribed_actions: [
-                  'ISOLATE NON-ESSENTIAL LOAD',
-                  'REVIEW FUEL RESERVE',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
+        },
+      }))
+    } else if (scenarioKey === 'RESUPPLY_DELAY') {
+      set((state) => ({
+        telemetry: {
+          ...state.telemetry,
+          [station]: {
+            ...state.telemetry[station],
+            fuel: { tank_level_liters: 48000, burn_rate_lph: 145.0, days_of_autonomy: 13.8 },
+            risk: {
+              anomaly_score: -0.22,
+              is_anomaly: true,
+              severity: 'CRITICAL',
+              prescribed_actions: [
+                'ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde)',
+                'ACTION: Isolate unoccupied summer residential modules',
+              ],
             },
           },
-        }
-      }
-
-      if (scenario === 'POLAR_NIGHT') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
-
-              ambient: {
-                ...base.ambient,
-                temp_c: -31.5,
-                solar_flux_w_m2: 0,
-              },
-
-              thermal: {
-                ...base.thermal,
-                aux_heater_kw: 120,
-                heat_loss_kw: 340,
-              },
-
-              fuel: {
-                ...base.fuel,
-                days_of_autonomy: 104,
-                burn_rate_lph: 165,
-              },
-
-              risk: {
-                anomaly_score: 0.36,
-                is_anomaly: false,
-                severity: 'ADVISORY',
-                prescribed_actions: [
-                  'MONITOR THERMAL LOAD',
-                  'PRESERVE FUEL RESERVE',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
+        },
+      }))
+    } else if (scenarioKey === 'POLAR_NIGHT') {
+      set((state) => ({
+        telemetry: {
+          ...state.telemetry,
+          [station]: {
+            ...state.telemetry[station],
+            ambient: { temp_c: -28.0, wind_speed_knots: 32.0, solar_flux_w_m2: 0.0 },
+            thermal: { ...state.telemetry[station].thermal, aux_heater_kw: 90.0, heat_loss_kw: 290.0 },
+            risk: {
+              anomaly_score: -0.08,
+              is_anomaly: false,
+              severity: 'ADVISORY',
+              prescribed_actions: [
+                'ACTION: Isolate unoccupied summer residential modules',
+              ],
             },
           },
-        }
-      }
-
-      return state
-    }),
-
-  connectTelemetry: () => {
-    set({
-      connection: {
-        status: 'CONNECTING',
-        latency_ms: 0,
-        last_update: null,
-      },
-    })
-
-    const socket = connectTelemetrySocket(
-      (data) => {
-        const station = data.station_id
-
-        set((state) => ({
-          telemetry: {
-            ...state.telemetry,
-            [station]: data,
-          },
-
-          connection: {
-            status:
-              data.link_status?.health === 'DEGRADED'
-                ? 'DEGRADED'
-                : 'ONLINE',
-
-            latency_ms:
-              data.link_status?.latency_ms ?? 0,
-
-            last_update: data.timestamp,
-          },
-        }))
-      },
-
-      () => {
-        set({
-          connection: {
-            status: 'OFFLINE',
-            latency_ms: 0,
-            last_update: null,
-          },
-        })
-      },
-    )
-
-    return socket
+        },
+      }))
+    } else if (scenarioKey === 'NOMINAL') {
+      set((state) => ({
+        telemetry: {
+          ...state.telemetry,
+          [station]: base,
+        },
+      }))
+    }
   },
 }))
