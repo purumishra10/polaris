@@ -10,10 +10,10 @@ function LockdownMarkers({ station }) {
   const xs =
     station === 'BHARATI'
       ? [-18, -9, 0, 9, 18]
-      : [-3.8, -1.9, 0, 1.9, 3.8]
-  const y = station === 'BHARATI' ? 12.35 : 4.35
-  const z = station === 'BHARATI' ? 15.22 : 2.55
-  const width = station === 'BHARATI' ? 1.4 : 0.75
+      : [-10, -7, -4, -1, 2, 5, 8]
+  const y = station === 'BHARATI' ? 12.35 : 5.3
+  const z = station === 'BHARATI' ? 15.22 : 2.56
+  const width = station === 'BHARATI' ? 1.4 : 0.55
 
   return (
     <group>
@@ -41,9 +41,9 @@ function FuelLevel({ level, station }) {
     Math.min(1, level / 600000),
   )
   const position =
-    station === 'BHARATI' ? [-58, 1.8, -28] : [-7, 1.45, -2]
-  const height = station === 'BHARATI' ? 3.2 : 2.5
-  const radius = station === 'BHARATI' ? 0.85 : 0.62
+    station === 'BHARATI' ? [-58, 1.8, -28] : [-18, 1.5, 1.5]
+  const height = station === 'BHARATI' ? 3.2 : 2.8
+  const radius = station === 'BHARATI' ? 0.85 : 0.7
 
   return (
     <group position={position}>
@@ -82,7 +82,7 @@ function FuelLevel({ level, station }) {
 
 function GeneratorState({ active, station }) {
   const position =
-    station === 'BHARATI' ? [36, 1.6, -16] : [6.5, 1.3, -2]
+    station === 'BHARATI' ? [36, 1.6, -16] : [16, 1.2, 0.5]
   const size = station === 'BHARATI' ? [2.4, 2.8, 2.2] : [2.2, 2.4, 2]
 
   return (
@@ -123,8 +123,8 @@ export default function OperationalState({
 
   if (!telemetry) return null
 
-  const beaconY = station === 'BHARATI' ? 17.2 : 7.2
-  const lightDistance = station === 'BHARATI' ? 28 : 10
+  const beaconY = station === 'BHARATI' ? 17.2 : 7.5
+  const lightDistance = station === 'BHARATI' ? 28 : 14
 
   return (
     <group>

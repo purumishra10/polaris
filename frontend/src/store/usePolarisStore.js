@@ -80,7 +80,7 @@ export const usePolarisStore = create((set) => ({
     set((state) => ({
       selectedStation: station,
       selectedSubsystem: null,
-      cameraPreset: station === 'BHARATI' ? 'droneAerial' : null,
+      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'hero',
       flySource: 'preset',
       cameraTick: state.cameraTick + 1,
     })),
