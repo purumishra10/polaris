@@ -1,8 +1,50 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Html, useCursor } from '@react-three/drei'
+import * as THREE from 'three'
 import { usePolarisStore } from '../../store/usePolarisStore'
 import { bharatiAnchors } from '../stations/Bharati/bharatiAnchors'
 import { maitriAnchors } from '../stations/Maitri/maitriAnchors'
+
+// Soft ice-blue tint added to a component's materials while hovered
+const HOVER_TINT = new THREE.Color('#8fd3ff')
+const HOVER_STRENGTH = 0.16
+
+function forEachMaterial(root, fn) {
+  if (!root) return
+  root.traverse((object) => {
+    if (!object.isMesh || !object.material) return
+    const materials = Array.isArray(object.material)
+      ? object.material
+      : [object.material]
+    for (const material of materials) {
+      if (material) fn(material)
+    }
+  })
+}
+
+function applyHoverGlow(root, on) {
+  forEachMaterial(root, (material) => {
+    if (!material.emissive) return
+    if (material.userData._polarisBaseEmissive === undefined) {
+      material.userData._polarisBaseEmissive = material.emissive.clone()
+      material.userData._polarisBaseEmissiveIntensity = material.emissiveIntensity
+    }
+    const base = material.userData._polarisBaseEmissive
+    const baseIntensity = material.userData._polarisBaseEmissiveIntensity
+    if (on) {
+      // Add a light tint on top of whatever the material already emits
+      material.emissive
+        .copy(base)
+        .multiplyScalar(Math.max(baseIntensity, 0))
+        .addScaledVector(HOVER_TINT, HOVER_STRENGTH)
+      material.emissiveIntensity = 1
+    } else {
+      material.emissive.copy(base)
+      material.emissiveIntensity = baseIntensity
+    }
+    material.needsUpdate = true
+  })
+}
 
 function applyFocusDim(root, dim) {
   if (!root) return
@@ -55,6 +97,13 @@ export default function InteractiveAsset({
   useLayoutEffect(() => {
     applyFocusDim(root.current, dimmed)
   }, [dimmed])
+
+  const glow = hovered && !selected
+  useLayoutEffect(() => {
+    const node = root.current
+    applyHoverGlow(node, glow)
+    return () => applyHoverGlow(node, false)
+  }, [glow])
 
   const anchors =
     selectedStation === 'BHARATI' ? bharatiAnchors : maitriAnchors

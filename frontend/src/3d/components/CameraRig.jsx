@@ -16,7 +16,7 @@ function isUiTarget(target) {
   return Boolean(
     target instanceof Element &&
       target.closest(
-        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .letterbox, .title-slam',
+        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .cinematic-brief-rail, .letterbox, .title-slam, .twin-live-chrome, .twin-exit-fullscreen',
       ),
   )
 }
@@ -40,7 +40,7 @@ export default function CameraRig() {
   const defaultTarget = isBharati ? [0, 6, 4] : [0, 4, 0]
   const defaultPos = isBharati ? [82, 54, 68] : [38, 22, 32]
   const minRadius = isBharati ? 3 : 8
-  const maxRadius = isBharati ? 280 : 120
+  const maxRadius = isBharati ? 900 : 420
 
   const target = useRef(new THREE.Vector3(...defaultTarget))
   const spherical = useRef(new THREE.Spherical())
@@ -53,6 +53,7 @@ export default function CameraRig() {
   const goalTarget = useRef(new THREE.Vector3(...defaultTarget))
   const panRight = useRef(new THREE.Vector3())
   const panUp = useRef(new THREE.Vector3())
+  const previousSubsystem = useRef(selectedSubsystem)
 
   const apply = () => {
     spherical.current.makeSafe()
@@ -236,6 +237,20 @@ export default function CameraRig() {
     }
   }, [camera, invalidate, minRadius, maxRadius])
 
+  // Deselecting a component: keep the camera where it is but swing the orbit
+  // pivot back to the station centre, so drags revolve around the station again.
+  useEffect(() => {
+    const was = previousSubsystem.current
+    previousSubsystem.current = selectedSubsystem
+    if (!was || selectedSubsystem) return
+    goalPos.current.copy(camera.position)
+    goalTarget.current.set(...defaultTarget)
+    autoSpin.current = false
+    announced.current = true
+    flying.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSubsystem])
+
   useFrame((_, delta) => {
     if (autoSpin.current && !dragging.current && !flying.current) {
       spherical.current.theta += delta * 0.32
@@ -250,7 +265,10 @@ export default function CameraRig() {
     spherical.current.setFromVector3(
       camera.position.clone().sub(target.current),
     )
-    if (camera.position.distanceTo(goalPos.current) < 0.55) {
+    if (
+      camera.position.distanceTo(goalPos.current) < 0.55 &&
+      target.current.distanceTo(goalTarget.current) < 0.55
+    ) {
       flying.current = false
       if (!announced.current) {
         announced.current = true
