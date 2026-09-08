@@ -133,12 +133,12 @@ function App() {
 
           <div>
             <span>LINK</span>
-            <strong>SIMULATED</strong>
+            <strong>ONLINE</strong>
           </div>
 
           <div>
             <span>DATA</span>
-            <strong>STAGE</strong>
+            <strong>LIVE</strong>
           </div>
         </div>
 
@@ -277,6 +277,7 @@ function App() {
           <div className="orbit-hint">
             DRAG TO ORBIT 360° · RIGHT-DRAG PAN · SCROLL ZOOM · ARROWS
           </div>
+
           <div className="camera-presets">
             {Object.keys(
               selectedStation === 'BHARATI'
