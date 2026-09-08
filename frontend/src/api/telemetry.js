@@ -1,5 +1,6 @@
-const ENGINE_URL = 'http://localhost:8000'
-const WS_URL = 'ws://localhost:8000/ws/telemetry'
+const ENGINE_URL =
+  import.meta.env.VITE_TWIN_ENGINE_URL ?? 'http://localhost:8000'
+const WS_URL = `${ENGINE_URL.replace(/^http/, 'ws')}/ws/telemetry`
 
 export async function fetchTelemetrySnapshot() {
   const response = await fetch(`${ENGINE_URL}/api/telemetry`)
@@ -67,7 +68,10 @@ export function connectTelemetrySocket(onTelemetry, onStatusChange) {
         const data = await fetchTelemetrySnapshot()
         if (data) {
           onTelemetry(data)
-          onStatusChange?.({ status: 'FALLBACK_POLLING', latency_ms: data.link_status?.latency_ms || 450 })
+          onStatusChange?.({
+            status: 'FALLBACK_POLLING',
+            latency_ms: data.link_status?.latency_ms || 450,
+          })
         }
       } catch (err) {
         onStatusChange?.({ status: 'OFFLINE', error: err.message })
@@ -125,7 +129,11 @@ export function connectTelemetrySocket(onTelemetry, onStatusChange) {
       isClosedExplicitly = true
       if (reconnectTimer) clearTimeout(reconnectTimer)
       if (pollTimer) clearInterval(pollTimer)
-      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+      if (
+        socket &&
+        (socket.readyState === WebSocket.OPEN ||
+          socket.readyState === WebSocket.CONNECTING)
+      ) {
         socket.close()
       }
     },

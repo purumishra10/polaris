@@ -64,6 +64,10 @@ export const usePolarisStore = create((set, get) => ({
   selectedSubsystem: null,
   isThermalView: false,
   linkMode: 'REALTIME', // 'REALTIME' | 'STRESS_TEST'
+  cameraPreset: 'droneAerial',
+  cameraTick: 0,
+  flySource: 'preset',
+  flyComplete: true,
 
   connection: {
     status: 'CONNECTING',
@@ -77,7 +81,20 @@ export const usePolarisStore = create((set, get) => ({
   },
 
   setSelectedStation: async (station) => {
-    set({ selectedStation: station })
+    if (!['BHARATI', 'MAITRI'].includes(station)) {
+      console.error(`[Twin] Unknown station: ${station}`)
+      return
+    }
+
+    set((state) => ({
+      selectedStation: station,
+      selectedSubsystem: null,
+      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'hero',
+      flySource: 'preset',
+      cameraTick: state.cameraTick + 1,
+      flyComplete: true,
+    }))
+
     try {
       await apiSwitchStation(station)
     } catch {
@@ -85,11 +102,32 @@ export const usePolarisStore = create((set, get) => ({
     }
   },
 
-  setSelectedSubsystem: (subsystem) => set({ selectedSubsystem: subsystem }),
+  setSelectedSubsystem: (subsystem) =>
+    set((state) => ({
+      selectedSubsystem: subsystem,
+      flySource: subsystem ? 'asset' : state.flySource,
+      cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
+      flyComplete: !subsystem,
+    })),
+
+  setCameraPreset: (preset) =>
+    set((state) => ({
+      cameraPreset: preset,
+      selectedSubsystem: null,
+      flySource: 'preset',
+      cameraTick: state.cameraTick + 1,
+      flyComplete: true,
+    })),
+
+  markFlyComplete: () =>
+    set({
+      flyComplete: true,
+    }),
 
   setThermalView: (enabled) => set({ isThermalView: enabled }),
 
-  toggleThermalView: () => set((state) => ({ isThermalView: !state.isThermalView })),
+  toggleThermalView: () =>
+    set((state) => ({ isThermalView: !state.isThermalView })),
 
   setLinkMode: (mode) => set({ linkMode: mode }),
 
@@ -126,7 +164,6 @@ export const usePolarisStore = create((set, get) => ({
   // Apply station mitigation controls
   executeMitigation: async (actionText) => {
     const station = get().selectedStation
-    const currentControls = get().telemetry[station]?.controls || {}
 
     const patch = {}
     if (actionText.includes('Hatch') || actionText.includes('hatch')) {
@@ -159,7 +196,10 @@ export const usePolarisStore = create((set, get) => ({
     try {
       await apiApplyControls(patch)
     } catch (err) {
-      console.warn('Backend controls POST failed, operating in optimistic mode:', err)
+      console.warn(
+        'Backend controls POST failed, operating in optimistic mode:',
+        err,
+      )
     }
   },
 
@@ -168,23 +208,39 @@ export const usePolarisStore = create((set, get) => ({
     const station = get().selectedStation
     const base = createDefaultTelemetry(station)
 
-    // Call live backend endpoint
     try {
-      await apiInjectScenario(scenarioKey, 60)
+      if (scenarioKey !== 'NOMINAL') {
+        await apiInjectScenario(scenarioKey, 60)
+      }
     } catch (err) {
-      console.warn('Backend scenario POST failed, applying local simulation:', err)
+      console.warn(
+        'Backend scenario POST failed, applying local simulation:',
+        err,
+      )
     }
 
-    // Also update local state so UI reacts instantly
     if (scenarioKey === 'BLIZZARD_80KT') {
       set((state) => ({
         telemetry: {
           ...state.telemetry,
           [station]: {
             ...state.telemetry[station],
-            ambient: { temp_c: -36.5, wind_speed_knots: 84.0, solar_flux_w_m2: 15.0 },
-            thermal: { ...state.telemetry[station].thermal, internal_temp_c: 14.8, heat_loss_kw: 410.0, aux_heater_kw: 140.0 },
-            fuel: { ...state.telemetry[station].fuel, burn_rate_lph: 195.0, days_of_autonomy: 109.0 },
+            ambient: {
+              temp_c: -36.5,
+              wind_speed_knots: 84.0,
+              solar_flux_w_m2: 15.0,
+            },
+            thermal: {
+              ...state.telemetry[station].thermal,
+              internal_temp_c: 14.8,
+              heat_loss_kw: 410.0,
+              aux_heater_kw: 140.0,
+            },
+            fuel: {
+              ...state.telemetry[station].fuel,
+              burn_rate_lph: 195.0,
+              days_of_autonomy: 109.0,
+            },
             risk: {
               anomaly_score: -0.38,
               is_anomaly: true,
@@ -204,7 +260,11 @@ export const usePolarisStore = create((set, get) => ({
           ...state.telemetry,
           [station]: {
             ...state.telemetry[station],
-            fuel: { tank_level_liters: 48000, burn_rate_lph: 145.0, days_of_autonomy: 13.8 },
+            fuel: {
+              tank_level_liters: 48000,
+              burn_rate_lph: 145.0,
+              days_of_autonomy: 13.8,
+            },
             risk: {
               anomaly_score: -0.22,
               is_anomaly: true,
@@ -223,8 +283,16 @@ export const usePolarisStore = create((set, get) => ({
           ...state.telemetry,
           [station]: {
             ...state.telemetry[station],
-            ambient: { temp_c: -28.0, wind_speed_knots: 32.0, solar_flux_w_m2: 0.0 },
-            thermal: { ...state.telemetry[station].thermal, aux_heater_kw: 90.0, heat_loss_kw: 290.0 },
+            ambient: {
+              temp_c: -28.0,
+              wind_speed_knots: 32.0,
+              solar_flux_w_m2: 0.0,
+            },
+            thermal: {
+              ...state.telemetry[station].thermal,
+              aux_heater_kw: 90.0,
+              heat_loss_kw: 290.0,
+            },
             risk: {
               anomaly_score: -0.08,
               is_anomaly: false,
@@ -243,6 +311,19 @@ export const usePolarisStore = create((set, get) => ({
           [station]: base,
         },
       }))
+    }
+  },
+
+  injectScenario: async (scenario, durationSeconds = 60) => {
+    if (scenario === 'NOMINAL') {
+      return get().triggerScenario('NOMINAL')
+    }
+
+    try {
+      return await apiInjectScenario(scenario, durationSeconds)
+    } catch (error) {
+      console.error('[Twin] Scenario injection failed', error)
+      throw error
     }
   },
 }))

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import './App.css'
 import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import MissionControl from './pages/MissionControl'
