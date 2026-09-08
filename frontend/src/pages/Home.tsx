@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Radio,
   Thermometer,
@@ -23,26 +23,77 @@ interface HomeProps {
 export default function Home({ onNavigate }: HomeProps) {
   const { telemetry, selectedStation, setSelectedStation } = usePolarisStore()
   const [clock, setClock] = useState(new Date())
+  const parallaxRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const id = setInterval(() => setClock(new Date()), 1000)
     return () => clearInterval(id)
   }, [])
 
+  useEffect(() => {
+    const layer = parallaxRef.current
+    if (!layer) return
+
+    const pointer = { x: 0, y: 0 }
+    let scrollY = window.scrollY
+    let frame = 0
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const apply = () => {
+      frame = 0
+      if (prefersReducedMotion) {
+        layer.style.transform = 'translate3d(0, 0, 0) scale(1.12)'
+        return
+      }
+      const x = pointer.x * 36
+      const y = scrollY * 0.38 + pointer.y * 22
+      layer.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.18)`
+    }
+
+    const schedule = () => {
+      if (frame) return
+      frame = requestAnimationFrame(apply)
+    }
+
+    const onScroll = () => {
+      scrollY = window.scrollY
+      schedule()
+    }
+
+    const onPointer = (event: PointerEvent) => {
+      pointer.x = event.clientX / window.innerWidth - 0.5
+      pointer.y = event.clientY / window.innerHeight - 0.5
+      schedule()
+    }
+
+    apply()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('pointermove', onPointer, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('pointermove', onPointer)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [])
+
   const activeTelemetry = telemetry[selectedStation]
 
   return (
     <div className="relative min-h-screen flex flex-col bg-base-950 text-white overflow-hidden">
-      {/* Background Antarctic Image with Vignette & Dark Overlay */}
-      <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 scale-105"
-        style={{
-          backgroundImage: `url('/antarctica-bg.jpg')`,
-        }}
-      >
-        {/* Layered dark gradients to enforce White, Black and Blue palette */}
-        <div className="absolute inset-0 bg-gradient-to-b from-base-950/80 via-base-950/75 to-base-950/95 backdrop-blur-[2px]" />
-        <div className="absolute inset-0 bg-radial-vignette opacity-70" />
+      {/* Parallax Antarctic background — image tracks pointer and scroll behind the UI */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div
+          ref={parallaxRef}
+          className="absolute -inset-[10%] bg-cover bg-center bg-no-repeat will-change-transform"
+          style={{
+            backgroundImage: `url('/antarctica-bg.jpg')`,
+            transform: 'translate3d(0, 0, 0) scale(1.18)',
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-base-950/70 via-base-950/58 to-base-950/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(3,5,8,0.72)_100%)]" />
       </div>
 
       {/* Main Content Area */}
@@ -51,7 +102,7 @@ export default function Home({ onNavigate }: HomeProps) {
         <div className="mb-10 text-center md:text-left pt-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ice-600/20 border border-ice-400/40 text-ice-300 text-xs font-mono font-semibold tracking-wider mb-4 shadow-glow">
             <Snowflake size={14} className="animate-spin-slow text-ice-300" />
-            <span>NCPOR ANTARCTIC MISSION CONTROL · SIH 2026 PS-26060</span>
+            <span>NCPOR ANTARCTIC MISSION CONTROL</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-4 leading-tight">
