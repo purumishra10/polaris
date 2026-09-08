@@ -122,7 +122,10 @@ export const usePolarisStore = create((set, get) => ({
     set((state) => ({
       selectedStation: station,
       selectedSubsystem: null,
-      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'hero',
+      cameraPreset:
+        station === 'BHARATI'
+          ? 'droneAerial'
+          : 'hero',
       flySource: 'preset',
       cameraTick: state.cameraTick + 1,
       flyComplete: true,
@@ -138,8 +141,12 @@ export const usePolarisStore = create((set, get) => ({
   setSelectedSubsystem: (subsystem) =>
     set((state) => ({
       selectedSubsystem: subsystem,
-      flySource: subsystem ? 'asset' : state.flySource,
-      cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
+      flySource: subsystem
+        ? 'asset'
+        : state.flySource,
+      cameraTick: subsystem
+        ? state.cameraTick + 1
+        : state.cameraTick,
       flyComplete: !subsystem,
     })),
 
@@ -157,12 +164,20 @@ export const usePolarisStore = create((set, get) => ({
       flyComplete: true,
     }),
 
-  setThermalView: (enabled) => set({ isThermalView: enabled }),
+  setThermalView: (enabled) =>
+    set({
+      isThermalView: enabled,
+    }),
 
   toggleThermalView: () =>
-    set((state) => ({ isThermalView: !state.isThermalView })),
+    set((state) => ({
+      isThermalView: !state.isThermalView,
+    })),
 
-  setLinkMode: (mode) => set({ linkMode: mode }),
+  setLinkMode: (mode) =>
+    set({
+      linkMode: mode,
+    }),
 
   setConnectionStatus: (conn) =>
     set((state) => ({
@@ -176,19 +191,26 @@ export const usePolarisStore = create((set, get) => ({
   // Called whenever live telemetry arrives from WebSocket or polling
   setTelemetryPacket: (packet) => {
     if (!packet || !packet.station_id) return
+
     const station = packet.station_id
+
     set((state) => ({
       telemetry: {
         ...state.telemetry,
         [station]: {
           ...state.telemetry[station],
           ...packet,
-          timestamp: packet.timestamp || new Date().toISOString(),
+          timestamp:
+            packet.timestamp ||
+            new Date().toISOString(),
         },
       },
+
       connection: {
         ...state.connection,
-        latency_ms: packet.link_status?.latency_ms || state.connection.latency_ms,
+        latency_ms:
+          packet.link_status?.latency_ms ||
+          state.connection.latency_ms,
         last_update: new Date().toISOString(),
       },
     }))
@@ -199,16 +221,32 @@ export const usePolarisStore = create((set, get) => ({
     const station = get().selectedStation
 
     const patch = {}
-    if (actionText.includes('Hatch') || actionText.includes('hatch')) {
+
+    if (
+      actionText.includes('Hatch') ||
+      actionText.includes('hatch')
+    ) {
       patch.hatch_lockdown = true
     }
-    if (actionText.includes('Science') || actionText.includes('scientific')) {
+
+    if (
+      actionText.includes('Science') ||
+      actionText.includes('scientific')
+    ) {
       patch.science_instruments_online = false
     }
-    if (actionText.includes('Summer') || actionText.includes('summer')) {
+
+    if (
+      actionText.includes('Summer') ||
+      actionText.includes('summer')
+    ) {
       patch.summer_wing_isolated = true
     }
-    if (actionText.includes('Generator') || actionText.includes('auxiliary')) {
+
+    if (
+      actionText.includes('Generator') ||
+      actionText.includes('auxiliary')
+    ) {
       patch.aux_generator_active = true
     }
 
@@ -236,188 +274,154 @@ export const usePolarisStore = create((set, get) => ({
     }
   },
 
-  // Inject pitch demo scenario
+  // Inject scenario through the backend only.
+  // Telemetry changes come back through the WebSocket.
   triggerScenario: async (scenarioKey) => {
-    const station = get().selectedStation
-    const base = createDefaultTelemetry(station)
-
     try {
-      if (scenarioKey !== 'NOMINAL') {
-        await apiInjectScenario(scenarioKey, 60)
-      }
-    } catch (err) {
-      console.warn(
-        'Backend scenario POST failed, applying local simulation:',
-        err,
+      await apiInjectScenario(
+        scenarioKey,
+        60,
       )
-    }
-
-    if (scenarioKey === 'BLIZZARD_80KT') {
-      set((state) => ({
-        telemetry: {
-          ...state.telemetry,
-          [station]: {
-            ...state.telemetry[station],
-            ambient: {
-              temp_c: -36.5,
-              wind_speed_knots: 84.0,
-              solar_flux_w_m2: 15.0,
-            },
-            thermal: {
-              ...state.telemetry[station].thermal,
-              internal_temp_c: 14.8,
-              heat_loss_kw: 410.0,
-              aux_heater_kw: 140.0,
-            },
-            fuel: {
-              ...state.telemetry[station].fuel,
-              burn_rate_lph: 195.0,
-              days_of_autonomy: 109.0,
-            },
-            risk: {
-              anomaly_score: -0.38,
-              is_anomaly: true,
-              severity: 'CRITICAL',
-              prescribed_actions: [
-                'ACTION: Engage exterior hatch structural airlock sequence',
-                'ACTION: Stow external weather sensors',
-                'ACTION: Spin up Standby Auxiliary Generator',
-              ],
-            },
-          },
-        },
-      }))
-    } else if (scenarioKey === 'RESUPPLY_DELAY') {
-      set((state) => ({
-        telemetry: {
-          ...state.telemetry,
-          [station]: {
-            ...state.telemetry[station],
-            fuel: {
-              tank_level_liters: 48000,
-              burn_rate_lph: 145.0,
-              days_of_autonomy: 13.8,
-            },
-            risk: {
-              anomaly_score: -0.22,
-              is_anomaly: true,
-              severity: 'CRITICAL',
-              prescribed_actions: [
-                'ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde)',
-                'ACTION: Isolate unoccupied summer residential modules',
-              ],
-            },
-          },
-        },
-      }))
-    } else if (scenarioKey === 'POLAR_NIGHT') {
-      set((state) => ({
-        telemetry: {
-          ...state.telemetry,
-          [station]: {
-            ...state.telemetry[station],
-            ambient: {
-              temp_c: -28.0,
-              wind_speed_knots: 32.0,
-              solar_flux_w_m2: 0.0,
-            },
-            thermal: {
-              ...state.telemetry[station].thermal,
-              aux_heater_kw: 90.0,
-              heat_loss_kw: 290.0,
-            },
-            risk: {
-              anomaly_score: -0.08,
-              is_anomaly: false,
-              severity: 'ADVISORY',
-              prescribed_actions: [
-                'ACTION: Isolate unoccupied summer residential modules',
-              ],
-            },
-          },
-        },
-      }))
-    } else if (scenarioKey === 'NOMINAL') {
-      set((state) => ({
-        telemetry: {
-          ...state.telemetry,
-          [station]: base,
-        },
-      }))
+    } catch (error) {
+      console.error(
+        '[Twin] Scenario injection failed',
+        error,
+      )
     }
   },
 
-  injectScenario: async (scenario, durationSeconds = 60) => {
+  injectScenario: async (
+    scenario,
+    durationSeconds = 60,
+  ) => {
     if (scenario === 'NOMINAL') {
       try {
         await apiLiveNow()
       } catch (error) {
-        console.warn('[Twin] Live now failed during NOMINAL reset', error)
+        console.warn(
+          '[Twin] Live now failed during NOMINAL reset',
+          error,
+        )
       }
-      return get().triggerScenario('NOMINAL')
+
+      return get().triggerScenario(
+        'NOMINAL',
+      )
     }
 
     try {
-      return await apiInjectScenario(scenario, durationSeconds)
+      return await apiInjectScenario(
+        scenario,
+        durationSeconds,
+      )
     } catch (error) {
-      console.error('[Twin] Scenario injection failed', error)
+      console.error(
+        '[Twin] Scenario injection failed',
+        error,
+      )
       throw error
     }
   },
 
   replayAug2018: async () => {
     try {
-      const result = await apiReplayAug2018()
+      const result =
+        await apiReplayAug2018()
+
       set((state) => ({
         selectedStation: 'BHARATI',
         selectedSubsystem: null,
         cameraPreset: 'droneAerial',
         flySource: 'preset',
-        cameraTick: state.cameraTick + 1,
+        cameraTick:
+          state.cameraTick + 1,
         flyComplete: true,
       }))
-      console.log('[Twin] Replay 2018-08-05:', result)
+
+      console.log(
+        '[Twin] Replay 2018-08-05:',
+        result,
+      )
+
       return result
     } catch (error) {
-      console.error('[Twin] Replay failed', error)
+      console.error(
+        '[Twin] Replay failed',
+        error,
+      )
       throw error
     }
   },
 
   setClock: async (clock) => {
     try {
-      const result = await apiSetClock(clock)
-      console.log('[Twin] Clock set:', result)
+      const result =
+        await apiSetClock(clock)
+
+      console.log(
+        '[Twin] Clock set:',
+        result,
+      )
+
       return result
     } catch (error) {
-      console.error('[Twin] Clock set failed', error)
+      console.error(
+        '[Twin] Clock set failed',
+        error,
+      )
       throw error
     }
   },
 
   liveNow: async () => {
     try {
-      const result = await apiLiveNow()
-      console.log('[Twin] Live now:', result)
+      const result =
+        await apiLiveNow()
+
+      console.log(
+        '[Twin] Live now:',
+        result,
+      )
+
       return result
     } catch (error) {
-      console.error('[Twin] Live now failed', error)
+      console.error(
+        '[Twin] Live now failed',
+        error,
+      )
       throw error
     }
   },
 
   executeAction: async (action) => {
-    const controls = actionToControls(action)
+    const controls =
+      actionToControls(action)
+
     if (!controls) {
-      console.warn('[Twin] No actuator mapping for', action)
+      console.warn(
+        '[Twin] No actuator mapping for',
+        action,
+      )
       return
     }
+
     try {
-      const result = await updateStationControls(controls)
-      console.log('[Twin] Controls updated:', result)
+      const result =
+        await updateStationControls(
+          controls,
+        )
+
+      console.log(
+        '[Twin] Controls updated:',
+        result,
+      )
+
       return result
     } catch (error) {
-      console.error('[Twin] Control update failed', error)
+      console.error(
+        '[Twin] Control update failed',
+        error,
+      )
       throw error
     }
   },

@@ -21,6 +21,7 @@ from config import settings
 from models import RawTelemetry, StationTelemetry
 from lockouts import compute_lockouts
 from sop import build_risk
+from proactive import ProactiveEngine
 
 log = logging.getLogger("polaris.ingest")
 
@@ -46,12 +47,15 @@ class ConnectionManager:
     async def broadcast(self, payload: dict) -> None:
         async with self._lock:
             targets = list(self._clients)
+
         dead: list[WebSocket] = []
+
         for ws in targets:
             try:
                 await ws.send_json(payload)
             except Exception:  # noqa: BLE001
                 dead.append(ws)
+
         if dead:
             async with self._lock:
                 for ws in dead:
@@ -61,9 +65,14 @@ class ConnectionManager:
 class TwinState:
     """In-memory HQ state. No database by design."""
 
-    def __init__(self, scorer: AnomalyScorer, manager: ConnectionManager) -> None:
+    def __init__(
+        self,
+        scorer: AnomalyScorer,
+        manager: ConnectionManager,
+    ) -> None:
         self.scorer = scorer
         self.manager = manager
+        self.proactive = ProactiveEngine()
         self.client: Optional[httpx.AsyncClient] = None
 
         self.latest: Optional[StationTelemetry] = None
@@ -84,8 +93,13 @@ class TwinState:
             base_url=settings.edge_base_url,
             timeout=settings.edge_timeout_seconds,
         )
+
         self._stop.clear()
-        self._task = asyncio.create_task(self._loop(), name="polaris-ingest")
+        self._task = asyncio.create_task(
+            self._loop(),
+            name="polaris-ingest",
+        )
+
         log.info(
             "Ingest worker started -> %s every %.1fs (sat %d–%d ms)",
             settings.edge_base_url,
@@ -96,27 +110,75 @@ class TwinState:
 
     async def stop(self) -> None:
         self._stop.set()
+
         if self._task:
             self._task.cancel()
+
             try:
                 await self._task
             except (asyncio.CancelledError, Exception):  # noqa: BLE001
                 pass
+
         if self.client:
             await self.client.aclose()
 
     # ------------------------------------------------------------------ #
     # enrichment
     # ------------------------------------------------------------------ #
-    def enrich(self, raw: RawTelemetry, latency_ms: int) -> StationTelemetry:
+    def enrich(
+        self,
+        raw: RawTelemetry,
+        latency_ms: int,
+    ) -> StationTelemetry:
         result = self.scorer.score(raw)
-        risk = build_risk(raw, result.anomaly_score, result.is_outlier)
+
+        risk = build_risk(
+            raw,
+            result.anomaly_score,
+            result.is_outlier,
+        )
+
         lockouts = compute_lockouts(raw)
+
         payload = raw.model_dump()
         payload["lockouts"] = lockouts.model_dump()
+
+        link_status = satellite.online(latency_ms)
+
+        if raw.scenario_id == "COMMUNICATION_DEGRADATION":
+            from models import LinkStatus
+
+            degradation_level = min(
+                2400,
+                800
+                + (
+                    len(
+                        self.proactive.history.get(
+                            raw.station_id,
+                            [],
+                        )
+                    )
+                    * 180
+                ),
+            )
+
+            link_status = LinkStatus(
+                type="C-band/LEO",
+                latency_ms=degradation_level,
+                health="DEGRADED",
+            )
+
+        proactive = self.proactive.update(
+            station_id=raw.station_id,
+            telemetry=raw,
+            link_health=link_status.health,
+        )
+
+        payload["proactive"] = proactive
+
         return StationTelemetry(
             **payload,
-            link_status=satellite.online(latency_ms),
+            link_status=link_status,
             risk=risk,
         )
 
@@ -125,58 +187,113 @@ class TwinState:
     # ------------------------------------------------------------------ #
     async def _tick(self) -> None:
         assert self.client is not None
+
         latency_ms = await satellite.satellite_delay()
 
         try:
-            resp = await self.client.get("/edge/raw-telemetry")
+            resp = await self.client.get(
+                "/edge/raw-telemetry"
+            )
             resp.raise_for_status()
-            raw = RawTelemetry.model_validate(resp.json())
-        except (httpx.HTTPError, ValidationError, ValueError) as exc:
+
+            raw = RawTelemetry.model_validate(
+                resp.json()
+            )
+
+        except (
+            httpx.HTTPError,
+            ValidationError,
+            ValueError,
+        ) as exc:
             await self._on_failure(exc)
             return
 
-        enriched = self.enrich(raw, latency_ms)
+        enriched = self.enrich(
+            raw,
+            latency_ms,
+        )
+
         self.latest = enriched
         self.active_station = raw.station_id
         self.last_latency_ms = latency_ms
-        self.last_ingest_utc = datetime.now(timezone.utc).isoformat()
+        self.last_ingest_utc = (
+            datetime.now(timezone.utc).isoformat()
+        )
+
         if self.consecutive_edge_failures:
-            log.info("Edge link restored after %d failures", self.consecutive_edge_failures)
+            log.info(
+                "Edge link restored after %d failures",
+                self.consecutive_edge_failures,
+            )
+
         self.consecutive_edge_failures = 0
         self.edge_reachable = True
 
-        await self.manager.broadcast(enriched.model_dump())
+        await self.manager.broadcast(
+            enriched.model_dump()
+        )
 
-    async def _on_failure(self, exc: Exception) -> None:
+    async def _on_failure(
+        self,
+        exc: Exception,
+    ) -> None:
         self.consecutive_edge_failures += 1
         self.edge_reachable = False
+
         log.warning(
             "Edge poll failed (%d consecutive): %s",
             self.consecutive_edge_failures,
             exc.__class__.__name__,
         )
+
         if self.latest is None:
             return
+
         degraded = self.latest.model_copy(
-            update={"link_status": satellite.degraded(self.last_latency_ms)}
+            update={
+                "link_status": satellite.degraded(
+                    self.last_latency_ms
+                )
+            }
         )
+
         self.latest = degraded
-        await self.manager.broadcast(degraded.model_dump())
+
+        await self.manager.broadcast(
+            degraded.model_dump()
+        )
 
     async def _loop(self) -> None:
         while not self._stop.is_set():
             t0 = time.monotonic()
+
             try:
                 await self._tick()
+
             except asyncio.CancelledError:
                 raise
+
             except Exception:  # noqa: BLE001
-                log.exception("Unexpected ingest error; continuing")
+                log.exception(
+                    "Unexpected ingest error; continuing"
+                )
+
             elapsed = time.monotonic() - t0
-            await asyncio.sleep(max(0.0, settings.poll_interval_seconds - elapsed))
+
+            await asyncio.sleep(
+                max(
+                    0.0,
+                    settings.poll_interval_seconds
+                    - elapsed,
+                )
+            )
 
     # ------------------------------------------------------------------ #
     # helpers for routes
     # ------------------------------------------------------------------ #
     def snapshot(self) -> Optional[dict]:
-        return self.latest.model_dump() if self.latest else None
+        return (
+            self.latest.model_dump()
+            if self.latest
+            else None
+        )

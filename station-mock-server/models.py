@@ -5,6 +5,7 @@ class AmbientState(BaseModel):
     temp_c: float
     wind_speed_knots: float
     solar_flux_w_m2: float
+    pressure_hpa: float = 985.0
 
 class ThermalState(BaseModel):
     internal_temp_c: float
@@ -69,6 +70,7 @@ class RawTelemetryPayload(BaseModel):
     timestamp: str
     source: str = "synthetic"
     confidence: str = "modeled"
+    scenario_id: Optional[str] = None
     ambient: AmbientState
     thermal: ThermalState
     microgrid: MicrogridState
