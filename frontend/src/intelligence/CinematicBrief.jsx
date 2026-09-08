@@ -80,7 +80,7 @@ function SlotVisual({ slot }) {
   )
 }
 
-export default function CinematicBrief() {
+function useCinematicBrief({ bindEffects = false } = {}) {
   const selectedStation = usePolarisStore((state) => state.selectedStation)
   const selectedSubsystem = usePolarisStore(
     (state) => state.selectedSubsystem,
@@ -95,124 +95,141 @@ export default function CinematicBrief() {
   const markFlyComplete = usePolarisStore((state) => state.markFlyComplete)
 
   useEffect(() => {
-    if (!selectedSubsystem) return undefined
+    if (!bindEffects || !selectedSubsystem) return undefined
     const fallback = window.setTimeout(() => {
       markFlyComplete()
     }, 1100)
     return () => window.clearTimeout(fallback)
-  }, [selectedSubsystem, selectedStation, markFlyComplete])
-
-  useEffect(() => {
-    const onKey = (event) => {
-      if (event.key === 'Escape') setSelectedSubsystem(null)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [setSelectedSubsystem])
+  }, [bindEffects, selectedSubsystem, selectedStation, markFlyComplete])
 
   if (!selectedSubsystem) return null
 
   const template = getTemplate(selectedStation, selectedSubsystem)
-  const heroes = template.heroes ?? []
-  const features = template.features ?? []
-  const signals = uniqueSignals(template.signals(telemetry) ?? [])
-  const slots = template.slots(telemetry) ?? []
+  return {
+    selectedStation,
+    selectedSubsystem,
+    flyComplete,
+    telemetry,
+    setSelectedSubsystem,
+    template,
+    heroes: template.heroes ?? [],
+    features: template.features ?? [],
+    signals: uniqueSignals(template.signals(telemetry) ?? []),
+    slots: template.slots(telemetry) ?? [],
+  }
+}
+
+export function CinematicOverlays() {
+  const brief = useCinematicBrief({ bindEffects: true })
+  if (!brief) return null
 
   return (
-    <>
+    <div className="cinematic-overlays">
       <div className="letterbox top in">
-        <span>
-          POLARIS · {selectedStation}
-        </span>
-        <span>{template.callsign}</span>
+        <span>POLARIS · {brief.selectedStation}</span>
+        <span>{brief.template.callsign}</span>
       </div>
 
       <div className="letterbox bottom in">
-        <span>{template.location}</span>
-        <span>ESC TO EXIT · {template.sourceTag}</span>
+        <span>{brief.template.location}</span>
+        <span>ESC TO CLOSE · {brief.template.sourceTag}</span>
       </div>
 
-      {flyComplete && (
-        <div className="title-slam" key={`${selectedSubsystem}-slam`}>
-          <div className="title-slam-id">{template.id}</div>
-          <div className="title-slam-call">{template.callsign}</div>
-          <div className="title-slam-tag">{template.sourceTag}</div>
+      {brief.flyComplete && (
+        <div className="title-slam" key={`${brief.selectedSubsystem}-slam`}>
+          <div className="title-slam-id">{brief.template.id}</div>
+          <div className="title-slam-call">{brief.template.callsign}</div>
+          <div className="title-slam-tag">{brief.template.sourceTag}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function CinematicPanel({ className = '' }) {
+  const brief = useCinematicBrief()
+  if (!brief) return null
+
+  return (
+    <aside className={`cinematic-brief ${className}`.trim()} key={`${brief.selectedSubsystem}-brief`}>
+      <div className="brief-header">
+        <div>
+          <div className="brief-kicker">PLACE INTELLIGENCE</div>
+          <div className="brief-title">{brief.template.callsign}</div>
+          <div className="brief-location">{brief.template.location}</div>
+        </div>
+        <button
+          type="button"
+          className="brief-close"
+          onClick={() => brief.setSelectedSubsystem(null)}
+        >
+          CLOSE
+        </button>
+      </div>
+
+      <div className="brief-heroes">
+        {brief.heroes.map((hero) => (
+          <div key={hero.label} className="brief-hero">
+            <span>
+              {hero.label}
+              {hero.tag ? ` · ${hero.tag}` : ''}
+            </span>
+            <strong>
+              {formatHero(hero, brief.telemetry)}
+              {hero.unit ? ` ${hero.unit}` : ''}
+            </strong>
+          </div>
+        ))}
+      </div>
+
+      {brief.features.length > 0 && (
+        <div className="brief-block">
+          <div className="brief-block-title">FEATURES AT THIS PLACE</div>
+          <div className="brief-features">
+            {brief.features.map((feature) => (
+              <div key={feature.id} className="brief-feature">
+                <b>{feature.label}</b>
+                <span>{feature.hint}</span>
+                <em>
+                  {typeof feature.pin === 'function'
+                    ? feature.pin(brief.telemetry)
+                    : ''}
+                </em>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {flyComplete && (
-        <aside className="cinematic-brief" key={`${selectedSubsystem}-brief`}>
-          <div className="brief-header">
-            <div>
-              <div className="brief-kicker">PLACE INTELLIGENCE</div>
-              <div className="brief-title">{template.callsign}</div>
-              <div className="brief-location">{template.location}</div>
-            </div>
-            <button
-              type="button"
-              className="brief-close"
-              onClick={() => setSelectedSubsystem(null)}
+      <div className="brief-block">
+        <div className="brief-block-title">SIGNALS</div>
+        <div className="brief-signals">
+          {brief.signals.map((signal) => (
+            <div
+              key={signal.id}
+              className={`brief-signal ${signal.tone}`}
             >
-              CLOSE
-            </button>
-          </div>
-
-          <div className="brief-heroes">
-            {heroes.map((hero) => (
-              <div key={hero.label} className="brief-hero">
-                <span>
-                  {hero.label}
-                  {hero.tag ? ` · ${hero.tag}` : ''}
-                </span>
-                <strong>
-                  {formatHero(hero, telemetry)}
-                  {hero.unit ? ` ${hero.unit}` : ''}
-                </strong>
-              </div>
-            ))}
-          </div>
-
-          {features.length > 0 && (
-            <div className="brief-block">
-              <div className="brief-block-title">FEATURES AT THIS PLACE</div>
-              <div className="brief-features">
-                {features.map((feature) => (
-                  <div key={feature.id} className="brief-feature">
-                    <b>{feature.label}</b>
-                    <span>{feature.hint}</span>
-                    <em>
-                      {typeof feature.pin === 'function'
-                        ? feature.pin(telemetry)
-                        : ''}
-                    </em>
-                  </div>
-                ))}
-              </div>
+              {signal.text}
             </div>
-          )}
+          ))}
+        </div>
+      </div>
 
-          <div className="brief-block">
-            <div className="brief-block-title">SIGNALS</div>
-            <div className="brief-signals">
-              {signals.map((signal) => (
-                <div
-                  key={signal.id}
-                  className={`brief-signal ${signal.tone}`}
-                >
-                  {signal.text}
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="brief-block">
+        <div className="brief-block-title">ANALYSIS FRAMES</div>
+        {brief.slots.map((slot) => (
+          <SlotVisual key={slot.label} slot={slot} />
+        ))}
+      </div>
+    </aside>
+  )
+}
 
-          <div className="brief-block">
-            <div className="brief-block-title">ANALYSIS FRAMES</div>
-            {slots.map((slot) => (
-              <SlotVisual key={slot.label} slot={slot} />
-            ))}
-          </div>
-        </aside>
-      )}
+export default function CinematicBrief() {
+  return (
+    <>
+      <CinematicOverlays />
+      <CinematicPanel />
     </>
   )
 }

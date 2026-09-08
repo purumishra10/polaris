@@ -23,14 +23,13 @@ import {
   Sun,
   Flame,
   Clock,
-  Layers,
   Activity,
   AlertTriangle,
   Info,
 } from 'lucide-react'
 import TopNav from '../components/TopNav'
+import LiveTwinViewport from '../components/LiveTwinViewport'
 import { usePolarisStore } from '../store/usePolarisStore'
-import StationScene from '../3d/StationScene'
 import SeverityBadge from '../components/SeverityBadge'
 
 interface Props {
@@ -58,12 +57,7 @@ const HISTORY_LIMIT = 30
 export default function Analytics({ onNavigate }: Props) {
   const {
     selectedStation,
-    setSelectedStation,
     telemetry,
-    selectedSubsystem,
-    setSelectedSubsystem,
-    isThermalView,
-    toggleThermalView,
   } = usePolarisStore()
 
   const t = telemetry[selectedStation]
@@ -133,71 +127,7 @@ export default function Analytics({ onNavigate }: Props) {
           </div>
         </div>
 
-        {/* 3D Model System Viewport in Telemetry Analytics Tab */}
-        <div className="relative rounded-2xl border border-base-700 bg-base-900 overflow-hidden shadow-2xl">
-          <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2">
-            <div className="px-3 py-1 rounded-lg bg-base-950/80 backdrop-blur border border-base-700 text-xs font-mono flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-ice-400 animate-pulse" />
-              <span className="text-slate-300">3D DIGITAL TWIN SPATIAL VIEW</span>
-            </div>
-
-            {selectedSubsystem && (
-              <div className="px-3 py-1 rounded-lg bg-ice-600/30 backdrop-blur border border-ice-400 text-xs font-mono text-ice-200 flex items-center gap-2">
-                <span>FOCUSED: <strong>{selectedSubsystem}</strong></span>
-                <button
-                  onClick={() => setSelectedSubsystem(null)}
-                  className="text-slate-400 hover:text-white ml-1 font-bold"
-                >
-                  ×
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-            <button
-              onClick={toggleThermalView}
-              className={`px-3 py-1 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all ${
-                isThermalView
-                  ? 'bg-red-500/30 border border-red-500 text-red-300 shadow-glow-red'
-                  : 'bg-base-950/80 border border-base-700 text-slate-300 hover:border-ice-400'
-              }`}
-            >
-              <Flame size={13} className={isThermalView ? 'text-red-400' : 'text-ice-400'} />
-              <span>{isThermalView ? 'THERMAL IR: ACTIVE' : 'TOGGLE THERMAL IR'}</span>
-            </button>
-          </div>
-
-          {/* 3D Canvas Viewport */}
-          <div className="relative w-full h-[280px] sm:h-[320px]">
-            <StationScene />
-          </div>
-
-          {/* Subsystem quick-focus chips */}
-          <div className="px-4 py-2 border-t border-base-800 bg-base-950/60 backdrop-blur flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <span className="text-slate-500 text-[11px]">CLICK 3D PIN OR SELECT SUBSYSTEM:</span>
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                { id: 'FUEL', label: 'Fuel Farm' },
-                { id: 'MICROGRID', label: 'CHP Generator' },
-                { id: 'COMMUNICATIONS', label: 'MARA Radome' },
-                { id: 'STRUCTURE', label: 'Habitat Living' },
-              ].map((sub) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setSelectedSubsystem(selectedSubsystem === sub.id ? null : sub.id)}
-                  className={`px-2.5 py-0.5 rounded border text-[11px] transition-colors ${
-                    selectedSubsystem === sub.id
-                      ? 'bg-ice-600 text-white border-ice-400 font-semibold'
-                      : 'bg-base-900 border-base-700 text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <LiveTwinViewport />
 
         {/* Hero Countdown & Fuel Analytics Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

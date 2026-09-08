@@ -9,19 +9,16 @@ import {
   Zap,
   Activity,
   AlertTriangle,
-  Flame,
   Check,
   RotateCcw,
-  Layers,
   Send,
   Sliders,
   Cpu,
 } from 'lucide-react'
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
+import LiveTwinViewport from '../components/LiveTwinViewport'
 import { usePolarisStore } from '../store/usePolarisStore'
-import StationScene from '../3d/StationScene'
-import CinematicBrief from '../intelligence/CinematicBrief'
 
 interface Props {
   onNavigate: (
@@ -128,16 +125,11 @@ export default function MissionControl({
 }: Props) {
   const {
     selectedStation,
-    setSelectedStation,
     telemetry,
     linkMode,
     setLinkMode,
     executeMitigation,
     triggerScenario,
-    selectedSubsystem,
-    setSelectedSubsystem,
-    isThermalView,
-    toggleThermalView,
   } = usePolarisStore()
 
   const [executedActions, setExecutedActions] =
@@ -448,154 +440,7 @@ export default function MissionControl({
             </div>
           )}
 
-        {/* 3D Spatial Twin Viewport (Dev 5 Three.js / React Three Fiber) */}
-        <div className="relative w-full rounded-2xl border border-base-700 bg-base-900 overflow-hidden shadow-2xl">
-          {/* Top 3D Control Bar Overlay */}
-          <div className="absolute top-3 left-3 z-10 flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border border-base-700 bg-base-950/80 backdrop-blur p-0.5 text-xs font-mono">
-              <button
-                onClick={() =>
-                  setSelectedStation(
-                    'BHARATI'
-                  )
-                }
-                className={`px-3 py-1 rounded font-semibold transition-all ${
-                  selectedStation ===
-                  'BHARATI'
-                    ? 'bg-ice-600 text-white shadow-glow'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                BHARATI 3D
-              </button>
-
-              <button
-                onClick={() =>
-                  setSelectedStation(
-                    'MAITRI'
-                  )
-                }
-                className={`px-3 py-1 rounded font-medium transition-all ${
-                  selectedStation ===
-                  'MAITRI'
-                    ? 'bg-ice-600 text-white shadow-glow'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                MAITRI 3D
-              </button>
-            </div>
-
-            {selectedSubsystem && (
-              <div className="px-3 py-1 rounded-lg bg-ice-600/30 backdrop-blur border border-ice-400 text-xs font-mono text-ice-200 flex items-center gap-1.5">
-                <span>
-                  INSPECTOR:{' '}
-                  <strong>
-                    {selectedSubsystem}
-                  </strong>
-                </span>
-
-                <button
-                  onClick={() =>
-                    setSelectedSubsystem(
-                      null
-                    )
-                  }
-                  className="text-slate-400 hover:text-white ml-1 font-bold"
-                >
-                  ×
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
-            <button
-              onClick={toggleThermalView}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono flex items-center gap-1.5 transition-all backdrop-blur ${
-                isThermalView
-                  ? 'bg-red-500/40 border border-red-500 text-red-200 shadow-glow-red'
-                  : 'bg-base-950/80 border border-base-700 text-slate-300 hover:border-ice-400'
-              }`}
-            >
-              <Flame
-                size={14}
-                className={
-                  isThermalView
-                    ? 'text-red-400'
-                    : 'text-ice-400'
-                }
-              />
-
-              <span>
-                {isThermalView
-                  ? 'THERMAL INFRARED: ON'
-                  : 'THERMAL VIEW'}
-              </span>
-            </button>
-          </div>
-
-          {/* 3D Canvas */}
-          <div className="relative w-full h-[380px] sm:h-[440px]">
-            <StationScene />
-            <CinematicBrief />
-          </div>
-
-          {/* Bottom 3D Subsystem Selection Strip */}
-          <div className="px-4 py-2 border-t border-base-800 bg-base-950/70 backdrop-blur flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-            <div className="flex items-center gap-2 text-slate-400">
-              <Layers
-                size={14}
-                className="text-ice-400"
-              />
-
-              <span>
-                INTERACTIVE 3D SUBSYSTEM PINS:
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {[
-                {
-                  id: 'MICROGRID',
-                  label: 'CHP Microgrid Block',
-                },
-                {
-                  id: 'FUEL',
-                  label: 'JET A1 Fuel Farm',
-                },
-                {
-                  id: 'COMMUNICATIONS',
-                  label: 'MARA Science Radome',
-                },
-                {
-                  id: 'STRUCTURE',
-                  label: 'Elevated Habitation Pods',
-                },
-              ].map((sub) => (
-                <button
-                  key={sub.id}
-                  onClick={() =>
-                    setSelectedSubsystem(
-                      selectedSubsystem ===
-                        sub.id
-                        ? null
-                        : sub.id
-                    )
-                  }
-                  className={`px-3 py-1 rounded-md border transition-all ${
-                    selectedSubsystem ===
-                    sub.id
-                      ? 'bg-ice-600 text-white border-ice-400 font-semibold shadow-glow'
-                      : 'bg-base-900 border-base-700 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <LiveTwinViewport />
 
         {/* Closed-Loop Command Grid: SOP Mitigations & Scenario Injections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
