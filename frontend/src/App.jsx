@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import StationScene from './3d/StationScene'
+import CinematicBrief from './intelligence/CinematicBrief'
 
 import { usePolarisStore } from './store/usePolarisStore'
 import {
@@ -72,7 +73,7 @@ function App() {
       : MAITRI_SUBSYSTEMS
 
   return (
-    <main className="polaris">
+    <main className={selectedSubsystem ? 'polaris brief-open' : 'polaris'}>
       <StationScene />
 
       <header className="topbar">
@@ -170,7 +171,7 @@ function App() {
         </div>
       </aside>
 
-      {showTelemetry && (
+      {showTelemetry && !selectedSubsystem && (
         <section className="telemetry-panel">
           <div className="panel-header">
             <span>STATION STATE</span>
@@ -219,28 +220,16 @@ function App() {
         </section>
       )}
 
-      {selectedSubsystem && (
-        <div className="subsystem-card">
-          <div className="subsystem-label">
-            SELECTED SUBSYSTEM
-          </div>
+      <CinematicBrief />
 
-          <div className="subsystem-name">
-            {selectedSubsystem}
-          </div>
-
-          <div className="subsystem-hint">
-            Physical asset selected
-          </div>
-        </div>
+      {!selectedSubsystem && (
+        <button
+          className="telemetry-toggle"
+          onClick={() => setShowTelemetry((value) => !value)}
+        >
+          {showTelemetry ? 'HIDE DATA' : 'SHOW DATA'}
+        </button>
       )}
-
-      <button
-        className="telemetry-toggle"
-        onClick={() => setShowTelemetry((value) => !value)}
-      >
-        {showTelemetry ? 'HIDE DATA' : 'SHOW DATA'}
-      </button>
 
       <section className="scenario-panel">
         <div className="scenario-title">
@@ -277,7 +266,7 @@ function App() {
       {selectedStation === 'BHARATI' && (
         <>
           <div className="orbit-hint">
-            DRAG TO ORBIT 360° · RIGHT-DRAG PAN · SCROLL ZOOM · ARROWS
+            DRAG TO ORBIT 360° · RIGHT-DRAG PAN · SCROLL ZOOM · ARROWS · CLICK A PLACE
           </div>
           <div className="camera-presets">
             {Object.keys(bharatiCameraPresets).map((id) => (

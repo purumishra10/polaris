@@ -2,16 +2,23 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { usePolarisStore } from '../../store/usePolarisStore'
+import { getTemplate } from '../../intelligence/subsystemCatalog'
 import {
   bharatiAnchors,
   bharatiCameraPresets,
 } from '../stations/Bharati/bharatiAnchors'
+import { maitriAnchors } from '../stations/Maitri/maitriAnchors'
+
+const MAITRI_OVERVIEW = {
+  position: [24, 16, 27],
+  target: [0, 3.2, 0],
+}
 
 function isUiTarget(target) {
   return Boolean(
     target instanceof Element &&
       target.closest(
-        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle',
+        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .letterbox, .title-slam',
       ),
   )
 }
@@ -23,6 +30,7 @@ export default function CameraRig() {
   const dragging = useRef(null)
   const last = useRef({ x: 0, y: 0 })
   const flying = useRef(false)
+  const announced = useRef(true)
   const autoSpin = useRef(false)
   const goalPos = useRef(new THREE.Vector3(82, 54, 68))
   const goalTarget = useRef(new THREE.Vector3(0, 6, 4))
@@ -34,6 +42,9 @@ export default function CameraRig() {
   const flySource = usePolarisStore((state) => state.flySource)
   const selectedSubsystem = usePolarisStore(
     (state) => state.selectedSubsystem,
+  )
+  const selectedStation = usePolarisStore(
+    (state) => state.selectedStation,
   )
 
   const apply = () => {
@@ -65,26 +76,55 @@ export default function CameraRig() {
 
   useEffect(() => {
     flying.current = true
+    announced.current = false
 
-    if (flySource === 'preset' && cameraPreset) {
-      const view = bharatiCameraPresets[cameraPreset]
-      if (!view) return
-      goalPos.current.set(...view.position)
-      goalTarget.current.set(...view.target)
-      autoSpin.current = cameraPreset === 'spin360'
+    if (flySource === 'preset') {
+      if (selectedStation === 'BHARATI') {
+        const view = bharatiCameraPresets[cameraPreset]
+        if (!view) {
+          usePolarisStore.getState().markFlyComplete()
+          return
+        }
+        goalPos.current.set(...view.position)
+        goalTarget.current.set(...view.target)
+        autoSpin.current = cameraPreset === 'spin360'
+        return
+      }
+
+      goalPos.current.set(...MAITRI_OVERVIEW.position)
+      goalTarget.current.set(...MAITRI_OVERVIEW.target)
+      autoSpin.current = false
       return
     }
 
     if (flySource === 'asset' && selectedSubsystem) {
-      const look = bharatiAnchors[selectedSubsystem]
-      if (!look) return
+      const anchors =
+        selectedStation === 'BHARATI' ? bharatiAnchors : maitriAnchors
+      const look = anchors[selectedSubsystem]
+      if (!look) {
+        usePolarisStore.getState().markFlyComplete()
+        return
+      }
+      const template = getTemplate(selectedStation, selectedSubsystem)
       const [tx, ty, tz] = look
-      const offset = 16 + Math.max(4, ty * 0.35)
-      goalPos.current.set(tx + offset * 0.95, ty + 8, tz + offset)
+      const distance = template.framing?.distance ?? 16
+      const height = template.framing?.height ?? 8
+      const lateral = template.framing?.lateral ?? 0.95
+      goalPos.current.set(
+        tx + distance * lateral,
+        ty + height,
+        tz + distance,
+      )
       goalTarget.current.set(tx, ty, tz)
       autoSpin.current = false
     }
-  }, [cameraPreset, cameraTick, flySource, selectedSubsystem])
+  }, [
+    cameraPreset,
+    cameraTick,
+    flySource,
+    selectedSubsystem,
+    selectedStation,
+  ])
 
   useEffect(() => {
     const onDown = (event) => {
@@ -205,6 +245,10 @@ export default function CameraRig() {
     )
     if (camera.position.distanceTo(goalPos.current) < 0.55) {
       flying.current = false
+      if (!announced.current) {
+        announced.current = true
+        usePolarisStore.getState().markFlyComplete()
+      }
     }
   })
 

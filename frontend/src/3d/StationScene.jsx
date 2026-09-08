@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, ContactShadows } from '@react-three/drei'
+import { ContactShadows } from '@react-three/drei'
 
 import AntarcticGround from './environment/AntarcticGround'
 import Atmosphere from './environment/Atmosphere'
@@ -14,6 +14,7 @@ import MaitriStation from './stations/Maitri/MaitriStation'
 import { usePolarisStore } from '../store/usePolarisStore'
 import OperationalState from './components/OperationalState'
 import CameraRig from './components/CameraRig'
+import WorldPins from '../intelligence/WorldPins'
 
 export default function StationScene() {
   const orbitRoot = useRef(null)
@@ -44,6 +45,8 @@ export default function StationScene() {
         onCreated={({ camera }) => {
           if (isBharati) {
             camera.lookAt(0, 6, 4)
+          } else {
+            camera.lookAt(0, 3.2, 0)
           }
         }}
         onPointerMissed={() => {
@@ -55,7 +58,6 @@ export default function StationScene() {
             <BharatiEnvironment />
             <BharatiGround />
             <BharatiStation />
-            <CameraRig />
           </>
         ) : (
           <>
@@ -70,16 +72,11 @@ export default function StationScene() {
               blur={2.5}
               far={10}
             />
-            <OrbitControls
-              enableDamping
-              dampingFactor={0.08}
-              minDistance={11}
-              maxDistance={55}
-              maxPolarAngle={Math.PI / 2.05}
-              target={[0, 3.2, 0]}
-            />
           </>
         )}
+
+        <CameraRig />
+        <WorldPins />
 
         <OperationalState
           telemetry={telemetry}

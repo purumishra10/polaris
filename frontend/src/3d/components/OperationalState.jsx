@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 
+import { heightAt } from '../environment/terrainHeight'
+
 function severityColor(severity) {
   if (severity === 'CRITICAL') return '#ff4055'
   if (severity === 'ADVISORY') return '#ffb84d'
@@ -40,10 +42,31 @@ function FuelLevel({ level, station }) {
     0,
     Math.min(1, level / 600000),
   )
-  const position =
-    station === 'BHARATI' ? [-58, 1.8, -28] : [-7, 1.45, -2]
-  const height = station === 'BHARATI' ? 3.2 : 2.5
-  const radius = station === 'BHARATI' ? 0.85 : 0.62
+
+  if (station === 'BHARATI') {
+    const ground = heightAt(-52, -28)
+    const height = 3.4
+    const fillH = Math.max(0.04, normalized * height)
+
+    return (
+      <group position={[-52, ground, -28]}>
+        <mesh position={[0, fillH / 2, 0]}>
+          <cylinderGeometry args={[1.52, 1.52, fillH, 24]} />
+          <meshStandardMaterial
+            color="#56b9d8"
+            emissive="#1e8cad"
+            emissiveIntensity={1.6}
+            transparent
+            opacity={0.78}
+          />
+        </mesh>
+      </group>
+    )
+  }
+
+  const position = [-7, 1.45, -2]
+  const height = 2.5
+  const radius = 0.62
 
   return (
     <group position={position}>

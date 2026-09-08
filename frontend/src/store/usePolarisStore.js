@@ -67,6 +67,7 @@ export const usePolarisStore = create((set) => ({
   cameraPreset: 'droneAerial',
   cameraTick: 0,
   flySource: 'preset',
+  flyComplete: true,
 
   connection: {
     status: 'SIMULATION',
@@ -80,9 +81,10 @@ export const usePolarisStore = create((set) => ({
     set((state) => ({
       selectedStation: station,
       selectedSubsystem: null,
-      cameraPreset: station === 'BHARATI' ? 'droneAerial' : null,
+      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'overview',
       flySource: 'preset',
       cameraTick: state.cameraTick + 1,
+      flyComplete: true,
     })),
 
   setSelectedSubsystem: (subsystem) =>
@@ -90,6 +92,7 @@ export const usePolarisStore = create((set) => ({
       selectedSubsystem: subsystem,
       flySource: subsystem ? 'asset' : state.flySource,
       cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
+      flyComplete: !subsystem,
     })),
 
   setCameraPreset: (preset) =>
@@ -98,7 +101,13 @@ export const usePolarisStore = create((set) => ({
       selectedSubsystem: null,
       flySource: 'preset',
       cameraTick: state.cameraTick + 1,
+      flyComplete: true,
     })),
+
+  markFlyComplete: () =>
+    set({
+      flyComplete: true,
+    }),
 
   setThermalView: (enabled) =>
     set({
