@@ -3,8 +3,31 @@ import { useState } from 'react'
 import StationScene from './3d/StationScene'
 
 import { usePolarisStore } from './store/usePolarisStore'
+import {
+  BHARATI_SUBSYSTEMS,
+  bharatiCameraPresets,
+} from './3d/stations/Bharati/bharatiAnchors'
 
 import './App.css'
+
+const MAITRI_SUBSYSTEMS = [
+  'STRUCTURE',
+  'FUEL',
+  'MICROGRID',
+  'COMMUNICATIONS',
+  'SAFETY',
+]
+
+const CAMERA_PRESET_LABELS = {
+  droneAerial: 'DRONE',
+  groundVcolumns: 'V-COLUMNS',
+  roofTerrace: 'ROOF',
+  containerVillage: 'ISO YARD',
+  radomeRidge: 'RADOME',
+  meltPond: 'POND',
+  undercroft: 'UNDERCROFT',
+  spin360: '360°',
+}
 
 function App() {
   const selectedStation = usePolarisStore(
@@ -25,11 +48,28 @@ function App() {
     (state) => state.setSelectedStation,
   )
 
+  const setSelectedSubsystem = usePolarisStore(
+    (state) => state.setSelectedSubsystem,
+  )
+
+  const setCameraPreset = usePolarisStore(
+    (state) => state.setCameraPreset,
+  )
+
+  const cameraPreset = usePolarisStore(
+    (state) => state.cameraPreset,
+  )
+
   const injectScenario = usePolarisStore(
     (state) => state.injectScenario,
   )
 
   const [showTelemetry, setShowTelemetry] = useState(true)
+
+  const subsystems =
+    selectedStation === 'BHARATI'
+      ? BHARATI_SUBSYSTEMS
+      : MAITRI_SUBSYSTEMS
 
   return (
     <main className="polaris">
@@ -102,6 +142,31 @@ function App() {
             <span>DATA</span>
             <strong>STAGE</strong>
           </div>
+        </div>
+
+        <div className="eyebrow asset-eyebrow">
+          ASSETS
+        </div>
+
+        <div className="asset-list">
+          {subsystems.map((id) => (
+            <button
+              key={id}
+              type="button"
+              className={
+                selectedSubsystem === id
+                  ? 'asset-button active'
+                  : 'asset-button'
+              }
+              onClick={() =>
+                setSelectedSubsystem(
+                  selectedSubsystem === id ? null : id,
+                )
+              }
+            >
+              {id}
+            </button>
+          ))}
         </div>
       </aside>
 
@@ -208,6 +273,30 @@ function App() {
           </button>
         </div>
       </section>
+
+      {selectedStation === 'BHARATI' && (
+        <>
+          <div className="orbit-hint">
+            DRAG TO ORBIT 360° · RIGHT-DRAG PAN · SCROLL ZOOM · ARROWS
+          </div>
+          <div className="camera-presets">
+            {Object.keys(bharatiCameraPresets).map((id) => (
+              <button
+                key={id}
+                type="button"
+                className={
+                  cameraPreset === id && !selectedSubsystem
+                    ? 'camera-chip active'
+                    : 'camera-chip'
+                }
+                onClick={() => setCameraPreset(id)}
+              >
+                {CAMERA_PRESET_LABELS[id] ?? id}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="bottom-bar">
         <span>POLARIS / MISSION CONTROL</span>
