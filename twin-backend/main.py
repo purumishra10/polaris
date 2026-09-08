@@ -20,6 +20,7 @@ from config import settings
 from ingest import ConnectionManager, TwinState
 from models import (
     VALID_STATIONS,
+    ClockRequest,
     ControlsAckResponse,
     ControlsState,
     ControlUpdateRequest,
@@ -128,6 +129,44 @@ async def _inject(payload: ScenarioInjectRequest) -> ScenarioInjectResponse:
         scenario=payload.scenario_type or "",
         duration_seconds=payload.duration_seconds,
     )
+
+
+@app.post("/api/replay/2018-08-05")
+async def replay_2018() -> dict[str, Any]:
+    data = await _edge_post("/edge/replay/2018-08-05")
+    twin.active_station = str(data.get("station_id", "BHARATI")).upper()
+    return data
+
+
+@app.post("/api/replay/clear")
+async def replay_clear() -> dict[str, Any]:
+    return await _edge_post("/edge/replay/clear")
+
+
+@app.post("/api/clock")
+async def set_clock(payload: ClockRequest) -> dict[str, Any]:
+    data = await _edge_post(
+        "/edge/clock",
+        json=payload.model_dump(),
+    )
+    if data.get("station_id"):
+        twin.active_station = str(data["station_id"]).upper()
+    return data
+
+
+@app.get("/api/clock/catalog")
+async def clock_catalog() -> dict[str, Any]:
+    if twin.client is None:
+        raise HTTPException(status_code=503, detail="Twin engine initializing")
+    await satellite.satellite_delay()
+    try:
+        resp = await twin.client.get("/edge/clock/catalog")
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(
+            status_code=502, detail=f"Edge catalog unreachable: {exc.__class__.__name__}"
+        ) from exc
 
 
 # --------------------------------------------------------------------------- #

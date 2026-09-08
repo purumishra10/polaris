@@ -19,6 +19,7 @@ import satellite
 from anomaly import AnomalyScorer
 from config import settings
 from models import RawTelemetry, StationTelemetry
+from lockouts import compute_lockouts
 from sop import build_risk
 
 log = logging.getLogger("polaris.ingest")
@@ -110,8 +111,11 @@ class TwinState:
     def enrich(self, raw: RawTelemetry, latency_ms: int) -> StationTelemetry:
         result = self.scorer.score(raw)
         risk = build_risk(raw, result.anomaly_score, result.is_outlier)
+        lockouts = compute_lockouts(raw)
+        payload = raw.model_dump()
+        payload["lockouts"] = lockouts.model_dump()
         return StationTelemetry(
-            **raw.model_dump(),
+            **payload,
             link_status=satellite.online(latency_ms),
             risk=risk,
         )

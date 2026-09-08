@@ -2,6 +2,17 @@ const ENGINE_URL =
   import.meta.env.VITE_TWIN_ENGINE_URL ?? 'http://localhost:8000'
 const WS_URL = `${ENGINE_URL.replace(/^http/, 'ws')}/ws/telemetry`
 
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${ENGINE_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+  })
+  if (!response.ok) {
+    throw new Error(`Request failed (${response.status}): ${path}`)
+  }
+  return response.json()
+}
+
 export async function fetchTelemetrySnapshot() {
   const response = await fetch(`${ENGINE_URL}/api/telemetry`)
   if (!response.ok) {
@@ -45,6 +56,36 @@ export async function switchStation(stationId) {
     throw new Error(`Station switch failed: ${response.status}`)
   }
   return response.json()
+}
+
+export async function replayAug2018() {
+  return apiRequest('/api/replay/2018-08-05', { method: 'POST' })
+}
+
+export async function setClock(clock) {
+  return apiRequest('/api/clock', {
+    method: 'POST',
+    body: JSON.stringify({ clock, live: false }),
+  })
+}
+
+export async function liveNow() {
+  return apiRequest('/api/clock', {
+    method: 'POST',
+    body: JSON.stringify({ live: true }),
+  })
+}
+
+export async function getClockCatalog() {
+  return apiRequest('/api/clock/catalog')
+}
+
+export async function clearReplay() {
+  return apiRequest('/api/replay/clear', { method: 'POST' })
+}
+
+export async function updateStationControls(controls) {
+  return applyControls(controls)
 }
 
 export async function checkBackendHealth() {

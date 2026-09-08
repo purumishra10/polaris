@@ -14,6 +14,7 @@ import { usePolarisStore } from '../store/usePolarisStore'
 import OperationalState from './components/OperationalState'
 import CameraRig from './components/CameraRig'
 import WorldPins from '../intelligence/WorldPins'
+import FeatureWarnings from './components/FeatureWarnings'
 
 export default function StationScene() {
   const orbitRoot = useRef(null)
@@ -76,6 +77,7 @@ export default function StationScene() {
 
         <CameraRig />
         <WorldPins />
+        <FeatureWarnings />
 
         <OperationalState
           telemetry={telemetry}

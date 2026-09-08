@@ -30,6 +30,40 @@ class ControlsState(BaseModel):
     hatch_lockdown: bool = False
     aux_generator_active: bool = False
 
+class DayFact(BaseModel):
+    label: str
+    value: str
+    tag: str = ""
+
+
+class ReplayState(BaseModel):
+    active: bool = False
+    scenario_id: Optional[str] = None
+    clock: Optional[str] = None
+    citation: Optional[str] = None
+    source_type: Optional[str] = None
+    occupancy: Optional[int] = None
+    note: Optional[str] = None
+    mode: str = "LIVE"
+    polar: Optional[str] = None
+    season: Optional[str] = None
+    voyage_air: Optional[str] = None
+    voyage_sea: Optional[str] = None
+    isolation: Optional[str] = None
+    hazards: list[str] = Field(default_factory=list)
+    facts: list[DayFact] = Field(default_factory=list)
+    wind_tag: Optional[str] = None
+    temp_tag: Optional[str] = None
+
+
+class LockoutsState(BaseModel):
+    outdoor: str = "OPEN"
+    heli: str = "OPEN"
+    convoy: str = "OPEN"
+    field: str = "OPEN"
+    reasons: list[str] = Field(default_factory=list)
+
+
 class RawTelemetryPayload(BaseModel):
     station_id: str
     timestamp: str
@@ -40,6 +74,8 @@ class RawTelemetryPayload(BaseModel):
     microgrid: MicrogridState
     fuel: FuelState
     controls: ControlsState
+    replay: ReplayState = Field(default_factory=ReplayState)
+    lockouts: LockoutsState = Field(default_factory=LockoutsState)
 
 class ScenarioInjectRequest(BaseModel):
     scenario_type: str = Field(..., description="BLIZZARD_80KT, RESUPPLY_DELAY, or POLAR_NIGHT")
@@ -50,3 +86,8 @@ class ControlUpdateRequest(BaseModel):
     summer_wing_isolated: Optional[bool] = None
     hatch_lockdown: Optional[bool] = None
     aux_generator_active: Optional[bool] = None
+
+
+class ClockRequest(BaseModel):
+    clock: Optional[str] = None
+    live: bool = False

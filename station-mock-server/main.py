@@ -6,10 +6,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import (
     RawTelemetryPayload,
     ScenarioInjectRequest,
-    ControlUpdateRequest
+    ControlUpdateRequest,
+    ClockRequest,
+    ReplayState,
+    LockoutsState,
 )
 from physics import StationPhysicsSimulator
 from scenarios import ScenarioController
+from clock import (
+    resolve as resolve_clock,
+    catalog as clock_catalog,
+    replay_from_snapshot,
+    live_replay_payload,
+    lockouts_from_snapshot,
+)
 
 app = FastAPI(
     title="Antarctica Station Edge Gateway",
@@ -31,6 +41,19 @@ simulator = StationPhysicsSimulator(station_id="BHARATI")
 scenario_mgr = ScenarioController()
 cached_telemetry: RawTelemetryPayload | None = None
 
+
+def _hold_ambient():
+    if not scenario_mgr.hold or not scenario_mgr.snapshot:
+        return None
+    return scenario_mgr.snapshot["stations"][simulator.station_id]["ambient"]
+
+
+def _tick_timestamp() -> str:
+    if scenario_mgr.hold and scenario_mgr.replay_clock:
+        return scenario_mgr.replay_clock
+    return datetime.now(timezone.utc).isoformat()
+
+
 @app.on_event("startup")
 async def start_background_physics():
     asyncio.create_task(physics_tick_loop())
@@ -41,19 +64,28 @@ async def physics_tick_loop():
         scenario_mgr.tick()
         ambient, thermal, microgrid, fuel, controls = simulator.step(
             active_scenario=scenario_mgr.active_scenario,
-            dt_seconds=2.0
+            dt_seconds=2.0,
+            hold_ambient=_hold_ambient(),
         )
 
         cached_telemetry = RawTelemetryPayload(
             station_id=simulator.station_id,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=_tick_timestamp(),
             source="synthetic",
             confidence="modeled",
             ambient=ambient,
             thermal=thermal,
             microgrid=microgrid,
             fuel=fuel,
-            controls=controls
+            controls=controls,
+            replay=ReplayState.model_validate(
+                replay_from_snapshot(scenario_mgr.snapshot, simulator.station_id)
+                if scenario_mgr.hold and scenario_mgr.snapshot
+                else live_replay_payload()
+            ),
+            lockouts=LockoutsState.model_validate(
+                lockouts_from_snapshot(scenario_mgr.snapshot, simulator.station_id)
+            ),
         )
 
         await asyncio.sleep(2.0)
@@ -68,6 +100,19 @@ async def get_raw_telemetry():
 @app.post("/edge/scenario/inject")
 async def inject_scenario(payload: ScenarioInjectRequest):
     """Simulates an on-site crisis scenario."""
+    scenario_mgr.hold = False
+    scenario_mgr.replay_clock = None
+    scenario_mgr.snapshot = None
+
+    if payload.scenario_type == "NOMINAL":
+        scenario_mgr.clear()
+        return {
+            "status": "scenario_cleared",
+            "scenario": "NOMINAL",
+            "duration_seconds": 0,
+            "remaining_ticks": 0,
+        }
+
     if payload.scenario_type == "RESUPPLY_DELAY":
         # Simulates low reserves scenario immediately
         simulator.fuel_tank_liters = 26500.0
@@ -82,6 +127,73 @@ async def inject_scenario(payload: ScenarioInjectRequest):
         "duration_seconds": payload.duration_seconds,
         "remaining_ticks": duration_ticks
     }
+
+
+def _apply_snapshot(snapshot: dict, station_id: str = "BHARATI"):
+    simulator.station_id = station_id
+    if station_id == "MAITRI":
+        simulator.u_area_factor = 3.6
+        simulator.internal_temp_c = 18.0
+    else:
+        simulator.u_area_factor = 2.45
+        simulator.internal_temp_c = 20.4
+    scenario_mgr.trigger_replay(snapshot)
+    hold = snapshot["stations"][station_id]["ambient"]
+    simulator.ambient.temp_c = float(hold["temp_c"])
+    simulator.ambient.wind_speed_knots = float(hold["wind_speed_knots"])
+    simulator.ambient.solar_flux_w_m2 = float(hold["solar_flux_w_m2"])
+
+
+@app.post("/edge/clock")
+async def set_clock(payload: ClockRequest):
+    """Jump the twin to a UTC clock, or return to live present."""
+    if payload.live or not payload.clock:
+        return await clear_replay()
+    try:
+        snapshot = resolve_clock(payload.clock)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    _apply_snapshot(snapshot, simulator.station_id)
+    return {
+        "status": "clock_set",
+        "mode": "HISTORICAL",
+        "clock": snapshot["clock"],
+        "citation": snapshot["citation"],
+        "station_id": simulator.station_id,
+        "facts": snapshot["stations"][simulator.station_id].get("facts", []),
+    }
+
+
+@app.get("/edge/clock/catalog")
+async def get_clock_catalog():
+    return {"presets": clock_catalog()}
+
+
+@app.post("/edge/replay/2018-08-05")
+async def replay_aug_2018():
+    snapshot = resolve_clock("2018-08-05T18:00:00+00:00")
+    _apply_snapshot(snapshot, "BHARATI")
+    return {
+        "status": "replay_active",
+        "scenario": snapshot["scenario_id"],
+        "clock": snapshot["clock"],
+        "citation": snapshot["citation"],
+        "station_id": "BHARATI",
+    }
+
+
+@app.post("/edge/replay/clear")
+async def clear_replay():
+    scenario_mgr.clear()
+    if simulator.station_id == "MAITRI":
+        simulator.ambient.temp_c = -18.0
+        simulator.ambient.wind_speed_knots = 22.0
+        simulator.ambient.solar_flux_w_m2 = 110.0
+    else:
+        simulator.ambient.temp_c = -14.2
+        simulator.ambient.wind_speed_knots = 24.0
+        simulator.ambient.solar_flux_w_m2 = 145.0
+    return {"status": "replay_cleared"}
 
 @app.post("/edge/controls")
 async def apply_hardware_controls(payload: ControlUpdateRequest):
@@ -112,6 +224,12 @@ async def switch_station(station_id: str):
         simulator.u_area_factor = 2.45
         simulator.internal_temp_c = 20.4
 
+    if scenario_mgr.hold and scenario_mgr.snapshot:
+        hold = scenario_mgr.snapshot["stations"][upper_id]["ambient"]
+        simulator.ambient.temp_c = float(hold["temp_c"])
+        simulator.ambient.wind_speed_knots = float(hold["wind_speed_knots"])
+        simulator.ambient.solar_flux_w_m2 = float(hold["solar_flux_w_m2"])
+
     return {"status": "station_switched", "active_station": simulator.station_id}
 
 @app.get("/health")
@@ -119,5 +237,7 @@ async def health_check():
     return {
         "status": "ONLINE",
         "station_id": simulator.station_id,
-        "active_scenario": scenario_mgr.active_scenario
+        "active_scenario": scenario_mgr.active_scenario,
+        "replay_active": scenario_mgr.hold,
+        "replay_clock": scenario_mgr.replay_clock,
     }
