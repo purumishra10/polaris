@@ -6,6 +6,10 @@ import {
   bharatiAnchors,
   bharatiCameraPresets,
 } from '../stations/Bharati/bharatiAnchors'
+import {
+  maitriAnchors,
+  maitriCameraPresets,
+} from '../stations/Maitri/maitriAnchors'
 
 function isUiTarget(target) {
   return Boolean(
@@ -18,23 +22,35 @@ function isUiTarget(target) {
 
 export default function CameraRig() {
   const { camera, invalidate } = useThree()
-  const target = useRef(new THREE.Vector3(0, 6, 4))
+
+  const cameraPreset = usePolarisStore((state) => state.cameraPreset)
+  const cameraTick = usePolarisStore((state) => state.cameraTick)
+  const flySource = usePolarisStore((state) => state.flySource)
+  const selectedStation = usePolarisStore(
+    (state) => state.selectedStation,
+  )
+  const selectedSubsystem = usePolarisStore(
+    (state) => state.selectedSubsystem,
+  )
+
+  const isBharati = selectedStation === 'BHARATI'
+  const anchors = isBharati ? bharatiAnchors : maitriAnchors
+  const cameraPresets = isBharati ? bharatiCameraPresets : maitriCameraPresets
+  const defaultTarget = isBharati ? [0, 6, 4] : [0, 4, 0]
+  const defaultPos = isBharati ? [82, 54, 68] : [38, 22, 32]
+  const minRadius = isBharati ? 3 : 8
+  const maxRadius = isBharati ? 280 : 120
+
+  const target = useRef(new THREE.Vector3(...defaultTarget))
   const spherical = useRef(new THREE.Spherical())
   const dragging = useRef(null)
   const last = useRef({ x: 0, y: 0 })
   const flying = useRef(false)
   const autoSpin = useRef(false)
-  const goalPos = useRef(new THREE.Vector3(82, 54, 68))
-  const goalTarget = useRef(new THREE.Vector3(0, 6, 4))
+  const goalPos = useRef(new THREE.Vector3(...defaultPos))
+  const goalTarget = useRef(new THREE.Vector3(...defaultTarget))
   const panRight = useRef(new THREE.Vector3())
   const panUp = useRef(new THREE.Vector3())
-
-  const cameraPreset = usePolarisStore((state) => state.cameraPreset)
-  const cameraTick = usePolarisStore((state) => state.cameraTick)
-  const flySource = usePolarisStore((state) => state.flySource)
-  const selectedSubsystem = usePolarisStore(
-    (state) => state.selectedSubsystem,
-  )
 
   const apply = () => {
     spherical.current.makeSafe()
@@ -45,8 +61,8 @@ export default function CameraRig() {
     )
     spherical.current.radius = THREE.MathUtils.clamp(
       spherical.current.radius,
-      3,
-      280,
+      minRadius,
+      maxRadius,
     )
     camera.position
       .setFromSpherical(spherical.current)
@@ -56,18 +72,24 @@ export default function CameraRig() {
   }
 
   useEffect(() => {
+    target.current.set(...defaultTarget)
+    goalPos.current.set(...defaultPos)
+    goalTarget.current.set(...defaultTarget)
+    camera.position.set(...defaultPos)
     spherical.current.setFromVector3(
       camera.position.clone().sub(target.current),
     )
+    flying.current = false
+    autoSpin.current = false
     apply()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedStation])
 
   useEffect(() => {
     flying.current = true
 
     if (flySource === 'preset' && cameraPreset) {
-      const view = bharatiCameraPresets[cameraPreset]
+      const view = cameraPresets[cameraPreset]
       if (!view) return
       goalPos.current.set(...view.position)
       goalTarget.current.set(...view.target)
@@ -76,15 +98,25 @@ export default function CameraRig() {
     }
 
     if (flySource === 'asset' && selectedSubsystem) {
-      const look = bharatiAnchors[selectedSubsystem]
+      const look = anchors[selectedSubsystem]
       if (!look) return
       const [tx, ty, tz] = look
-      const offset = 16 + Math.max(4, ty * 0.35)
-      goalPos.current.set(tx + offset * 0.95, ty + 8, tz + offset)
+      const offset = isBharati
+        ? 16 + Math.max(4, ty * 0.35)
+        : 12 + Math.max(3, ty * 0.3)
+      goalPos.current.set(tx + offset * 0.95, ty + 6, tz + offset)
       goalTarget.current.set(tx, ty, tz)
       autoSpin.current = false
     }
-  }, [cameraPreset, cameraTick, flySource, selectedSubsystem])
+  }, [
+    cameraPreset,
+    cameraTick,
+    flySource,
+    selectedSubsystem,
+    anchors,
+    cameraPresets,
+    isBharati,
+  ])
 
   useEffect(() => {
     const onDown = (event) => {
@@ -187,7 +219,7 @@ export default function CameraRig() {
       window.removeEventListener('contextmenu', onContext)
       window.removeEventListener('keydown', onKey)
     }
-  }, [camera, invalidate])
+  }, [camera, invalidate, minRadius, maxRadius])
 
   useFrame((_, delta) => {
     if (autoSpin.current && !dragging.current && !flying.current) {
