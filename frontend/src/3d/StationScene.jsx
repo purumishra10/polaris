@@ -31,6 +31,12 @@ export default function StationScene() {
   useEffect(() => {
     connectTelemetry()
   }, [connectTelemetry])
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      usePolarisStore.getState().tickLive()
+    }, 700)
+    return () => window.clearInterval(id)
+  }, [])
   const isBharati = selectedStation === 'BHARATI'
 
   return (

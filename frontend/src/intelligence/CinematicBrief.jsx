@@ -6,6 +6,7 @@ import {
   getTemplate,
   uniqueSignals,
 } from './subsystemCatalog'
+import { assetFault } from '../ops/assetHealth'
 
 function SlotVisual({ slot }) {
   if (slot.type === 'meter') {
@@ -117,6 +118,7 @@ export default function CinematicBrief() {
   const features = template.features ?? []
   const signals = uniqueSignals(template.signals(telemetry) ?? [])
   const slots = template.slots(telemetry) ?? []
+  const fault = assetFault(selectedSubsystem, telemetry)
 
   return (
     <>
@@ -156,6 +158,14 @@ export default function CinematicBrief() {
               CLOSE
             </button>
           </div>
+
+          {fault && (
+            <div className={`brief-fault ${fault.tone}`}>
+              <div className="brief-fault-kicker">WHY THIS ASSET IS DOWN</div>
+              <strong>{fault.title}</strong>
+              <p>{fault.reason}</p>
+            </div>
+          )}
 
           <div className="brief-heroes">
             {heroes.map((hero) => (

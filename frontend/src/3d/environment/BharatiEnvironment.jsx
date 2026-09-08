@@ -11,15 +11,17 @@ import {
 import { ToneMappingMode } from 'postprocessing'
 import * as THREE from 'three'
 
-const SUN = [92, 38, 54]
+import { usePolarisStore } from '../../store/usePolarisStore'
+import { climateLook } from '../../lib/climateLook'
+import WeatherField from './WeatherField'
 
-function BharatiLights() {
+function BharatiLights({ climate }) {
   return (
     <>
-      <hemisphereLight args={['#d7e4ee', '#6a5a48', 0.68]} />
+      <hemisphereLight args={[climate.hemiSky, climate.hemiGround, 0.68]} />
       <directionalLight
-        position={SUN}
-        intensity={2.85}
+        position={climate.sun}
+        intensity={climate.sunIntensity}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -34,29 +36,36 @@ function BharatiLights() {
       />
       <directionalLight
         position={[-70, 24, -48]}
-        intensity={0.7}
-        color="#9eb6c8"
+        intensity={climate.fillIntensity}
+        color={climate.fillColor}
       />
-      <ambientLight intensity={0.3} />
-      <mesh position={SUN}>
+      <ambientLight intensity={climate.ambientIntensity} />
+      <mesh position={climate.sun}>
         <sphereGeometry args={[6.2, 16, 16]} />
-        <meshBasicMaterial color="#fff6d0" />
+        <meshBasicMaterial
+          color="#fff6d0"
+          transparent
+          opacity={Math.max(0.12, 1 - climate.dark * 0.85)}
+        />
       </mesh>
     </>
   )
 }
 
 export default function BharatiEnvironment() {
+  const telemetry = usePolarisStore((state) => state.telemetry.BHARATI)
+  const climate = climateLook(telemetry, 'BHARATI')
+
   return (
     <>
-      <color attach="background" args={['#9eb4c4']} />
-      <fog attach="fog" args={['#b7c6d2', 180, 540]} />
+      <color attach="background" args={[climate.background]} />
+      <fog attach="fog" args={[climate.fog, climate.fogNear, climate.fogFar]} />
 
       <Sky
-        sunPosition={SUN}
-        turbidity={2.4}
-        rayleigh={0.42}
-        mieCoefficient={0.005}
+        sunPosition={climate.sun}
+        turbidity={climate.turbidity}
+        rayleigh={climate.rayleigh}
+        mieCoefficient={climate.mieCoefficient}
         mieDirectionalG={0.82}
       />
 
@@ -71,7 +80,7 @@ export default function BharatiEnvironment() {
             volume={28}
             color="#eef3f6"
             fade={90}
-            opacity={0.42}
+            opacity={0.42 + climate.gale * 0.35}
           />
           <Cloud
             position={[-60, 58, 20]}
@@ -81,7 +90,7 @@ export default function BharatiEnvironment() {
             volume={22}
             color="#f4f7f8"
             fade={80}
-            opacity={0.35}
+            opacity={0.35 + climate.gale * 0.4}
           />
           <Cloud
             position={[90, 70, 40]}
@@ -91,19 +100,26 @@ export default function BharatiEnvironment() {
             volume={18}
             color="#e7eef2"
             fade={100}
-            opacity={0.3}
+            opacity={0.3 + climate.gale * 0.45}
           />
         </Clouds>
       </Suspense>
 
-      <BharatiLights />
+      <BharatiLights climate={climate} />
+
+      <WeatherField
+        gale={climate.gale}
+        cold={climate.cold}
+        count={climate.snowCount}
+        extent={[240, 52, 200]}
+      />
 
       <Sparkles
-        count={120}
+        count={climate.sparkleCount}
         scale={[220, 36, 180]}
-        size={2.4}
-        speed={0.25}
-        opacity={0.45}
+        size={1.6 + climate.gale * 1.4}
+        speed={climate.sparkleSpeed}
+        opacity={climate.sparkleOpacity}
         color="#f4fbff"
       />
 
@@ -118,9 +134,9 @@ export default function BharatiEnvironment() {
         <Bloom
           luminanceThreshold={0.72}
           luminanceSmoothing={0.2}
-          intensity={0.38}
+          intensity={climate.bloom}
         />
-        <Vignette eskil={false} offset={0.18} darkness={0.42} />
+        <Vignette eskil={false} offset={0.18} darkness={climate.vignette} />
         <SMAA />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>

@@ -1,6 +1,9 @@
 const ENGINE_URL =
   import.meta.env.VITE_TWIN_ENGINE_URL ?? 'http://localhost:8000'
 
+export const VOICE_URL =
+  import.meta.env.VITE_VOICE_URL ?? 'http://localhost:8002'
+
 async function request(path, options = {}) {
   const response = await fetch(`${ENGINE_URL}${path}`, {
     ...options,
@@ -48,6 +51,24 @@ export async function updateStationControls(controls) {
     method: 'POST',
     body: JSON.stringify(controls),
   })
+}
+
+export async function setClock(clock) {
+  return request('/api/clock', {
+    method: 'POST',
+    body: JSON.stringify({ clock, live: false }),
+  })
+}
+
+export async function liveNow() {
+  return request('/api/clock', {
+    method: 'POST',
+    body: JSON.stringify({ live: true }),
+  })
+}
+
+export async function getClockCatalog() {
+  return request('/api/clock/catalog')
 }
 
 export function connectTelemetrySocket({

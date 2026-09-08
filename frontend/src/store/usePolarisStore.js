@@ -3,7 +3,24 @@ import {
   connectTelemetrySocket,
   injectScenario as apiInjectScenario,
   switchStation as apiSwitchStation,
+  setClock as apiSetClock,
+  liveNow as apiLiveNow,
+  updateStationControls as apiUpdateControls,
 } from '../api/telemetry'
+import {
+  applyReplaySnapshot,
+  clearReplay,
+  findReplayPreset,
+  REPLAY_PRESETS,
+} from '../lib/replayCatalog'
+import {
+  pushSample,
+  seedLiveSeries,
+  seedStormSeries,
+  applyLiveDrift,
+} from '../lib/telemetrySeries'
+import { SOP } from '../ops/decisions'
+import { exportSitrep } from '../ops/exportSitrep'
 
 const createTelemetry = (station) => ({
   station_id: station,
@@ -57,6 +74,28 @@ const createTelemetry = (station) => ({
     severity: 'NOMINAL',
     prescribed_actions: [],
   },
+
+  replay: {
+    active: false,
+    scenario_id: null,
+    clock: null,
+    citation: null,
+    source_type: null,
+    occupancy: null,
+    note: null,
+    mode: 'LIVE',
+    facts: [],
+    wind_tag: null,
+    temp_tag: null,
+  },
+
+  lockouts: {
+    outdoor: 'OPEN',
+    heli: 'OPEN',
+    convoy: 'OPEN',
+    field: 'OPEN',
+    reasons: [],
+  },
 })
 
 const createStationTelemetry = () => ({
@@ -64,14 +103,89 @@ const createStationTelemetry = () => ({
   MAITRI: createTelemetry('MAITRI'),
 })
 
+const seedAllSeries = (telemetry, mode = 'live') => ({
+  BHARATI:
+    mode === 'storm'
+      ? seedStormSeries(telemetry.BHARATI)
+      : seedLiveSeries('BHARATI', telemetry.BHARATI),
+  MAITRI:
+    mode === 'storm'
+      ? seedStormSeries(telemetry.MAITRI)
+      : seedLiveSeries('MAITRI', telemetry.MAITRI),
+})
+
+function applyLocalScenario(scenario, current) {
+  if (scenario === 'BLIZZARD_80KT') {
+    return {
+      ...current,
+      ambient: {
+        ...current.ambient,
+        wind_speed_knots: 80,
+        temp_c: Math.min(current.ambient.temp_c ?? -12, -12),
+        solar_flux_w_m2: 12,
+      },
+      lockouts: {
+        ...current.lockouts,
+        outdoor: 'LOCKED',
+        heli: 'LOCKED',
+        field: 'LOCKED',
+      },
+      risk: {
+        ...current.risk,
+        is_anomaly: true,
+        severity: 'CRITICAL',
+        prescribed_actions: [SOP.HATCH, SOP.STOW_SENSORS],
+      },
+    }
+  }
+  if (scenario === 'RESUPPLY_DELAY') {
+    return {
+      ...current,
+      fuel: {
+        ...current.fuel,
+        days_of_autonomy: 12.4,
+        tank_level_liters: 26500,
+      },
+      controls: {
+        ...current.controls,
+        science_instruments_online: false,
+        summer_wing_isolated: true,
+      },
+      risk: {
+        ...current.risk,
+        is_anomaly: true,
+        severity: 'CRITICAL',
+        prescribed_actions: [SOP.SHED_SCIENCE, SOP.ISOLATE_DEPRESSURIZE],
+      },
+    }
+  }
+  if (scenario === 'POLAR_NIGHT') {
+    return {
+      ...current,
+      ambient: {
+        ...current.ambient,
+        solar_flux_w_m2: 0,
+        temp_c: Math.min(current.ambient.temp_c ?? -18, -22),
+      },
+    }
+  }
+  return current
+}
+
+const initialTelemetry = createStationTelemetry()
+
 export const usePolarisStore = create((set) => ({
   selectedStation: 'BHARATI',
   selectedSubsystem: null,
+  showTelemetry: true,
   isThermalView: false,
   cameraPreset: 'droneAerial',
   cameraTick: 0,
   flySource: 'preset',
   flyComplete: true,
+  hudTab: 'live',
+  hoveredSubsystem: null,
+  criticalAck: null,
 
   connection: {
     status: 'SIMULATION',
@@ -79,7 +193,9 @@ export const usePolarisStore = create((set) => ({
     last_update: null,
   },
 
-  telemetry: createStationTelemetry(),
+  telemetry: initialTelemetry,
+  series: seedAllSeries(initialTelemetry),
+  baseline: initialTelemetry,
 
   setSelectedStation: async (station) => {
     if (!['BHARATI', 'MAITRI'].includes(station)) {
@@ -136,6 +252,44 @@ export const usePolarisStore = create((set) => ({
       flyComplete: !subsystem,
     })),
 
+  setShowTelemetry: (enabled) =>
+    set({
+      showTelemetry: Boolean(enabled),
+    }),
+
+  setHudTab: (tab) =>
+    set({
+      hudTab: tab,
+    }),
+
+  setHoveredSubsystem: (subsystem) =>
+    set({
+      hoveredSubsystem: subsystem,
+    }),
+
+  ackCritical: (signature) =>
+    set({
+      criticalAck: signature,
+    }),
+
+  tickLive: () =>
+    set((state) => {
+      const station = state.selectedStation
+      const base = state.baseline[station] ?? state.telemetry[station]
+      if (base?.replay?.active) return {}
+      const drifted = applyLiveDrift(base, Date.now())
+      return {
+        telemetry: {
+          ...state.telemetry,
+          [station]: drifted,
+        },
+        series: {
+          ...state.series,
+          [station]: pushSample(state.series[station], drifted),
+        },
+      }
+    }),
+
   setCameraPreset: (preset) =>
     set((state) => ({
       cameraPreset: preset,
@@ -156,15 +310,26 @@ export const usePolarisStore = create((set) => ({
     }),
 
   setTelemetry: (station, data) =>
-    set((state) => ({
-      telemetry: {
-        ...state.telemetry,
-        [station]: {
-          ...state.telemetry[station],
-          ...data,
+    set((state) => {
+      const next = {
+        ...state.telemetry[station],
+        ...data,
+      }
+      return {
+        telemetry: {
+          ...state.telemetry,
+          [station]: next,
         },
-      },
-    })),
+        baseline: {
+          ...state.baseline,
+          [station]: next,
+        },
+        series: {
+          ...state.series,
+          [station]: pushSample(state.series[station], next),
+        },
+      }
+    }),
 
   updateTelemetry: (station, updater) =>
     set((state) => ({
@@ -195,23 +360,42 @@ export const usePolarisStore = create((set) => ({
           return
         }
 
-        set((state) => ({
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...state.telemetry[station],
-              ...data,
+        set((state) => {
+          const current = state.telemetry[station]
+          if (current?.replay?.active) {
+            return {
+              connection: {
+                status:
+                  data.link_status?.health === 'DEGRADED'
+                    ? 'DEGRADED'
+                    : 'ONLINE',
+                latency_ms: data.link_status?.latency_ms ?? state.connection.latency_ms,
+                last_update: data.timestamp ?? null,
+              },
+            }
+          }
+
+          const nextBase = {
+            ...(state.baseline[station] ?? current),
+            ...data,
+            replay: current?.replay,
+          }
+
+          return {
+            baseline: {
+              ...state.baseline,
+              [station]: nextBase,
             },
-          },
-          connection: {
-            status:
-              data.link_status?.health === 'DEGRADED'
-                ? 'DEGRADED'
-                : 'ONLINE',
-            latency_ms: data.link_status?.latency_ms ?? 0,
-            last_update: data.timestamp ?? null,
-          },
-        }))
+            connection: {
+              status:
+                data.link_status?.health === 'DEGRADED'
+                  ? 'DEGRADED'
+                  : 'ONLINE',
+              latency_ms: data.link_status?.latency_ms ?? 0,
+              last_update: data.timestamp ?? null,
+            },
+          }
+        })
       },
 
       onOpen: () => {
@@ -253,9 +437,22 @@ export const usePolarisStore = create((set) => ({
 
   injectScenario: async (scenario, durationSeconds = 60) => {
     if (scenario === 'NOMINAL') {
-      console.warn(
-        '[Twin] NOMINAL is not a backend scenario and cannot be injected.',
-      )
+      try {
+        await apiLiveNow()
+      } catch {
+        // Backend may not support clock API yet
+      }
+      const reset = {
+        BHARATI: clearReplay(createTelemetry('BHARATI')),
+        MAITRI: clearReplay(createTelemetry('MAITRI')),
+      }
+      set((state) => ({
+        telemetry: reset,
+        baseline: reset,
+        series: seedAllSeries(reset),
+        hudTab: state.hudTab,
+        criticalAck: null,
+      }))
       return
     }
 
@@ -270,7 +467,215 @@ export const usePolarisStore = create((set) => ({
       return result
     } catch (error) {
       console.error('[Twin] Scenario injection failed', error)
+      if (
+        scenario === 'BLIZZARD_80KT' ||
+        scenario === 'RESUPPLY_DELAY' ||
+        scenario === 'POLAR_NIGHT'
+      ) {
+        set((state) => {
+          const station = state.selectedStation
+          const next = applyLocalScenario(scenario, state.telemetry[station])
+          return {
+            telemetry: {
+              ...state.telemetry,
+              [station]: next,
+            },
+            baseline: {
+              ...state.baseline,
+              [station]: next,
+            },
+            series: {
+              ...state.series,
+              [station]:
+                scenario === 'BLIZZARD_80KT'
+                  ? seedStormSeries(next)
+                  : pushSample(state.series[station], next),
+            },
+            hudTab: 'live',
+            criticalAck: null,
+          }
+        })
+        return { local: true, scenario }
+      }
       throw error
+    }
+  },
+
+  replayAug2018: () => {
+    const preset = REPLAY_PRESETS[0]
+    set((state) => {
+      const next = {
+        BHARATI: applyReplaySnapshot(
+          state.telemetry.BHARATI,
+          preset.snapshot,
+          'BHARATI',
+        ),
+        MAITRI: applyReplaySnapshot(
+          state.telemetry.MAITRI,
+          preset.snapshot,
+          'MAITRI',
+        ),
+      }
+      return {
+        selectedStation: 'BHARATI',
+        selectedSubsystem: null,
+        showTelemetry: true,
+        hudTab: 'live',
+        cameraPreset: 'droneAerial',
+        flySource: 'preset',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: true,
+        telemetry: next,
+        baseline: next,
+        series: seedAllSeries(next, 'storm'),
+        criticalAck: null,
+      }
+    })
+  },
+
+  setClock: async (clock) => {
+    const preset = findReplayPreset(clock)
+
+    try {
+      await apiSetClock(clock)
+    } catch {
+      // Fall back to local replay catalog
+    }
+
+    if (preset) {
+      set((state) => {
+        const next = {
+          BHARATI: applyReplaySnapshot(
+            state.telemetry.BHARATI,
+            preset.snapshot,
+            'BHARATI',
+          ),
+          MAITRI: applyReplaySnapshot(
+            state.telemetry.MAITRI,
+            preset.snapshot,
+            'MAITRI',
+          ),
+        }
+        return {
+          selectedStation: 'BHARATI',
+          selectedSubsystem: null,
+          showTelemetry: true,
+          hudTab: 'live',
+          cameraPreset: 'droneAerial',
+          flySource: 'preset',
+          cameraTick: state.cameraTick + 1,
+          flyComplete: true,
+          telemetry: next,
+          baseline: next,
+          series: seedAllSeries(next, 'storm'),
+          criticalAck: null,
+        }
+      })
+      return preset
+    }
+
+    console.warn('[Twin] No local replay preset for clock:', clock)
+    return null
+  },
+
+  liveNow: async () => {
+    try {
+      await apiLiveNow()
+    } catch {
+      // Fall back to local reset
+    }
+
+    set(() => {
+      const reset = {
+        BHARATI: clearReplay(createTelemetry('BHARATI')),
+        MAITRI: clearReplay(createTelemetry('MAITRI')),
+      }
+      return {
+        telemetry: reset,
+        baseline: reset,
+        series: seedAllSeries(reset),
+        criticalAck: null,
+      }
+    })
+  },
+
+  updateControls: async (controls) => {
+    try {
+      await apiUpdateControls(controls)
+    } catch (error) {
+      console.error('[Twin] Control update failed', error)
+      throw error
+    }
+  },
+
+  applyVoiceAction: async (action) => {
+    if (!action || typeof action !== 'object') return
+    const store = usePolarisStore.getState()
+    const kind = action.type
+
+    if (kind === 'select_station') {
+      await store.setSelectedStation(action.station)
+      return
+    }
+    if (kind === 'select_subsystem') {
+      store.setSelectedSubsystem(action.subsystem)
+      return
+    }
+    if (kind === 'camera_preset') {
+      store.setCameraPreset(action.preset)
+      return
+    }
+    if (kind === 'thermal_view') {
+      store.setThermalView(Boolean(action.enabled))
+      return
+    }
+    if (kind === 'inject_scenario') {
+      await store.injectScenario(action.scenario)
+      return
+    }
+    if (kind === 'set_controls') {
+      await store.updateControls(action.controls ?? {})
+      return
+    }
+    if (kind === 'live_now') {
+      await store.liveNow()
+      return
+    }
+    if (kind === 'replay_2018') {
+      store.replayAug2018()
+      return
+    }
+    if (kind === 'set_clock') {
+      await store.setClock(action.clock)
+      return
+    }
+    if (kind === 'show_telemetry') {
+      store.setShowTelemetry(action.enabled !== false)
+      return
+    }
+    if (kind === 'set_hud_tab') {
+      store.setShowTelemetry(true)
+      store.setHudTab(action.tab || 'live')
+      return
+    }
+    if (kind === 'export_sitrep') {
+      store.setShowTelemetry(true)
+      exportSitrep({
+        station: store.selectedStation,
+        telemetry: store.telemetry[store.selectedStation],
+      })
+      return
+    }
+    if (kind === 'close_brief') {
+      store.setSelectedSubsystem(null)
+    }
+  },
+
+  applyVoiceActions: async (actions) => {
+    if (!Array.isArray(actions) || actions.length === 0) return
+    const store = usePolarisStore.getState()
+    for (const action of actions) {
+      await store.applyVoiceAction(action)
     }
   },
 }))
