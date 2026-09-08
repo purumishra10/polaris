@@ -24,6 +24,12 @@ export default function StationScene() {
     (state) => state.telemetry[selectedStation],
   )
 
+  const connectTelemetry = usePolarisStore(
+    (state) => state.connectTelemetry,
+  )
+  useEffect(() => {
+    connectTelemetry()
+  }, [connectTelemetry])
   const isBharati = selectedStation === 'BHARATI'
 
   return (
