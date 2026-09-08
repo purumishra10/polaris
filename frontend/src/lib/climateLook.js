@@ -21,34 +21,71 @@ function mixHex(a, b, t) {
   return `#${((r << 16) | (g << 8) | bch).toString(16).padStart(6, '0')}`
 }
 
-export function climateLook(telemetry, station = 'BHARATI') {
-  const temp = telemetry?.ambient?.temp_c ?? -14
-  const wind = telemetry?.ambient?.wind_speed_knots ?? 18
-  const solar = telemetry?.ambient?.solar_flux_w_m2 ?? 120
+function quantize(value, step = 0.1) {
+  return Math.round(value / step) * step
+}
+
+/**
+ * Derive the visual climate from telemetry.
+ * `drivers` lets callers pass smoothed ambient values so the scene eases
+ * between states instead of snapping when a scenario is injected.
+ */
+export function climateLook(telemetry, station = 'BHARATI', drivers = null) {
+  const temp = drivers?.temp ?? telemetry?.ambient?.temp_c ?? -14
+  const wind = drivers?.wind ?? telemetry?.ambient?.wind_speed_knots ?? 18
+  const solar = drivers?.solar ?? telemetry?.ambient?.solar_flux_w_m2 ?? 120
+  const locked =
+    drivers?.locked ?? (telemetry?.lockouts?.outdoor === 'LOCKED' ? 1 : 0)
   const severity = telemetry?.risk?.severity ?? 'NOMINAL'
-  const outdoorLocked = telemetry?.lockouts?.outdoor === 'LOCKED'
+  const days = telemetry?.fuel?.days_of_autonomy ?? 999
 
   const cold = clamp((-temp - 4) / 28)
   const gale = clamp((wind - 14) / 66)
-  const dark = clamp(1 - solar / 160) * 0.62 + cold * 0.38
-  const whiteout = clamp(gale * 0.75 + (outdoorLocked ? 0.2 : 0))
+  // night: 0 in polar daylight, 1 when solar flux is gone (polar night)
+  const night = clamp(1 - solar / 70)
+  // A blizzard is a gloomy grey whiteout rather than a black night, so the
+  // storm tempers how far the light drops.
+  const dark = clamp(night * (1 - gale * 0.5) * 0.75 + cold * 0.25)
+  const whiteout = clamp(gale * 0.75 + locked * 0.2)
+  // Fuel-starvation pressure used by the resupply alarm visuals
+  const scarcity = clamp((30 - days) / 18)
 
   const isBharati = station === 'BHARATI'
   const sunBase = isBharati ? [92, 38, 54] : [68, 42, 38]
-  const sunY = lerp(sunBase[1], 5.5, dark)
+  // Sun sinks below the horizon as the polar night sets in; during a storm it
+  // stays up behind the overcast so the sky reads as grey, not sunset.
+  const nightEff = clamp((night * (1 - gale * 0.6)) / 0.8)
+  const sunY = lerp(sunBase[1], -6, nightEff)
   const sun = [sunBase[0], sunY, sunBase[2] * (1 - dark * 0.25)]
 
   const skyDay = isBharati ? '#9eb4c4' : '#a8bac6'
-  const skyNight = '#0d1520'
+  const skyNight = '#04070e'
   const skyCold = '#6a8498'
-  const background = mixHex(mixHex(skyDay, skyCold, cold), skyNight, dark)
+  const skyStorm = '#7d8b96'
+  const background = mixHex(
+    mixHex(mixHex(skyDay, skyCold, cold), skyStorm, gale * 0.8),
+    skyNight,
+    dark,
+  )
 
   const fogDay = isBharati ? '#b7c6d2' : '#b5c4ce'
   const fogStorm = '#8ea0ae'
-  const fog = mixHex(mixHex(fogDay, fogStorm, gale), '#1c2834', dark * 0.7)
+  const fog = mixHex(
+    mixHex(fogDay, fogStorm, gale),
+    '#0b1219',
+    Math.max(dark * 0.7, night * 0.85),
+  )
 
-  const fogNear = lerp(isBharati ? 180 : 120, 8, whiteout)
-  const fogFar = lerp(isBharati ? 540 : 320, 55, whiteout)
+  // Clear-day visibility runs out well past the far-field terrain so there is
+  // never a hard edge; a whiteout pulls it right in around the station.
+  const fogNear = lerp(isBharati ? 320 : 200, 8, whiteout)
+  const fogFar = lerp(isBharati ? 2600 : 1400, 55, whiteout)
+
+  // Sky features
+  const clearSky = clamp(1 - gale * 1.3) * clamp(1 - whiteout)
+  const starVisibility = night * night * clearSky
+  const moon = clamp((night - 0.35) / 0.45) * clamp(1 - gale * 1.1)
+  const aurora = clamp((night - 0.5) / 0.4) * clearSky
 
   return {
     temp,
@@ -57,31 +94,46 @@ export function climateLook(telemetry, station = 'BHARATI') {
     cold,
     gale,
     dark,
+    night,
     whiteout,
+    scarcity,
     severity,
     sun,
+    sunVisible: sunY > 1.5,
+    sunOpacity: clamp(1 - night * 1.25) * clamp(1 - gale * 0.6),
     background,
     fog,
     fogNear,
     fogFar,
-    sunIntensity: lerp(isBharati ? 2.85 : 2.4, 0.18, Math.max(dark, gale * 0.55)),
-    ambientIntensity: lerp(0.3, 0.08, dark),
-    hemiSky: mixHex('#d7e4ee', '#3d4e5c', Math.max(dark, cold)),
-    hemiGround: mixHex('#6a5a48', '#1a2228', cold),
-    fillColor: mixHex('#9eb6c8', '#4a6274', dark),
-    fillIntensity: lerp(0.7, 0.18, dark),
-    turbidity: lerp(2.4, 8.5, gale),
-    rayleigh: lerp(0.42, 0.12, dark),
-    mieCoefficient: lerp(0.005, 0.028, gale),
-    vignette: lerp(0.42, 0.78, Math.max(dark, gale * 0.5)),
-    bloom: lerp(0.38, 0.08, dark),
+    sunIntensity: lerp(isBharati ? 2.85 : 2.4, 0.05, Math.max(dark, gale * 0.55)),
+    ambientIntensity: lerp(0.3, 0.05, dark),
+    hemiSky: mixHex('#d7e4ee', '#1f2b38', Math.max(dark, cold)),
+    hemiGround: mixHex('#6a5a48', '#10161b', Math.max(cold, night)),
+    fillColor: mixHex('#9eb6c8', '#2f4256', dark),
+    fillIntensity: lerp(0.7, 0.1, dark),
+    turbidity: lerp(2.4, 11, gale),
+    rayleigh: lerp(0.42, 0.06, Math.max(dark, gale * 0.6)),
+    mieCoefficient: lerp(0.005, 0.04, gale),
+    // Quantised so post-processing passes are not rebuilt every frame
+    vignette: quantize(lerp(0.42, 0.8, Math.max(dark, gale * 0.5))),
+    bloom: quantize(lerp(0.38, 0.6, night) - gale * 0.15),
+    cloudOpacity: clamp(1 - night * 0.75),
+    // Night sky
+    starVisibility,
+    moon,
+    moonLight: moon * 0.55,
+    aurora,
+    stationGlow: clamp((night - 0.25) / 0.5) * (1 - gale * 0.3),
+    // Precipitation
     sparkleCount: 40 + Math.round(gale * 8) * 24 + Math.round(cold * 4) * 16,
     sparkleSpeed: 0.15 + gale * 2.8,
     sparkleOpacity: 0.2 + gale * 0.55,
     snowCount:
-      gale > 0.08 || cold > 0.35
-        ? 200 + Math.round(gale * 10) * 180
+      gale > 0.03 || cold > 0.3
+        ? Math.round(120 + Math.pow(gale, 1.5) * 5000 + cold * 220)
         : 0,
+    groundSnowCount:
+      gale > 0.3 ? Math.round(((gale - 0.3) / 0.7) * 2600) : 0,
   }
 }
 
