@@ -1,5 +1,9 @@
 import { create } from 'zustand'
-import { connectTelemetrySocket } from '../api/telemetry'
+import {
+  connectTelemetrySocket,
+  injectScenario as apiInjectScenario,
+  switchStation as apiSwitchStation,
+} from '../api/telemetry'
 
 const createTelemetry = (station) => ({
   station_id: station,
@@ -77,15 +81,52 @@ export const usePolarisStore = create((set) => ({
 
   telemetry: createStationTelemetry(),
 
-  setSelectedStation: (station) =>
+  setSelectedStation: async (station) => {
+    if (!['BHARATI', 'MAITRI'].includes(station)) {
+      console.error(`[Twin] Unknown station: ${station}`)
+      return
+    }
+
+    const currentStation = usePolarisStore.getState().selectedStation
+
+    if (station === currentStation) {
+      return
+    }
+
     set((state) => ({
-      selectedStation: station,
-      selectedSubsystem: null,
-      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'overview',
-      flySource: 'preset',
-      cameraTick: state.cameraTick + 1,
-      flyComplete: true,
-    })),
+      connection: {
+        ...state.connection,
+        status: 'SWITCHING',
+      },
+    }))
+
+    try {
+      await apiSwitchStation(station)
+
+      set((state) => ({
+        selectedStation: station,
+        selectedSubsystem: null,
+        cameraPreset:
+          station === 'BHARATI' ? 'droneAerial' : 'hero',
+        flySource: 'preset',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: true,
+        connection: {
+          ...state.connection,
+          status: 'ONLINE',
+        },
+      }))
+    } catch (error) {
+      console.error('[Twin] Station switch failed', error)
+
+      set((state) => ({
+        connection: {
+          ...state.connection,
+          status: 'OFFLINE',
+        },
+      }))
+    }
+  },
 
   setSelectedSubsystem: (subsystem) =>
     set((state) => ({
@@ -133,152 +174,6 @@ export const usePolarisStore = create((set) => ({
       },
     })),
 
-  injectScenario: (scenario) =>
-    set((state) => {
-      const station = state.selectedStation
-
-      // Always start from a clean nominal state.
-      // This prevents one scenario from contaminating another.
-      const base = createTelemetry(station)
-
-      if (scenario === 'NOMINAL') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: base,
-          },
-        }
-      }
-
-      if (scenario === 'BLIZZARD_80KT') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
-
-              ambient: {
-                ...base.ambient,
-                temp_c: -27.8,
-                wind_speed_knots: 80,
-                solar_flux_w_m2: 0,
-              },
-
-              thermal: {
-                ...base.thermal,
-                aux_heater_kw: 180,
-                heat_loss_kw: 390,
-              },
-
-              controls: {
-                ...base.controls,
-                science_instruments_online: false,
-                hatch_lockdown: true,
-                summer_wing_isolated: true,
-                aux_generator_active: true,
-              },
-
-              link_status: {
-                ...base.link_status,
-                health: 'DEGRADED',
-                latency_ms: 740,
-              },
-
-              risk: {
-                anomaly_score: 0.98,
-                is_anomaly: true,
-                severity: 'CRITICAL',
-                prescribed_actions: [
-                  'LOCK HATCHES',
-                  'RESTRICT OUTDOOR WORK',
-                  'ACTIVATE AUXILIARY GENERATOR',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
-            },
-          },
-        }
-      }
-
-      if (scenario === 'RESUPPLY_DELAY') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
-
-              fuel: {
-                ...base.fuel,
-                days_of_autonomy: 62,
-                burn_rate_lph: 180,
-              },
-
-              controls: {
-                ...base.controls,
-                summer_wing_isolated: true,
-              },
-
-              risk: {
-                anomaly_score: 0.71,
-                is_anomaly: true,
-                severity: 'ADVISORY',
-                prescribed_actions: [
-                  'ISOLATE NON-ESSENTIAL LOAD',
-                  'REVIEW FUEL RESERVE',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
-            },
-          },
-        }
-      }
-
-      if (scenario === 'POLAR_NIGHT') {
-        return {
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...base,
-
-              ambient: {
-                ...base.ambient,
-                temp_c: -31.5,
-                solar_flux_w_m2: 0,
-              },
-
-              thermal: {
-                ...base.thermal,
-                aux_heater_kw: 120,
-                heat_loss_kw: 340,
-              },
-
-              fuel: {
-                ...base.fuel,
-                days_of_autonomy: 104,
-                burn_rate_lph: 165,
-              },
-
-              risk: {
-                anomaly_score: 0.36,
-                is_anomaly: false,
-                severity: 'ADVISORY',
-                prescribed_actions: [
-                  'MONITOR THERMAL LOAD',
-                  'PRESERVE FUEL RESERVE',
-                ],
-              },
-
-              timestamp: new Date().toISOString(),
-            },
-          },
-        }
-      }
-
-      return state
-    }),
-
   connectTelemetry: () => {
     set({
       connection: {
@@ -288,31 +183,50 @@ export const usePolarisStore = create((set) => ({
       },
     })
 
-    const socket = connectTelemetrySocket(
-      (data) => {
-        const station = data.station_id
+    const socket = connectTelemetrySocket({
+      onTelemetry: (data) => {
+        const station = data?.station_id
+
+        if (!station) {
+          console.warn(
+            '[Twin WS] Telemetry missing station_id',
+            data,
+          )
+          return
+        }
 
         set((state) => ({
           telemetry: {
             ...state.telemetry,
-            [station]: data,
+            [station]: {
+              ...state.telemetry[station],
+              ...data,
+            },
           },
-
           connection: {
             status:
               data.link_status?.health === 'DEGRADED'
                 ? 'DEGRADED'
                 : 'ONLINE',
-
-            latency_ms:
-              data.link_status?.latency_ms ?? 0,
-
-            last_update: data.timestamp,
+            latency_ms: data.link_status?.latency_ms ?? 0,
+            last_update: data.timestamp ?? null,
           },
         }))
       },
 
-      () => {
+      onOpen: () => {
+        set({
+          connection: {
+            status: 'ONLINE',
+            latency_ms: 0,
+            last_update: null,
+          },
+        })
+
+        console.log('[Twin WS] Connected')
+      },
+
+      onError: () => {
         set({
           connection: {
             status: 'OFFLINE',
@@ -321,8 +235,42 @@ export const usePolarisStore = create((set) => ({
           },
         })
       },
-    )
+
+      onClose: () => {
+        set((state) => ({
+          connection: {
+            ...state.connection,
+            status: 'OFFLINE',
+          },
+        }))
+
+        console.log('[Twin WS] Disconnected')
+      },
+    })
 
     return socket
+  },
+
+  injectScenario: async (scenario, durationSeconds = 60) => {
+    if (scenario === 'NOMINAL') {
+      console.warn(
+        '[Twin] NOMINAL is not a backend scenario and cannot be injected.',
+      )
+      return
+    }
+
+    try {
+      const result = await apiInjectScenario(
+        scenario,
+        durationSeconds,
+      )
+
+      console.log('[Twin] Scenario injected:', result)
+
+      return result
+    } catch (error) {
+      console.error('[Twin] Scenario injection failed', error)
+      throw error
+    }
   },
 }))

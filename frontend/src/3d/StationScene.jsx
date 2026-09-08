@@ -1,12 +1,11 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ContactShadows } from '@react-three/drei'
 
-import AntarcticGround from './environment/AntarcticGround'
-import Atmosphere from './environment/Atmosphere'
-import Lighting from './environment/Lighting'
 import BharatiEnvironment from './environment/BharatiEnvironment'
 import BharatiGround from './environment/BharatiGround'
+import MaitriEnvironment from './environment/MaitriEnvironment'
+import MaitriGround from './environment/MaitriGround'
 
 import BharatiStation from './stations/Bharati/BharatiStation'
 import MaitriStation from './stations/Maitri/MaitriStation'
@@ -26,6 +25,12 @@ export default function StationScene() {
     (state) => state.telemetry[selectedStation],
   )
 
+  const connectTelemetry = usePolarisStore(
+    (state) => state.connectTelemetry,
+  )
+  useEffect(() => {
+    connectTelemetry()
+  }, [connectTelemetry])
   const isBharati = selectedStation === 'BHARATI'
 
   return (
@@ -40,13 +45,13 @@ export default function StationScene() {
         camera={
           isBharati
             ? { position: [82, 54, 68], fov: 42, near: 0.1, far: 720 }
-            : { position: [24, 16, 27], fov: 45, near: 0.1, far: 180 }
+            : { position: [0, 15.5, 38], fov: 38, near: 0.1, far: 320 }
         }
         onCreated={({ camera }) => {
           if (isBharati) {
             camera.lookAt(0, 6, 4)
           } else {
-            camera.lookAt(0, 3.2, 0)
+            camera.lookAt(0, 4.2, 1.5)
           }
         }}
         onPointerMissed={() => {
@@ -61,16 +66,15 @@ export default function StationScene() {
           </>
         ) : (
           <>
-            <Atmosphere />
-            <Lighting />
-            <AntarcticGround />
+            <MaitriEnvironment />
+            <MaitriGround />
             <MaitriStation position={[0, 0, 0]} />
             <ContactShadows
-              position={[0, 0.05, 0]}
-              opacity={0.45}
-              scale={30}
+              position={[0, 0.02, 0]}
+              opacity={0.35}
+              scale={50}
               blur={2.5}
-              far={10}
+              far={12}
             />
           </>
         )}

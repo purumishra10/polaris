@@ -7,12 +7,10 @@ import {
   bharatiAnchors,
   bharatiCameraPresets,
 } from '../stations/Bharati/bharatiAnchors'
-import { maitriAnchors } from '../stations/Maitri/maitriAnchors'
-
-const MAITRI_OVERVIEW = {
-  position: [24, 16, 27],
-  target: [0, 3.2, 0],
-}
+import {
+  maitriAnchors,
+  maitriCameraPresets,
+} from '../stations/Maitri/maitriAnchors'
 
 function isUiTarget(target) {
   return Boolean(
@@ -25,27 +23,36 @@ function isUiTarget(target) {
 
 export default function CameraRig() {
   const { camera, invalidate } = useThree()
-  const target = useRef(new THREE.Vector3(0, 6, 4))
+
+  const cameraPreset = usePolarisStore((state) => state.cameraPreset)
+  const cameraTick = usePolarisStore((state) => state.cameraTick)
+  const flySource = usePolarisStore((state) => state.flySource)
+  const selectedStation = usePolarisStore(
+    (state) => state.selectedStation,
+  )
+  const selectedSubsystem = usePolarisStore(
+    (state) => state.selectedSubsystem,
+  )
+
+  const isBharati = selectedStation === 'BHARATI'
+  const anchors = isBharati ? bharatiAnchors : maitriAnchors
+  const cameraPresets = isBharati ? bharatiCameraPresets : maitriCameraPresets
+  const defaultTarget = isBharati ? [0, 6, 4] : [0, 4, 0]
+  const defaultPos = isBharati ? [82, 54, 68] : [38, 22, 32]
+  const minRadius = isBharati ? 3 : 8
+  const maxRadius = isBharati ? 280 : 120
+
+  const target = useRef(new THREE.Vector3(...defaultTarget))
   const spherical = useRef(new THREE.Spherical())
   const dragging = useRef(null)
   const last = useRef({ x: 0, y: 0 })
   const flying = useRef(false)
   const announced = useRef(true)
   const autoSpin = useRef(false)
-  const goalPos = useRef(new THREE.Vector3(82, 54, 68))
-  const goalTarget = useRef(new THREE.Vector3(0, 6, 4))
+  const goalPos = useRef(new THREE.Vector3(...defaultPos))
+  const goalTarget = useRef(new THREE.Vector3(...defaultTarget))
   const panRight = useRef(new THREE.Vector3())
   const panUp = useRef(new THREE.Vector3())
-
-  const cameraPreset = usePolarisStore((state) => state.cameraPreset)
-  const cameraTick = usePolarisStore((state) => state.cameraTick)
-  const flySource = usePolarisStore((state) => state.flySource)
-  const selectedSubsystem = usePolarisStore(
-    (state) => state.selectedSubsystem,
-  )
-  const selectedStation = usePolarisStore(
-    (state) => state.selectedStation,
-  )
 
   const apply = () => {
     spherical.current.makeSafe()
@@ -56,8 +63,8 @@ export default function CameraRig() {
     )
     spherical.current.radius = THREE.MathUtils.clamp(
       spherical.current.radius,
-      3,
-      280,
+      minRadius,
+      maxRadius,
     )
     camera.position
       .setFromSpherical(spherical.current)
@@ -67,39 +74,36 @@ export default function CameraRig() {
   }
 
   useEffect(() => {
+    target.current.set(...defaultTarget)
+    goalPos.current.set(...defaultPos)
+    goalTarget.current.set(...defaultTarget)
+    camera.position.set(...defaultPos)
     spherical.current.setFromVector3(
       camera.position.clone().sub(target.current),
     )
+    flying.current = false
+    autoSpin.current = false
     apply()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedStation])
 
   useEffect(() => {
     flying.current = true
     announced.current = false
 
-    if (flySource === 'preset') {
-      if (selectedStation === 'BHARATI') {
-        const view = bharatiCameraPresets[cameraPreset]
-        if (!view) {
-          usePolarisStore.getState().markFlyComplete()
-          return
-        }
-        goalPos.current.set(...view.position)
-        goalTarget.current.set(...view.target)
-        autoSpin.current = cameraPreset === 'spin360'
+    if (flySource === 'preset' && cameraPreset) {
+      const view = cameraPresets[cameraPreset]
+      if (!view) {
+        usePolarisStore.getState().markFlyComplete()
         return
       }
-
-      goalPos.current.set(...MAITRI_OVERVIEW.position)
-      goalTarget.current.set(...MAITRI_OVERVIEW.target)
-      autoSpin.current = false
+      goalPos.current.set(...view.position)
+      goalTarget.current.set(...view.target)
+      autoSpin.current = cameraPreset === 'spin360'
       return
     }
 
     if (flySource === 'asset' && selectedSubsystem) {
-      const anchors =
-        selectedStation === 'BHARATI' ? bharatiAnchors : maitriAnchors
       const look = anchors[selectedSubsystem]
       if (!look) {
         usePolarisStore.getState().markFlyComplete()
@@ -107,8 +111,8 @@ export default function CameraRig() {
       }
       const template = getTemplate(selectedStation, selectedSubsystem)
       const [tx, ty, tz] = look
-      const distance = template.framing?.distance ?? 16
-      const height = template.framing?.height ?? 8
+      const distance = template.framing?.distance ?? (isBharati ? 16 : 12)
+      const height = template.framing?.height ?? 6
       const lateral = template.framing?.lateral ?? 0.95
       goalPos.current.set(
         tx + distance * lateral,
@@ -124,6 +128,9 @@ export default function CameraRig() {
     flySource,
     selectedSubsystem,
     selectedStation,
+    anchors,
+    cameraPresets,
+    isBharati,
   ])
 
   useEffect(() => {
@@ -227,7 +234,7 @@ export default function CameraRig() {
       window.removeEventListener('contextmenu', onContext)
       window.removeEventListener('keydown', onKey)
     }
-  }, [camera, invalidate])
+  }, [camera, invalidate, minRadius, maxRadius])
 
   useFrame((_, delta) => {
     if (autoSpin.current && !dragging.current && !flying.current) {

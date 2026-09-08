@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import './App.css'
 import StationScene from './3d/StationScene'
 import CinematicBrief from './intelligence/CinematicBrief'
 
@@ -8,16 +8,10 @@ import {
   BHARATI_SUBSYSTEMS,
   bharatiCameraPresets,
 } from './3d/stations/Bharati/bharatiAnchors'
-
-import './App.css'
-
-const MAITRI_SUBSYSTEMS = [
-  'STRUCTURE',
-  'FUEL',
-  'MICROGRID',
-  'COMMUNICATIONS',
-  'SAFETY',
-]
+import {
+  MAITRI_SUBSYSTEMS,
+  maitriCameraPresets,
+} from './3d/stations/Maitri/maitriAnchors'
 
 const CAMERA_PRESET_LABELS = {
   droneAerial: 'DRONE',
@@ -28,6 +22,10 @@ const CAMERA_PRESET_LABELS = {
   meltPond: 'POND',
   undercroft: 'UNDERCROFT',
   spin360: '360°',
+  hero: 'HERO',
+  groundAccess: 'STAIRS',
+  roofTechnical: 'ROOF',
+  fuelFarm: 'FUEL',
 }
 
 function App() {
@@ -136,12 +134,12 @@ function App() {
 
           <div>
             <span>LINK</span>
-            <strong>SIMULATED</strong>
+            <strong>ONLINE</strong>
           </div>
 
           <div>
             <span>DATA</span>
-            <strong>STAGE</strong>
+            <strong>LIVE</strong>
           </div>
         </div>
 
@@ -263,13 +261,18 @@ function App() {
         </div>
       </section>
 
-      {selectedStation === 'BHARATI' && (
+      {(selectedStation === 'BHARATI' || selectedStation === 'MAITRI') && (
         <>
           <div className="orbit-hint">
             DRAG TO ORBIT 360° · RIGHT-DRAG PAN · SCROLL ZOOM · ARROWS · CLICK A PLACE
           </div>
+
           <div className="camera-presets">
-            {Object.keys(bharatiCameraPresets).map((id) => (
+            {Object.keys(
+              selectedStation === 'BHARATI'
+                ? bharatiCameraPresets
+                : maitriCameraPresets,
+            ).map((id) => (
               <button
                 key={id}
                 type="button"

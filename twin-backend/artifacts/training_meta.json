@@ -1,0 +1,15 @@
+{
+  "features": [
+    "ambient.temp_c",
+    "ambient.wind_speed_knots",
+    "microgrid.total_load_kva",
+    "thermal.chp_thermal_output_kw",
+    "fuel.burn_rate_lph"
+  ],
+  "n_samples": 5000,
+  "contamination": 0.03,
+  "random_state": 42,
+  "n_estimators": 200,
+  "sklearn_version": "1.9.0",
+  "score_semantics": "decision_function: positive ~ inlier, negative ~ outlier"
+}
