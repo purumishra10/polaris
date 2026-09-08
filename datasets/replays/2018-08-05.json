@@ -1,0 +1,53 @@
+{
+  "scenario_id": "REPLAY_2018_08_05",
+  "clock": "2018-08-05T18:00:00+00:00",
+  "citation": "IMD MAUSAM 73(3) · annual max gust 80 kn · 5 Aug 2018 · Thapliyal et al.",
+  "source_type": "IMD_BHARATI",
+  "note": "Published annual max gust, not a Table 2 blizzard event. Polar night at Bharati ended 16 Jul 2018 — low winter sun, not polar night. Indoor heat and fuel-days are modeled.",
+  "voyage": {
+    "air": "closed",
+    "sea": "closed",
+    "heli": "LOCKED",
+    "reason": "August winter isolation. DROMLAN closed ~mid-February; ship gone ~March."
+  },
+  "stations": {
+    "BHARATI": {
+      "ambient": {
+        "temp_c": -12.0,
+        "wind_speed_knots": 80.0,
+        "solar_flux_w_m2": 18.0
+      },
+      "occupancy": 47,
+      "lockouts": {
+        "outdoor": "LOCKED",
+        "heli": "LOCKED",
+        "convoy": "LOCKED",
+        "field": "LOCKED"
+      },
+      "reasons": [
+        "IMD gust 80 kn on 5 Aug 2018",
+        "Gust far above 23 kn IMD blowing-snow threshold",
+        "Heli locked: ship not at Quilty Bay in August"
+      ]
+    },
+    "MAITRI": {
+      "ambient": {
+        "temp_c": -18.0,
+        "wind_speed_knots": 22.0,
+        "solar_flux_w_m2": 22.0
+      },
+      "occupancy": 25,
+      "lockouts": {
+        "outdoor": "OPEN",
+        "heli": "LOCKED",
+        "convoy": "OPEN",
+        "field": "OPEN"
+      },
+      "reasons": [
+        "Same expedition clock, different weather",
+        "Heli locked: shared voyage isolation",
+        "Bharati 80 kn gust is not Maitri wind"
+      ]
+    }
+  }
+}

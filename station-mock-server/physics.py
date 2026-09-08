@@ -18,9 +18,18 @@ class StationPhysicsSimulator:
             solar_flux_w_m2=145.0
         )
 
-    def step(self, active_scenario: str | None, dt_seconds: float = 2.0):
+    def step(
+        self,
+        active_scenario: str | None,
+        dt_seconds: float = 2.0,
+        hold_ambient: dict | None = None,
+    ):
         # 1. Environmental Weather Dynamics & Scenario Modifiers
-        if active_scenario == "BLIZZARD_80KT":
+        if hold_ambient:
+            self.ambient.wind_speed_knots = float(hold_ambient["wind_speed_knots"])
+            self.ambient.temp_c = float(hold_ambient["temp_c"])
+            self.ambient.solar_flux_w_m2 = float(hold_ambient["solar_flux_w_m2"])
+        elif active_scenario == "BLIZZARD_80KT":
             self.ambient.wind_speed_knots = min(82.0, self.ambient.wind_speed_knots + 3.5)
             self.ambient.temp_c = max(-36.5, self.ambient.temp_c - 1.2)
             self.ambient.solar_flux_w_m2 = 0.0

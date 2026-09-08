@@ -3,7 +3,12 @@ import {
   applyControls as apiApplyControls,
   injectScenario as apiInjectScenario,
   switchStation as apiSwitchStation,
+  replayAug2018 as apiReplayAug2018,
+  setClock as apiSetClock,
+  liveNow as apiLiveNow,
+  updateStationControls,
 } from '../api/telemetry'
+import { actionToControls } from '../lib/climateLook'
 
 const createDefaultTelemetry = (station) => ({
   station_id: station,
@@ -56,6 +61,34 @@ const createDefaultTelemetry = (station) => ({
     is_anomaly: false,
     severity: 'NOMINAL',
     prescribed_actions: [],
+  },
+
+  replay: {
+    active: false,
+    scenario_id: null,
+    clock: null,
+    citation: null,
+    source_type: null,
+    occupancy: null,
+    note: null,
+    mode: 'LIVE',
+    polar: null,
+    season: null,
+    voyage_air: null,
+    voyage_sea: null,
+    isolation: null,
+    hazards: [],
+    facts: [],
+    wind_tag: null,
+    temp_tag: null,
+  },
+
+  lockouts: {
+    outdoor: 'OPEN',
+    heli: 'OPEN',
+    convoy: 'OPEN',
+    field: 'OPEN',
+    reasons: [],
   },
 })
 
@@ -316,6 +349,11 @@ export const usePolarisStore = create((set, get) => ({
 
   injectScenario: async (scenario, durationSeconds = 60) => {
     if (scenario === 'NOMINAL') {
+      try {
+        await apiLiveNow()
+      } catch (error) {
+        console.warn('[Twin] Live now failed during NOMINAL reset', error)
+      }
       return get().triggerScenario('NOMINAL')
     }
 
@@ -323,6 +361,63 @@ export const usePolarisStore = create((set, get) => ({
       return await apiInjectScenario(scenario, durationSeconds)
     } catch (error) {
       console.error('[Twin] Scenario injection failed', error)
+      throw error
+    }
+  },
+
+  replayAug2018: async () => {
+    try {
+      const result = await apiReplayAug2018()
+      set((state) => ({
+        selectedStation: 'BHARATI',
+        selectedSubsystem: null,
+        cameraPreset: 'droneAerial',
+        flySource: 'preset',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: true,
+      }))
+      console.log('[Twin] Replay 2018-08-05:', result)
+      return result
+    } catch (error) {
+      console.error('[Twin] Replay failed', error)
+      throw error
+    }
+  },
+
+  setClock: async (clock) => {
+    try {
+      const result = await apiSetClock(clock)
+      console.log('[Twin] Clock set:', result)
+      return result
+    } catch (error) {
+      console.error('[Twin] Clock set failed', error)
+      throw error
+    }
+  },
+
+  liveNow: async () => {
+    try {
+      const result = await apiLiveNow()
+      console.log('[Twin] Live now:', result)
+      return result
+    } catch (error) {
+      console.error('[Twin] Live now failed', error)
+      throw error
+    }
+  },
+
+  executeAction: async (action) => {
+    const controls = actionToControls(action)
+    if (!controls) {
+      console.warn('[Twin] No actuator mapping for', action)
+      return
+    }
+    try {
+      const result = await updateStationControls(controls)
+      console.log('[Twin] Controls updated:', result)
+      return result
+    } catch (error) {
+      console.error('[Twin] Control update failed', error)
       throw error
     }
   },

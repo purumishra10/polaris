@@ -169,18 +169,19 @@ export default function OperationalState({
       />
 
       <FuelLevel
-        level={telemetry.fuel.tank_level_liters}
+        level={telemetry.fuel?.tank_level_liters ?? 0}
         station={station}
       />
 
       <GeneratorState
-        active={telemetry.controls.aux_generator_active}
+        active={Boolean(telemetry.controls?.aux_generator_active)}
         station={station}
       />
 
-      {telemetry.controls.hatch_lockdown && (
+      {telemetry.controls.hatch_lockdown ||
+      telemetry.lockouts?.outdoor === 'LOCKED' ? (
         <LockdownMarkers station={station} />
-      )}
+      ) : null}
     </group>
   )
 }

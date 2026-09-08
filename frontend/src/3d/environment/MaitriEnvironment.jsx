@@ -9,15 +9,17 @@ import {
 } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
 
-const SUN = [68, 42, 38]
+import { usePolarisStore } from '../../store/usePolarisStore'
+import { climateLook } from '../../lib/climateLook'
+import WeatherField from './WeatherField'
 
-function MaitriLights() {
+function MaitriLights({ climate }) {
   return (
     <>
-      <hemisphereLight args={['#c8d4dc', '#5a5048', 0.62]} />
+      <hemisphereLight args={[climate.hemiSky, climate.hemiGround, 0.62]} />
       <directionalLight
-        position={SUN}
-        intensity={2.4}
+        position={climate.sun}
+        intensity={climate.sunIntensity}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
@@ -32,25 +34,28 @@ function MaitriLights() {
       />
       <directionalLight
         position={[-48, 18, -36]}
-        intensity={0.55}
-        color="#8ea8b8"
+        intensity={climate.fillIntensity}
+        color={climate.fillColor}
       />
-      <ambientLight intensity={0.28} />
+      <ambientLight intensity={climate.ambientIntensity} />
     </>
   )
 }
 
 export default function MaitriEnvironment() {
+  const telemetry = usePolarisStore((state) => state.telemetry.MAITRI)
+  const climate = climateLook(telemetry, 'MAITRI')
+
   return (
     <>
-      <color attach="background" args={['#a8bac6']} />
-      <fog attach="fog" args={['#b5c4ce', 120, 320]} />
+      <color attach="background" args={[climate.background]} />
+      <fog attach="fog" args={[climate.fog, climate.fogNear, climate.fogFar]} />
 
       <Sky
-        sunPosition={SUN}
-        turbidity={2.8}
-        rayleigh={0.48}
-        mieCoefficient={0.004}
+        sunPosition={climate.sun}
+        turbidity={climate.turbidity}
+        rayleigh={climate.rayleigh}
+        mieCoefficient={climate.mieCoefficient}
         mieDirectionalG={0.78}
       />
 
@@ -58,7 +63,14 @@ export default function MaitriEnvironment() {
         <Environment preset="city" />
       </Suspense>
 
-      <MaitriLights />
+      <MaitriLights climate={climate} />
+
+      <WeatherField
+        gale={climate.gale}
+        cold={climate.cold}
+        count={Math.floor(climate.snowCount * 0.55)}
+        extent={[90, 28, 70]}
+      />
 
       <EffectComposer multisampling={0}>
         <N8AO
@@ -68,7 +80,7 @@ export default function MaitriEnvironment() {
           quality="medium"
           halfRes
         />
-        <Vignette eskil={false} offset={0.2} darkness={0.38} />
+        <Vignette eskil={false} offset={0.2} darkness={climate.vignette} />
         <SMAA />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>
