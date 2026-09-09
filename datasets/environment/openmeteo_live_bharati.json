@@ -1,14 +1,14 @@
 {
   "station_id": "BHARATI",
-  "fetched_at": "2026-09-09T06:23:34.696832+00:00",
+  "fetched_at": "2026-09-09T06:33:58.017458+00:00",
   "provider": "OPEN_METEO_FORECAST",
-  "model_time": "2026-09-09T06:15",
-  "temp_c": -15.3,
-  "wind_speed_knots": 1.3,
+  "model_time": "2026-09-09T06:30",
+  "temp_c": -15.2,
+  "wind_speed_knots": 1.2,
   "wind_gust_knots": 3.9,
-  "solar_flux_w_m2": 241.0,
-  "rh_pct": 66,
-  "pressure_hpa": 978.1,
+  "solar_flux_w_m2": 245.0,
+  "rh_pct": 67,
+  "pressure_hpa": 978.0,
   "hourly_tail": {
     "time": [
       "2026-09-10T00:00",
