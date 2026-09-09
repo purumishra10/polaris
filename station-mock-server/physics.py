@@ -55,6 +55,20 @@ class StationPhysicsSimulator:
             solar_flux_w_m2=145.0,
             pressure_hpa=985.0,
         )
+        self.live_ambient: dict | None = None
+        self.weather_source = "synthetic"
+
+    def set_live_ambient(
+        self,
+        ambient: dict | None,
+        source: str = "OPEN_METEO_FORECAST",
+    ) -> None:
+        self.live_ambient = ambient
+        if ambient:
+            self.weather_source = source
+            self.ambient.temp_c = float(ambient["temp_c"])
+            self.ambient.wind_speed_knots = float(ambient["wind_speed_knots"])
+            self.ambient.solar_flux_w_m2 = float(ambient["solar_flux_w_m2"])
 
     # -----------------------------------------------------------------------
     # Station profile reset
@@ -227,7 +241,13 @@ class StationPhysicsSimulator:
             # Return environmental conditions toward the selected
             # station's nominal profile.
 
-            if self.station_id == "MAITRI":
+            if self.live_ambient:
+                target = self.live_ambient
+                target_temp = float(target["temp_c"])
+                target_wind = float(target["wind_speed_knots"])
+                target_solar = float(target["solar_flux_w_m2"])
+                self.weather_source = "OPEN_METEO_FORECAST"
+            elif self.station_id == "MAITRI":
                 target_temp = -18.0
                 target_wind = 22.0
                 target_solar = 110.0

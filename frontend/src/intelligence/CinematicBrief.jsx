@@ -6,6 +6,7 @@ import {
   getTemplate,
   uniqueSignals,
 } from './subsystemCatalog'
+import { assetFault } from '../ops/assetHealth'
 
 function SlotVisual({ slot }) {
   if (slot.type === 'meter') {
@@ -116,6 +117,7 @@ function useCinematicBrief({ bindEffects = false } = {}) {
     features: template.features ?? [],
     signals: uniqueSignals(template.signals(telemetry) ?? []),
     slots: template.slots(telemetry) ?? [],
+    fault: assetFault(selectedSubsystem, telemetry),
   }
 }
 
@@ -166,6 +168,14 @@ export function CinematicPanel({ className = '' }) {
           CLOSE
         </button>
       </div>
+
+      {brief.fault && (
+        <div className={`brief-fault ${brief.fault.tone}`}>
+          <div className="brief-fault-kicker">WHY THIS ASSET IS DOWN</div>
+          <strong>{brief.fault.title}</strong>
+          <p>{brief.fault.reason}</p>
+        </div>
+      )}
 
       <div className="brief-heroes">
         {brief.heroes.map((hero) => (

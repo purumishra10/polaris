@@ -17,6 +17,7 @@ from physics import (
     StationPhysicsSimulator,
     NOMINAL_FUEL_LITERS,
 )
+from live_weather import LiveWeather, ambient_from_obs
 
 from scenarios import ScenarioController
 
@@ -61,10 +62,13 @@ simulator = StationPhysicsSimulator(
 )
 
 scenario_mgr = ScenarioController()
+weather = LiveWeather()
+WEATHER_POLL_SECONDS = 600.0
 
 cached_telemetry: RawTelemetryPayload | None = None
 
 physics_task: asyncio.Task | None = None
+weather_task: asyncio.Task | None = None
 
 clock_offset_seconds = 0.0
 clock_mode = "LIVE"
@@ -151,7 +155,6 @@ async def physics_tick_loop() -> None:
             # Do NOT pass the function object itself.
             hold_ambient = _hold_ambient()
 
-            # Advance physics.
             (
                 ambient,
                 thermal,
@@ -164,12 +167,23 @@ async def physics_tick_loop() -> None:
                 hold_ambient=hold_ambient,
             )
 
-            # Build edge telemetry.
+            obs = weather.snapshot(simulator.station_id)
+            injecting = active_scenario is not None
+            live_ok = bool(obs) and not injecting
+            if injecting and active_scenario == "RESUPPLY_DELAY" and obs:
+                live_ok = True
+            source = (
+                "OPEN_METEO_FORECAST"
+                if live_ok
+                else ("synthetic" if injecting else simulator.weather_source)
+            )
+            confidence = "forecast" if live_ok else "modeled"
+
             cached_telemetry = RawTelemetryPayload(
                 station_id=simulator.station_id,
                 timestamp=_tick_timestamp(),
-                source="synthetic",
-                confidence="modeled",
+                source=source,
+                confidence=confidence,
                 scenario_id=active_scenario,
 
                 ambient=ambient,
@@ -215,13 +229,30 @@ async def physics_tick_loop() -> None:
 # Startup
 # ===========================================================================
 
+async def weather_poll_loop() -> None:
+    while True:
+        station = simulator.station_id
+        ok = await asyncio.to_thread(weather.refresh, station)
+        obs = weather.snapshot(station)
+        amb = ambient_from_obs(obs) if obs else None
+        if ok and amb:
+            simulator.set_live_ambient(amb, "OPEN_METEO_FORECAST")
+        await asyncio.sleep(WEATHER_POLL_SECONDS)
+
+
 @app.on_event("startup")
 async def startup_event() -> None:
     global physics_task
+    global weather_task
 
     if physics_task is None:
         physics_task = asyncio.create_task(
             physics_tick_loop()
+        )
+
+    if weather_task is None:
+        weather_task = asyncio.create_task(
+            weather_poll_loop()
         )
 
     print(
@@ -541,6 +572,15 @@ async def switch_station(
         upper_id
     )
 
+    obs = weather.snapshot(upper_id)
+    amb = ambient_from_obs(obs) if obs else None
+    if not amb:
+        await asyncio.to_thread(weather.refresh, upper_id)
+        obs = weather.snapshot(upper_id)
+        amb = ambient_from_obs(obs) if obs else None
+    if amb:
+        simulator.set_live_ambient(amb, "OPEN_METEO_FORECAST")
+
     return {
         "status": "station_switched",
         "station": upper_id,
@@ -553,6 +593,7 @@ async def switch_station(
 
 @app.get("/health")
 async def health():
+    obs = weather.snapshot(simulator.station_id)
 
     return {
         "status": "ONLINE",
@@ -564,4 +605,9 @@ async def health():
         "replay_active": (
             scenario_mgr.replay_active
         ),
+        "weather": {
+            "source": simulator.weather_source,
+            "model_time": (obs or {}).get("model_time"),
+            "kp": (weather.space or {}).get("kp"),
+        },
     }

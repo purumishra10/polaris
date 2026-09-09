@@ -1,6 +1,9 @@
-const ENGINE_URL =
+﻿const ENGINE_URL =
   import.meta.env.VITE_TWIN_ENGINE_URL ?? 'http://localhost:8000'
 const WS_URL = `${ENGINE_URL.replace(/^http/, 'ws')}/ws/telemetry`
+
+export const VOICE_URL =
+  import.meta.env.VITE_VOICE_URL ?? 'http://localhost:8002'
 
 async function apiRequest(path, options = {}) {
   const response = await fetch(`${ENGINE_URL}${path}`, {

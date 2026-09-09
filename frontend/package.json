@@ -13,10 +13,13 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@react-three/postprocessing": "^2.19.1",
+    "jspdf": "^4.2.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.462.0",
     "postprocessing": "^6.39.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
     "recharts": "^2.12.7",
     "three": "^0.185.1",
     "zustand": "^5.0.15"

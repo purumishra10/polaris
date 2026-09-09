@@ -3,6 +3,8 @@ import './App.css'
 import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import MissionControl from './pages/MissionControl'
+import VoiceDock from './voice/VoiceDock'
+import CriticalOverlay from './ops/CriticalOverlay'
 import { usePolarisStore } from './store/usePolarisStore'
 import { connectTelemetrySocket } from './api/telemetry'
 
@@ -50,6 +52,13 @@ export default function App() {
     }
   }, [setTelemetryPacket, setConnectionStatus])
 
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      usePolarisStore.getState().tickLive()
+    }, 700)
+    return () => window.clearInterval(id)
+  }, [])
+
   const navigate = (nextRoute) => {
     setRoute(nextRoute)
     if (nextRoute === 'home') {
@@ -62,13 +71,20 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (route === 'analytics') {
-    return <Analytics onNavigate={navigate} />
-  }
+  const page =
+    route === 'analytics' ? (
+      <Analytics onNavigate={navigate} />
+    ) : route === 'mission-control' ? (
+      <MissionControl onNavigate={navigate} />
+    ) : (
+      <Home onNavigate={navigate} />
+    )
 
-  if (route === 'mission-control') {
-    return <MissionControl onNavigate={navigate} />
-  }
-
-  return <Home onNavigate={navigate} />
+  return (
+    <>
+      {page}
+      <CriticalOverlay />
+      <VoiceDock />
+    </>
+  )
 }

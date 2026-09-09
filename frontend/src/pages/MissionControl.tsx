@@ -20,6 +20,7 @@ import {
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
 import LiveTwinViewport from '../components/LiveTwinViewport'
+import AnalysisDesk from '../analysis/AnalysisDesk'
 import { usePolarisStore } from '../store/usePolarisStore'
 
 interface Props {
@@ -445,6 +446,10 @@ export default function MissionControl({
           )}
 
         <LiveTwinViewport />
+
+        <div className="polaris rounded-2xl border border-base-700 bg-base-900 overflow-hidden">
+          <AnalysisDesk />
+        </div>
 
         {/* Closed-Loop Command Grid: SOP Mitigations & Scenario Injections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
