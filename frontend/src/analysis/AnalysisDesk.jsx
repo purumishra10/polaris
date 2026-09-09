@@ -148,7 +148,7 @@ function MdBlocks({ blocks }) {
   })
 }
 
-export default function AnalysisDesk() {
+export default function AnalysisDesk({ onClose }) {
   const selectedStation = usePolarisStore((state) => state.selectedStation)
   const telemetry = usePolarisStore((state) => state.telemetry[selectedStation])
   const series = usePolarisStore((state) => state.series[selectedStation] ?? [])
@@ -243,9 +243,16 @@ export default function AnalysisDesk() {
     <section className="analysis-desk">
       <div className="panel-header">
         <span>STATION ANALYSIS</span>
-        <div className={`station-status status-${severity.toLowerCase()}`}>
-          <span className="status-dot live-pulse" />
-          {replayOn ? 'REPLAY' : 'LIVE'} · {severity}
+        <div className="desk-header-actions">
+          <div className={`station-status status-${severity.toLowerCase()}`}>
+            <span className="status-dot live-pulse" />
+            {replayOn ? 'REPLAY' : 'LIVE'} · {severity}
+          </div>
+          {onClose && (
+            <button type="button" className="brief-close" onClick={onClose}>
+              CLOSE
+            </button>
+          )}
         </div>
       </div>
 

@@ -913,6 +913,7 @@
 .topbar,
 .bottom-bar,
 .cinematic-brief,
+.twin-left-rail,
 .letterbox,
 .title-slam {
   z-index: 4;
@@ -2276,14 +2277,15 @@
 }
 
 .voice-dock {
-  position: absolute;
-  right: 28px;
-  bottom: 54px;
+  position: fixed;
+  left: 20px;
+  right: auto;
+  bottom: 20px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 10px;
-  z-index: 8;
+  z-index: 90;
   pointer-events: none;
 }
 
@@ -3436,4 +3438,204 @@
   color: #ff6b7c;
   font-style: normal;
   font-weight: 800;
+}
+
+/* ---------- LIVE TWIN LAYOUT: left rail + station analysis + voice dock ---------- */
+
+.twin-stage-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  min-height: 0;
+}
+
+.twin-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.twin-left-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 372px;
+  width: 372px;
+  max-width: min(372px, 42vw);
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid rgba(232, 196, 138, 0.28);
+  background: rgba(5, 14, 19, 0.97);
+  z-index: 6;
+  pointer-events: auto;
+}
+
+.twin-left-rail .cinematic-brief,
+.twin-left-rail .analysis-desk {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  max-width: none;
+  height: 100%;
+  max-height: none !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
+  animation: brief-in-left 220ms ease both;
+  z-index: 5;
+}
+
+.twin-left-rail .analysis-desk {
+  padding: 14px 14px 88px;
+}
+
+.twin-left-rail .cinematic-brief {
+  padding: 16px 16px 88px;
+}
+
+@keyframes brief-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.station-analysis-btn {
+  pointer-events: auto;
+  padding: 8px 11px;
+  border: 1px solid rgba(129, 175, 190, 0.28);
+  background: rgba(5, 14, 19, 0.88);
+  color: #c9e8f1;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.station-analysis-btn:hover,
+.station-analysis-btn.active {
+  border-color: rgba(232, 196, 138, 0.6);
+  color: #f3e0b8;
+  background: rgba(90, 70, 32, 0.4);
+}
+
+.desk-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.twin-live-fullscreen {
+  flex-direction: column;
+}
+
+.twin-live-fullscreen .topbar {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 12;
+  pointer-events: auto;
+  padding: 14px 20px;
+  background: rgba(3, 9, 13, 0.94);
+  border-bottom: 1px solid rgba(126, 168, 181, 0.14);
+}
+
+.twin-live-fullscreen .topbar-left,
+.twin-live-fullscreen .topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+}
+
+.twin-live-fullscreen .twin-exit-fullscreen {
+  position: relative;
+  top: auto;
+  right: auto;
+}
+
+.twin-live-fullscreen .twin-stage-row {
+  flex: 1 1 auto;
+}
+
+.twin-live-fullscreen .twin-stage .station-panel {
+  left: 16px;
+  top: 16px;
+  max-height: calc(100% - 160px);
+}
+
+.twin-live-fullscreen .cinematic-brief.overlay {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border: none;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.voice-dock {
+  position: fixed;
+  left: 20px;
+  right: auto;
+  bottom: 20px;
+  align-items: flex-start;
+  z-index: 90;
+}
+
+.voice-dock .voice-fab {
+  align-self: flex-start;
+}
+
+.twin-live-fullscreen.brief-open .topbar {
+  opacity: 1;
+}
+
+.twin-live-fullscreen .telemetry-panel {
+  top: 16px;
+  right: 16px;
+  max-height: calc(100% - 150px);
+}
+
+.twin-live-fullscreen .telemetry-toggle {
+  top: auto;
+  right: 16px;
+  bottom: 108px;
+}
+
+.twin-live-fullscreen .twin-pin-bar {
+  flex: 0 0 auto;
+  padding-left: 88px;
+}
+
+.twin-pin-bar {
+  z-index: 6;
+}
+
+@media (max-width: 900px) {
+  .twin-left-rail {
+    flex-basis: min(320px, 46vw);
+    width: min(320px, 46vw);
+    max-width: 46vw;
+  }
 }

@@ -5,6 +5,7 @@ import {
   CinematicOverlays,
   CinematicPanel,
 } from '../intelligence/CinematicBrief'
+import AnalysisDesk from '../analysis/AnalysisDesk'
 import { usePolarisStore } from '../store/usePolarisStore'
 import {
   BHARATI_SUBSYSTEMS,
@@ -74,18 +75,35 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
   } = usePolarisStore()
 
   const [fullscreen, setFullscreen] = useState(false)
+  const [analysisOpen, setAnalysisOpen] = useState(false)
   const t = telemetry[selectedStation]
   const severity = t?.risk?.severity ?? 'NOMINAL'
   const assets = selectedStation === 'BHARATI' ? BHARATI_SUBSYSTEMS : MAITRI_SUBSYSTEMS
   const presets =
     selectedStation === 'BHARATI' ? bharatiCameraPresets : maitriCameraPresets
   const meta = STATION_META[selectedStation]
+  const showLeftRail = Boolean(selectedSubsystem) || analysisOpen
+  const analysisVisible = analysisOpen && !selectedSubsystem
+
+  const toggleAnalysis = () => {
+    if (analysisOpen && !selectedSubsystem) {
+      setAnalysisOpen(false)
+      return
+    }
+    setAnalysisOpen(true)
+    if (selectedSubsystem) setSelectedSubsystem(null)
+  }
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return
       if (selectedSubsystem) {
         setSelectedSubsystem(null)
+        event.preventDefault()
+        return
+      }
+      if (analysisOpen) {
+        setAnalysisOpen(false)
         event.preventDefault()
         return
       }
@@ -96,7 +114,7 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [selectedSubsystem, fullscreen, setSelectedSubsystem])
+  }, [selectedSubsystem, analysisOpen, fullscreen, setSelectedSubsystem])
 
   useEffect(() => {
     const previous = document.body.style.overflow
@@ -110,56 +128,111 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
     ? 'h-[280px] sm:h-[320px]'
     : 'h-[420px] sm:h-[500px] lg:h-[580px]'
 
+  const analysisButton = (
+    <button
+      type="button"
+      className={`station-analysis-btn ${analysisVisible ? 'active' : ''}`}
+      onClick={toggleAnalysis}
+    >
+      STATION ANALYSIS
+    </button>
+  )
+
   return (
     <div
       className={`relative w-full overflow-hidden ${
         fullscreen
-          ? `twin-live-fullscreen polaris ${selectedSubsystem ? 'brief-open' : ''}`
-          : 'rounded-2xl border border-base-700 bg-base-900 shadow-2xl'
+          ? `twin-live-fullscreen polaris ${selectedSubsystem ? 'brief-open' : ''} ${showLeftRail ? 'rail-open' : ''}`
+          : `rounded-2xl border border-base-700 bg-base-900 shadow-2xl ${showLeftRail ? 'rail-open' : ''}`
       }`}
     >
-      {!fullscreen && (
-        <div className="absolute top-3 left-3 z-20 flex flex-wrap items-center gap-2 twin-live-chrome">
-          <div className="flex rounded-lg border border-base-700 bg-base-950/80 backdrop-blur p-0.5 text-xs font-mono">
+      {fullscreen && (
+        <div className="topbar">
+          <div className="topbar-left">
+            <div className="brand">
+              <div className="brand-mark">P</div>
+              <div>
+                <div className="brand-name">POLARIS</div>
+                <div className="brand-subtitle">NCPOR DIGITAL TWIN · LIVE RENDER</div>
+              </div>
+            </div>
+            {analysisButton}
+          </div>
+          <div className="topbar-right">
+            <div className={`top-status status-${severity.toLowerCase()}`}>
+              <span className="status-dot" />
+              {severity} · {selectedStation}
+            </div>
             <button
-              onClick={() => setSelectedStation('BHARATI')}
-              className={`px-3 py-1 rounded font-semibold transition-all ${
-                selectedStation === 'BHARATI'
-                  ? 'bg-ice-600 text-white shadow-glow'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              type="button"
+              className="twin-exit-fullscreen twin-live-chrome"
+              onClick={() => setFullscreen(false)}
+              title="Exit full screen"
             >
-              BHARATI 3D
-            </button>
-            <button
-              onClick={() => setSelectedStation('MAITRI')}
-              className={`px-3 py-1 rounded font-medium transition-all ${
-                selectedStation === 'MAITRI'
-                  ? 'bg-ice-600 text-white shadow-glow'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              MAITRI 3D
+              <Minimize2 size={14} />
+              EXIT FULL SCREEN
             </button>
           </div>
-          {selectedSubsystem && (
-            <div className="px-3 py-1 rounded-lg bg-ice-600/30 backdrop-blur border border-ice-400 text-xs font-mono text-ice-200 flex items-center gap-1.5">
-              <span>
-                INSPECTOR: <strong>{selectedSubsystem}</strong>
-              </span>
-              <button
-                onClick={() => setSelectedSubsystem(null)}
-                className="text-slate-400 hover:text-white ml-1 font-bold"
-              >
-                ×
-              </button>
-            </div>
-          )}
         </div>
       )}
 
-      <div className={`flex w-full items-stretch ${fullscreen ? 'flex-1 min-h-0' : 'flex-col lg:flex-row'}`}>
-        <div className={`relative min-w-0 flex-1 ${fullscreen ? 'h-full' : stageHeight}`}>
+      <div
+        className={`twin-stage-row ${
+          fullscreen ? 'flex-1 min-h-0' : stageHeight
+        }`}
+      >
+        {showLeftRail && (
+          <aside className="twin-left-rail">
+            {selectedSubsystem ? (
+              <CinematicPanel />
+            ) : (
+              <AnalysisDesk onClose={() => setAnalysisOpen(false)} />
+            )}
+          </aside>
+        )}
+
+        <div className="twin-stage">
+          {!fullscreen && (
+            <div className="absolute top-3 left-3 z-20 flex flex-wrap items-center gap-2 twin-live-chrome">
+              {analysisButton}
+              <div className="flex rounded-lg border border-base-700 bg-base-950/80 backdrop-blur p-0.5 text-xs font-mono">
+                <button
+                  onClick={() => setSelectedStation('BHARATI')}
+                  className={`px-3 py-1 rounded font-semibold transition-all ${
+                    selectedStation === 'BHARATI'
+                      ? 'bg-ice-600 text-white shadow-glow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  BHARATI 3D
+                </button>
+                <button
+                  onClick={() => setSelectedStation('MAITRI')}
+                  className={`px-3 py-1 rounded font-medium transition-all ${
+                    selectedStation === 'MAITRI'
+                      ? 'bg-ice-600 text-white shadow-glow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  MAITRI 3D
+                </button>
+              </div>
+              {selectedSubsystem && (
+                <div className="px-3 py-1 rounded-lg bg-ice-600/30 backdrop-blur border border-ice-400 text-xs font-mono text-ice-200 flex items-center gap-1.5">
+                  <span>
+                    INSPECTOR: <strong>{selectedSubsystem}</strong>
+                  </span>
+                  <button
+                    onClick={() => setSelectedSubsystem(null)}
+                    className="text-slate-400 hover:text-white ml-1 font-bold"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {!fullscreen && (
             <div className="absolute top-3 right-3 z-20 flex items-center gap-2 twin-live-chrome">
               <button
@@ -189,20 +262,6 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
 
           {fullscreen && (
             <>
-              <div className="topbar">
-                <div className="brand">
-                  <div className="brand-mark">P</div>
-                  <div>
-                    <div className="brand-name">POLARIS</div>
-                    <div className="brand-subtitle">NCPOR DIGITAL TWIN · LIVE RENDER</div>
-                  </div>
-                </div>
-                <div className={`top-status status-${severity.toLowerCase()}`}>
-                  <span className="status-dot" />
-                  {severity} · {selectedStation}
-                </div>
-              </div>
-
               <aside className="station-panel twin-live-chrome">
                 <div className="eyebrow">STATION</div>
                 <div className="station-selector">
@@ -277,8 +336,6 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
                 </aside>
               )}
 
-              {selectedSubsystem && <CinematicPanel className="overlay" />}
-
               <button
                 type="button"
                 className={`telemetry-toggle twin-live-chrome ${isThermalView ? 'active' : ''}`}
@@ -301,7 +358,9 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
               </div>
 
               {!selectedSubsystem && (
-                <div className="orbit-hint">DRAG TO ORBIT STATION · SCROLL TO ZOOM · RMB PANS · CLICK A COMPONENT TO FOCUS</div>
+                <div className="orbit-hint">
+                  DRAG TO ORBIT STATION · SCROLL TO ZOOM · RMB PANS · CLICK A COMPONENT TO FOCUS
+                </div>
               )}
 
               <div className="bottom-bar">
@@ -310,28 +369,12 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
                 </span>
                 <span>C-BAND / LEO · {t?.link_status?.latency_ms ?? 480} ms</span>
               </div>
-
-              <button
-                type="button"
-                className="twin-exit-fullscreen twin-live-chrome"
-                onClick={() => setFullscreen(false)}
-                title="Exit full screen"
-              >
-                <Minimize2 size={14} />
-                EXIT FULL SCREEN
-              </button>
             </>
           )}
         </div>
-
-        {!fullscreen && selectedSubsystem && (
-          <div className="cinematic-brief-rail">
-            <CinematicPanel />
-          </div>
-        )}
       </div>
 
-      <div className="px-4 py-2 border-t border-base-800 bg-base-950/70 backdrop-blur flex flex-wrap items-center justify-between gap-3 text-xs font-mono twin-live-chrome">
+      <div className="twin-pin-bar px-4 py-2 border-t border-base-800 bg-base-950/70 backdrop-blur flex flex-wrap items-center justify-between gap-3 text-xs font-mono twin-live-chrome">
         <div className="flex items-center gap-2 text-slate-400">
           <Layers size={14} className="text-ice-400" />
           <span>INTERACTIVE 3D SUBSYSTEM PINS:</span>
