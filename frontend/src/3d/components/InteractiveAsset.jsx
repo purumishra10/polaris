@@ -35,8 +35,7 @@ function applyHoverGlow(root, on) {
       // Add a light tint on top of whatever the material already emits
       material.emissive
         .copy(base)
-        .multiplyScalar(Math.max(baseIntensity, 0))
-        .addScaledVector(HOVER_TINT, HOVER_STRENGTH)
+        .lerp(HOVER_TINT, HOVER_STRENGTH)
       material.emissiveIntensity = 1
     } else {
       material.emissive.copy(base)
