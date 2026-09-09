@@ -286,4 +286,4 @@ class TwinHealthResponse(BaseModel):
     model_loaded: bool
     last_ingest_utc: Optional[str]
     connected_clients: int
-    consecutive_edge_failures: int
+    consecutive_edge_failures: int
