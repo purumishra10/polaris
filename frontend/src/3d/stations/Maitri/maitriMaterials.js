@@ -1,244 +1,234 @@
-// Main building — sage / olive-grey panels
+/** Cream / sand cladding — ISEA photos, Lonely Planet “tan-colored” block. */
 export const panelGreyGreen = {
-  color: '#809080',
-  metalness: 0.32,
-  roughness: 0.58,
+  color: '#e8c97a',
+  metalness: 0.08,
+  roughness: 0.62,
 }
 
 export const panelGreyGreenAlt = {
-  color: '#879987',
-  metalness: 0.3,
+  color: '#f0d48a',
+  metalness: 0.08,
   roughness: 0.6,
 }
 
-// Lower building fascia
 export const fasciaDark = {
-  color: '#3F4A46',
-  metalness: 0.38,
-  roughness: 0.56,
+  color: '#c45a22',
+  metalness: 0.2,
+  roughness: 0.55,
 }
 
-// Roof — light cool grey / silver-grey
 export const roofPanel = {
-  color: '#B5BEBD',
-  metalness: 0.26,
-  roughness: 0.64,
-}
-
-// Windows — dark blue-grey glass, no emissive
-export const windowGlass = {
-  color: '#2B3D42',
-  metalness: 0.18,
-  roughness: 0.14,
-}
-
-export const windowFrame = {
-  color: '#C3CBC8',
-  metalness: 0.22,
+  color: '#d8dde0',
+  metalness: 0.28,
   roughness: 0.52,
 }
 
-// Steel support frame — muted rusty red / reddish-brown
+export const windowGlass = {
+  color: '#0a3040',
+  metalness: 0.22,
+  roughness: 0.12,
+  emissive: '#1488a0',
+  emissiveIntensity: 0.16,
+}
+
+export const windowFrame = {
+  color: '#fff6e4',
+  metalness: 0.18,
+  roughness: 0.48,
+}
+
 export const steelFrame = {
-  color: '#7A3830',
+  color: '#c43c22',
   metalness: 0.42,
-  roughness: 0.58,
-}
-
-export const steelBeam = {
-  color: '#6F3028',
-  metalness: 0.4,
-  roughness: 0.6,
-}
-
-// Walkways — galvanized light grey
-export const walkwaySteel = {
-  color: '#929B99',
-  metalness: 0.34,
-  roughness: 0.56,
-}
-
-// Stairs — light grey galvanized steel
-export const stairSteel = {
-  color: '#9BA4A1',
-  metalness: 0.32,
-  roughness: 0.58,
-}
-
-export const stairTread = {
-  color: '#4A524F',
-  metalness: 0.28,
-  roughness: 0.72,
-}
-
-export const railingSteel = {
-  color: '#B0B8B5',
-  metalness: 0.3,
   roughness: 0.5,
 }
 
-// Doors
-export const doorPanel = {
-  color: '#A8B0AD',
-  metalness: 0.32,
-  roughness: 0.54,
+export const steelBeam = {
+  color: '#a8321c',
+  metalness: 0.4,
+  roughness: 0.52,
 }
 
-export const doorHandle = {
-  color: '#879987',
+export const walkwaySteel = {
+  color: '#c8d0cc',
   metalness: 0.4,
   roughness: 0.48,
 }
 
-// Floor deck beneath building
-export const floorDeck = {
-  color: '#3F4A46',
+export const stairSteel = {
+  color: '#d4dcd8',
   metalness: 0.38,
-  roughness: 0.56,
+  roughness: 0.5,
 }
 
-// Roof equipment
+export const stairTread = {
+  color: '#5a5248',
+  metalness: 0.28,
+  roughness: 0.7,
+}
+
+export const railingSteel = {
+  color: '#f26b1a',
+  metalness: 0.28,
+  roughness: 0.45,
+}
+
+export const doorPanel = {
+  color: '#1b5e9a',
+  metalness: 0.25,
+  roughness: 0.5,
+}
+
+export const doorHandle = {
+  color: '#f2c14b',
+  metalness: 0.55,
+  roughness: 0.35,
+}
+
+export const floorDeck = {
+  color: '#8a6a3a',
+  metalness: 0.2,
+  roughness: 0.68,
+}
+
 export const roofEquipmentDark = {
-  color: '#5A6360',
-  metalness: 0.36,
-  roughness: 0.6,
+  color: '#4a555c',
+  metalness: 0.4,
+  roughness: 0.55,
 }
 
 export const roofEquipmentMid = {
-  color: '#6E7774',
-  metalness: 0.32,
-  roughness: 0.62,
-}
-
-export const roofEquipmentLight = {
-  color: '#9BA4A1',
-  metalness: 0.28,
-  roughness: 0.58,
-}
-
-export const roofVent = {
-  color: '#8A9390',
-  metalness: 0.3,
-  roughness: 0.6,
-}
-
-export const roofPipe = {
-  color: '#AEB9B8',
+  color: '#6e7a80',
   metalness: 0.35,
   roughness: 0.55,
 }
 
-// Support / expedition modules
+export const roofEquipmentLight = {
+  color: '#c5d0d4',
+  metalness: 0.32,
+  roughness: 0.5,
+}
+
+export const roofVent = {
+  color: '#8a969c',
+  metalness: 0.35,
+  roughness: 0.55,
+}
+
+export const roofPipe = {
+  color: '#d0d8dc',
+  metalness: 0.4,
+  roughness: 0.45,
+}
+
 export const supportModuleGreen = {
-  color: '#7A8B7A',
-  metalness: 0.32,
-  roughness: 0.58,
-}
-
-export const supportModuleBlue = {
-  color: '#5A6878',
-  metalness: 0.32,
-  roughness: 0.58,
-}
-
-export const supportModuleOrange = {
-  color: '#8A6848',
-  metalness: 0.3,
+  color: '#e8c97a',
+  metalness: 0.1,
   roughness: 0.62,
 }
 
-export const supportModuleGrey = {
-  color: '#7A8280',
-  metalness: 0.32,
-  roughness: 0.58,
-}
-
-// Utility infrastructure
-export const fuelTankBody = {
-  color: '#6A7580',
-  metalness: 0.45,
+export const supportModuleBlue = {
+  color: '#0b5cad',
+  metalness: 0.3,
   roughness: 0.48,
 }
 
+export const supportModuleOrange = {
+  color: '#f05a14',
+  metalness: 0.22,
+  roughness: 0.5,
+}
+
+export const supportModuleGrey = {
+  color: '#c8c4b8',
+  metalness: 0.22,
+  roughness: 0.55,
+}
+
+export const fuelTankBody = {
+  color: '#e8eef2',
+  metalness: 0.62,
+  roughness: 0.32,
+}
+
 export const fuelTankCap = {
-  color: '#8A9390',
-  metalness: 0.5,
-  roughness: 0.42,
+  color: '#f26b1a',
+  metalness: 0.4,
+  roughness: 0.4,
 }
 
 export const fuelBund = {
-  color: '#4A4845',
+  color: '#5a5448',
   roughness: 0.92,
   metalness: 0.08,
 }
 
 export const generatorBody = {
-  color: '#5A6368',
-  metalness: 0.38,
-  roughness: 0.55,
+  color: '#4a555c',
+  metalness: 0.4,
+  roughness: 0.5,
 }
 
 export const generatorVent = {
-  color: '#3F4A46',
-  metalness: 0.35,
-  roughness: 0.6,
+  color: '#f26b1a',
+  metalness: 0.3,
+  roughness: 0.5,
 }
 
 export const containerBlue = {
-  color: '#5A6878',
-  metalness: 0.35,
-  roughness: 0.55,
+  color: '#0b5cad',
+  metalness: 0.32,
+  roughness: 0.48,
 }
 
 export const containerOrange = {
-  color: '#8A6848',
-  metalness: 0.32,
-  roughness: 0.58,
+  color: '#f05a14',
+  metalness: 0.24,
+  roughness: 0.5,
 }
 
 export const containerGrey = {
-  color: '#7A8280',
-  metalness: 0.34,
-  roughness: 0.56,
+  color: '#e8c97a',
+  metalness: 0.12,
+  roughness: 0.6,
 }
 
 export const helipadSurface = {
-  color: '#6A7570',
+  color: '#6a7570',
   metalness: 0.28,
   roughness: 0.72,
 }
 
 export const helipadMarking = {
-  color: '#C3CBC8',
+  color: '#f2c14b',
   metalness: 0.2,
-  roughness: 0.65,
+  roughness: 0.55,
 }
 
 export const commsMast = {
-  color: '#8A9390',
-  metalness: 0.4,
-  roughness: 0.5,
+  color: '#c5d0d4',
+  metalness: 0.45,
+  roughness: 0.42,
 }
 
 export const commsArm = {
-  color: '#AEB9B8',
-  metalness: 0.38,
-  roughness: 0.52,
+  color: '#e8eef2',
+  metalness: 0.4,
+  roughness: 0.45,
 }
 
 export const radomeShell = {
-  color: '#C8D0CD',
-  metalness: 0.12,
+  color: '#ffffff',
+  metalness: 0.06,
   roughness: 0.68,
 }
 
 export const radomeBase = {
-  color: '#8A9390',
-  metalness: 0.38,
-  roughness: 0.52,
+  color: '#f26b1a',
+  metalness: 0.35,
+  roughness: 0.45,
 }
 
-// Terrain (unchanged — reference only)
 export const rockBrown = {
   color: '#6a6358',
   roughness: 0.98,
@@ -246,7 +236,7 @@ export const rockBrown = {
 }
 
 export const snowPatch = {
-  color: '#dde4e6',
+  color: '#e8f0f4',
   roughness: 0.96,
   metalness: 0,
 }

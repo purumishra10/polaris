@@ -16,7 +16,7 @@ function isUiTarget(target) {
   return Boolean(
     target instanceof Element &&
       target.closest(
-        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .letterbox, .title-slam',
+        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .cinematic-brief-rail, .twin-left-rail, .analysis-desk, .station-analysis-btn, .voice-dock, .letterbox, .title-slam, .twin-live-chrome, .twin-exit-fullscreen',
       ),
   )
 }
@@ -40,7 +40,7 @@ export default function CameraRig() {
   const defaultTarget = isBharati ? [0, 6, 4] : [0, 4, 0]
   const defaultPos = isBharati ? [82, 54, 68] : [38, 22, 32]
   const minRadius = isBharati ? 3 : 8
-  const maxRadius = isBharati ? 280 : 120
+  const maxRadius = isBharati ? 900 : 420
 
   const target = useRef(new THREE.Vector3(...defaultTarget))
   const spherical = useRef(new THREE.Spherical())
@@ -121,6 +121,15 @@ export default function CameraRig() {
       )
       goalTarget.current.set(tx, ty, tz)
       autoSpin.current = false
+      return
+    }
+
+    // Deselect / return home: orbit the station at its centre again.
+    if (flySource === 'station' || !selectedSubsystem) {
+      goalPos.current.set(...defaultPos)
+      goalTarget.current.set(...defaultTarget)
+      autoSpin.current = false
+      announced.current = true
     }
   }, [
     cameraPreset,
@@ -250,7 +259,10 @@ export default function CameraRig() {
     spherical.current.setFromVector3(
       camera.position.clone().sub(target.current),
     )
-    if (camera.position.distanceTo(goalPos.current) < 0.55) {
+    if (
+      camera.position.distanceTo(goalPos.current) < 0.55 &&
+      target.current.distanceTo(goalTarget.current) < 0.55
+    ) {
       flying.current = false
       if (!announced.current) {
         announced.current = true

@@ -5,34 +5,52 @@ import {
   maitriTerrainColor,
   maitriWaterLevel,
   MAITRI_LAKE,
+  MAITRI_ICE_EDGE,
   hash,
 } from './maitriTerrainHeight'
+import {
+  displacedPlane,
+  displacedRing,
+  surfaceNormal,
+  alignToNormal,
+} from './terrainMesh'
 
-function DisplacedField() {
-  const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(200, 160, 100, 80)
-    const pos = geo.attributes.position
-    const colors = new Float32Array(pos.count * 3)
+const INNER_SIZE = 260
+const FAR_RADIUS = 1700
 
-    for (let i = 0; i < pos.count; i += 1) {
-      const x = pos.getX(i)
-      const z = pos.getY(i)
-      const y = maitriHeightAt(x, z)
-      pos.setZ(i, y)
-      const [r, g, b] = maitriTerrainColor(x, z, y)
-      colors[i * 3] = r
-      colors[i * 3 + 1] = g
-      colors[i * 3 + 2] = b
-    }
-
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    geo.computeVertexNormals()
-    return geo
-  }, [])
-
+function OasisField() {
+  const geometry = useMemo(
+    () => displacedPlane(INNER_SIZE, 200, maitriHeightAt, maitriTerrainColor),
+    [],
+  )
   return (
     <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <meshStandardMaterial vertexColors roughness={0.96} metalness={0.02} />
+      <meshStandardMaterial vertexColors roughness={0.94} metalness={0.02} />
+    </mesh>
+  )
+}
+
+/** Ice sheet climbing away to the horizon; tucked under the inner field where they overlap. */
+function IceSheetField() {
+  const geometry = useMemo(
+    () =>
+      displacedRing(
+        120,
+        FAR_RADIUS,
+        160,
+        48,
+        maitriHeightAt,
+        maitriTerrainColor,
+        (x, z) => {
+          const r = Math.hypot(x, z)
+          return -0.3 * Math.max(0, 1 - (r - 120) / 80)
+        },
+      ),
+    [],
+  )
+  return (
+    <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]}>
+      <meshStandardMaterial vertexColors roughness={0.9} metalness={0.02} />
     </mesh>
   )
 }
@@ -46,8 +64,8 @@ function FrozenLake() {
         <circleGeometry args={[MAITRI_LAKE.radius * 0.88, 40]} />
         <meshStandardMaterial
           color="#5a8a96"
-          roughness={0.18}
-          metalness={0.35}
+          roughness={0.16}
+          metalness={0.4}
         />
       </mesh>
       <mesh
@@ -80,7 +98,7 @@ function ServiceTracks() {
   return (
     <group>
       {tracks.map(([x, z, rot, w, len], i) => {
-        const y = maitriHeightAt(x, z) + 0.04
+        const y = maitriHeightAt(x, z) + 0.05
         return (
           <mesh
             key={i}
@@ -98,40 +116,41 @@ function ServiceTracks() {
 
 function RockScatter() {
   const meshRef = useRef()
-  const count = 65
+  const count = 120
   const dummy = useMemo(() => new THREE.Object3D(), [])
+  const normal = useMemo(() => new THREE.Vector3(), [])
 
   useLayoutEffect(() => {
     if (!meshRef.current) return
     let placed = 0
     let i = 0
-    while (placed < count && i < 400) {
+    while (placed < count && i < 1000) {
       i += 1
-      const x = ((i * 53) % 180) - 90
-      const z = ((i * 71) % 140) - 70
-      if (Math.hypot(x, z) < 18) continue
+      const angle = hash(i * 6.1) * Math.PI * 2
+      const radius = 18 + Math.sqrt(hash(i * 2.7)) * (MAITRI_ICE_EDGE - 20)
+      const x = Math.cos(angle) * radius
+      const z = Math.sin(angle) * radius
+      if (Math.hypot(x - MAITRI_LAKE.x, z - MAITRI_LAKE.z) < MAITRI_LAKE.radius + 1.5) continue
       const surface = maitriHeightAt(x, z)
-      if (surface < -0.5) continue
-      const s = 0.35 + hash(i) * 1.1
-      dummy.position.set(x, surface + s * 0.18, z)
-      dummy.scale.set(s * 1.4, s * 0.32, s * 1.0)
-      dummy.rotation.set(
-        hash(i * 2) * 0.35,
-        hash(i * 3) * Math.PI,
-        hash(i * 5) * 0.25,
-      )
+      if (surface < -0.4) continue
+
+      const s = 0.3 + Math.pow(hash(i), 2) * 1.6
+      surfaceNormal(maitriHeightAt, x, z, 0.8, normal)
+      dummy.position.set(x, surface - s * 0.12, z)
+      dummy.scale.set(s * 1.4, s * 0.6, s * 1.0)
+      alignToNormal(dummy, normal, hash(i * 3) * Math.PI * 2)
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(placed, dummy.matrix)
       placed += 1
     }
     meshRef.current.count = placed
     meshRef.current.instanceMatrix.needsUpdate = true
-  }, [dummy])
+  }, [dummy, normal])
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]} castShadow receiveShadow>
-      <dodecahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color="#635a50" roughness={0.98} flatShading />
+      <dodecahedronGeometry args={[1, 1]} />
+      <meshStandardMaterial color="#5a5046" roughness={0.97} flatShading />
     </instancedMesh>
   )
 }
@@ -147,7 +166,7 @@ function LowRidges() {
   return (
     <group>
       {ridges.map(([x, z, width, height, depth], i) => {
-        const y = maitriHeightAt(x, z) + height * 0.3
+        const y = maitriHeightAt(x, z) + height * 0.12
         return (
           <mesh
             key={i}
@@ -155,8 +174,9 @@ function LowRidges() {
             scale={[width, height, depth]}
             rotation={[0, i * 0.5, 0]}
             castShadow
+            receiveShadow
           >
-            <dodecahedronGeometry args={[1, 0]} />
+            <dodecahedronGeometry args={[1, 1]} />
             <meshStandardMaterial color="#5a5248" roughness={0.98} flatShading />
           </mesh>
         )
@@ -165,14 +185,50 @@ function LowRidges() {
   )
 }
 
+/** Rock peaks breaking through the ice sheet in the distance. */
+function Nunataks() {
+  const peaks = useMemo(() => {
+    const list = []
+    for (let i = 0; i < 9; i += 1) {
+      const angle = hash(i * 8.3 + 2) * Math.PI * 2
+      const radius = 260 + hash(i * 3.9 + 1) * 700
+      const x = Math.cos(angle) * radius
+      const z = Math.sin(angle) * radius
+      const base = maitriHeightAt(x, z)
+      const h = 14 + hash(i * 5.7) * 40 + radius * 0.02
+      list.push({ x, z, base, sx: h * (0.9 + hash(i) * 1.1), sy: h, sz: h * (0.8 + hash(i * 2) * 1.2), rot: hash(i * 4) * Math.PI })
+    }
+    return list
+  }, [])
+
+  return (
+    <group>
+      {peaks.map((p, i) => (
+        <mesh
+          key={i}
+          position={[p.x, p.base - p.sy * 0.35, p.z]}
+          scale={[p.sx, p.sy, p.sz]}
+          rotation={[0, p.rot, 0]}
+          castShadow
+        >
+          <dodecahedronGeometry args={[1, 1]} />
+          <meshStandardMaterial color="#3b3430" roughness={0.98} flatShading />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
 export default function MaitriGround() {
   return (
     <group>
-      <DisplacedField />
+      <OasisField />
+      <IceSheetField />
       <FrozenLake />
       <ServiceTracks />
       <RockScatter />
       <LowRidges />
+      <Nunataks />
     </group>
   )
 }

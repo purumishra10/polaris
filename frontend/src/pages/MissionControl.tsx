@@ -1,79 +1,226 @@
 import { useState } from 'react'
-import { Radio, Wind, Snowflake, Fuel, ShieldAlert, CheckCircle2, Zap } from 'lucide-react'
+import {
+  Radio,
+  Wind,
+  Snowflake,
+  Fuel,
+  ShieldAlert,
+  CheckCircle2,
+  Zap,
+  Activity,
+  AlertTriangle,
+  Check,
+  RotateCcw,
+  Send,
+  Sliders,
+  Cpu,
+  BookOpen,
+  FileText,
+} from 'lucide-react'
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
+import LiveTwinViewport from '../components/LiveTwinViewport'
 import { usePolarisStore } from '../store/usePolarisStore'
-import { applyControl, injectScenarioSim } from '../lib/telemetrySim'
-import type { ScenarioKey } from '../lib/types'
-import StationScene from '../3d/StationScene'
 
 interface Props {
-  onNavigate: (route: 'home' | 'mission-control' | 'analytics') => void
+  onNavigate: (
+    route: 'home' | 'mission-control' | 'analytics'
+  ) => void
 }
 
-const SCENARIOS: { key: ScenarioKey; label: string; icon: React.ReactNode }[] = [
-  { key: 'BLIZZARD_80KT', label: 'Trigger 80-Knot Blizzard', icon: <Wind size={16} /> },
-  { key: 'RESUPPLY_DELAY', label: 'Simulate Sea-Ice Resupply Delay', icon: <Fuel size={16} /> },
-  { key: 'POLAR_NIGHT', label: 'Initiate Polar Night Transition', icon: <Snowflake size={16} /> },
+const SCENARIOS = [
+  {
+    key: 'BLIZZARD_80KT',
+    label: 'Forecast Incoming Blizzard',
+    desc: 'Pressure collapse → gust acceleration → structural hazard',
+    icon: <Wind size={16} className="text-ice-400" />,
+  },
+  {
+    key: 'RESUPPLY_DELAY',
+    label: 'Simulate Resupply Delay',
+    desc: 'Fuel burn projection and progressive autonomy depletion',
+    icon: <Fuel size={16} className="text-amber-400" />,
+  },
+  {
+    key: 'POLAR_NIGHT',
+    label: 'Initiate Polar Night Transition',
+    desc: 'Drops solar flux to 0 W/m², drops ambient to -31°C, increases base heating',
+    icon: <Snowflake size={16} className="text-blue-400" />,
+  },
+  {
+    key: 'MICROGRID_FAILURE',
+    label: 'Simulate CHP / Microgrid Failure',
+    desc: 'Progressive generator degradation and thermal margin collapse',
+    icon: <Zap size={16} className="text-red-400" />,
+  },
+  {
+    key: 'COMMUNICATION_DEGRADATION',
+    label: 'Simulate Satellite Degradation',
+    desc: 'C-band/LEO latency escalation and edge autonomy transition',
+    icon: <Radio size={16} className="text-orange-400" />,
+  },
+  {
+    key: 'NOMINAL',
+    label: 'Reset to Nominal State',
+    desc: 'Clears injected anomalies and restores standard baseline physics',
+    icon: <RotateCcw size={16} className="text-emerald-400" />,
+  },
 ]
 
-const ACTION_LABELS: Record<string, string> = {
-  'ACTION: Engage exterior hatch structural airlock sequence': 'Lock Down Hatches',
-  'ACTION: Stow external weather sensors': 'Stow Weather Sensors',
-  'ACTION: Spin up Standby Auxiliary Generator': 'Start Aux Generator',
-  'ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde)': 'Shed Science Payloads',
-  'ACTION: Isolate unoccupied summer residential modules': 'Isolate Summer Wing',
+const MITIGATION_MAP: Record<
+  string,
+  { label: string; actuator: string }
+> = {
+  'ACTION: Engage exterior hatch structural airlock sequence': {
+    label: 'Engage Structural Airlock Lockdown',
+    actuator: 'hatch_lockdown: true',
+  },
+
+  'ACTION: Stow external weather sensors': {
+    label: 'Stow Meteorological Mast Sensors',
+    actuator: 'weather_mast: stowed',
+  },
+
+  'ACTION: Spin up Standby Auxiliary Generator': {
+    label: 'Spin Up Auxiliary CHP Generator',
+    actuator: 'aux_generator_active: true',
+  },
+
+  'ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde)': {
+    label: 'Shed Science Payloads (MARA Radar & Ionosonde)',
+    actuator: 'science_instruments_online: false',
+  },
+
+  'ACTION: Isolate unoccupied summer residential modules': {
+    label: 'Isolate Unoccupied Summer Residential Wing',
+    actuator: 'summer_wing_isolated: true',
+  },
+
+  'LOCK HATCHES': {
+    label: 'Engage Structural Airlock Lockdown',
+    actuator: 'hatch_lockdown: true',
+  },
+
+  'RESTRICT OUTDOOR WORK': {
+    label: 'Issue Station Airlock Lockdown',
+    actuator: 'hatch_lockdown: true',
+  },
+
+  'ACTIVATE AUXILIARY GENERATOR': {
+    label: 'Spin Up Auxiliary CHP Generator',
+    actuator: 'aux_generator_active: true',
+  },
+
+  'ISOLATE NON-ESSENTIAL LOAD': {
+    label: 'Isolate Summer Residential Wing',
+    actuator: 'summer_wing_isolated: true',
+  },
+
+  'REVIEW FUEL RESERVE': {
+    label: 'Shed Non-Vital Science Payloads',
+    actuator: 'science_instruments_online: false',
+  },
 }
 
-export default function MissionControl({ onNavigate }: Props) {
-  const { selectedStation, setSelectedStation, telemetry, linkMode, setLinkMode } = usePolarisStore()
-  const [executed, setExecuted] = useState<Set<string>>(new Set())
-  const [lastInjected, setLastInjected] = useState<ScenarioKey | null>(null)
+export default function MissionControl({
+  onNavigate,
+}: Props) {
+  const {
+    selectedStation,
+    telemetry,
+    linkMode,
+    setLinkMode,
+    executeMitigation,
+    triggerScenario,
+  } = usePolarisStore()
+
+  const [executedActions, setExecutedActions] =
+    useState<Set<string>>(new Set())
+
+  const [activeScenario, setActiveScenario] =
+    useState<string | null>(null)
+
+  const [executingAction, setExecutingAction] =
+    useState<string | null>(null)
 
   const t = telemetry[selectedStation]
 
-  const handleExecute = (action: string) => {
-    if (action.includes('Aux Generator') || action.includes('Auxiliary Generator')) {
-      applyControl(selectedStation, 'aux_generator_active', true)
-    }
-    if (action.includes('Summer Wing') || action.includes('summer residential')) {
-      applyControl(selectedStation, 'summer_wing_isolated', true)
-    }
-    if (action.includes('Science Payloads') || action.includes('scientific payloads')) {
-      applyControl(selectedStation, 'science_online', false)
-    }
-    if (action.includes('Hatch') || action.includes('hatch')) {
-      applyControl(selectedStation, 'hatch_lockdown', true)
-    }
-    setExecuted((prev) => new Set(prev).add(action))
+  const proactive = t?.proactive
+
+  const severity =
+    t?.risk?.severity ?? 'NOMINAL'
+
+  const isCritical =
+    severity === 'CRITICAL'
+
+  const isAdvisory =
+    severity === 'ADVISORY'
+
+  const handleExecute = async (
+    actionText: string
+  ) => {
+    setExecutingAction(actionText)
+
+    await executeMitigation(actionText)
+
+    setExecutedActions(
+      (prev) =>
+        new Set(prev).add(actionText)
+    )
+
+    setExecutingAction(null)
   }
 
-  const handleScenario = (key: ScenarioKey) => {
-    injectScenarioSim(selectedStation, key, 30)
-    setLastInjected(key)
-    setTimeout(() => setLastInjected((cur) => (cur === key ? null : cur)), 3000)
+  const handleScenario = async (
+    scenarioKey: string
+  ) => {
+    setActiveScenario(scenarioKey)
+
+    await triggerScenario(scenarioKey)
+
+    setTimeout(() => {
+      setActiveScenario(null)
+    }, 4000)
   }
+
+  const prescribedActions =
+    t?.risk?.prescribed_actions ?? []
+  const citations =
+    t?.risk?.citations ?? []
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-base-950 text-white">
+      {/* Persistent Navigation Header */}
       <TopNav
-        title="Mission Control"
-        subtitle="Alert & Mitigation · 3D Digital Twin · Live Satellite Feed"
-        onHome={() => onNavigate('home')}
+        currentTab="mission-control"
+        onNavigate={onNavigate}
         right={
           <div className="flex items-center gap-2">
-            <div className="flex rounded-lg border border-base-600 overflow-hidden text-xs">
+            <div className="flex rounded-lg border border-base-700 bg-base-900 p-0.5 text-xs font-mono">
               <button
                 id="link-mode-realtime"
-                onClick={() => setLinkMode('REALTIME')}
-                className={`px-3 py-1.5 ${linkMode === 'REALTIME' ? 'bg-ice-600 text-white' : 'bg-base-800 text-slate-400 hover:text-slate-200'}`}
+                onClick={() =>
+                  setLinkMode('REALTIME')
+                }
+                className={`px-3 py-1 rounded transition-colors ${
+                  linkMode === 'REALTIME'
+                    ? 'bg-ice-600 text-white font-semibold shadow-glow'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
               >
-                Real-time Synced
+                Real-Time
               </button>
+
               <button
                 id="link-mode-stress"
-                onClick={() => setLinkMode('STRESS_TEST')}
-                className={`px-3 py-1.5 ${linkMode === 'STRESS_TEST' ? 'bg-ice-600 text-white' : 'bg-base-800 text-slate-400 hover:text-slate-200'}`}
+                onClick={() =>
+                  setLinkMode('STRESS_TEST')
+                }
+                className={`px-3 py-1 rounded transition-colors ${
+                  linkMode === 'STRESS_TEST'
+                    ? 'bg-ice-600 text-white font-semibold shadow-glow'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
               >
                 Stress-Test
               </button>
@@ -82,148 +229,595 @@ export default function MissionControl({ onNavigate }: Props) {
         }
       />
 
-      {/* 3D Scene — full width banner */}
-      <div className="relative w-full h-[360px] border-b border-base-700">
-        <StationScene />
-
-        {/* Station switcher overlay inside the 3D view */}
-        <div className="absolute top-3 left-3 flex rounded-lg border border-base-600 overflow-hidden z-10">
-          {(['BHARATI', 'MAITRI'] as const).map((st) => (
-            <button
-              key={st}
-              id={`station-tab-${st.toLowerCase()}`}
-              onClick={() => st === 'BHARATI' && setSelectedStation(st)}
-              disabled={st === 'MAITRI'}
-              title={st === 'MAITRI' ? 'Maitri link currently unoperational' : undefined}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
-                selectedStation === st ? 'bg-ice-600 text-white' : 'bg-base-800/80 text-slate-400'
-              } ${st === 'MAITRI' ? 'opacity-40 cursor-not-allowed' : 'hover:text-slate-200'}`}
-            >
-              {st === 'BHARATI' ? 'Bharati' : 'Maitri (offline)'}
-            </button>
-          ))}
-        </div>
-
-        {/* Link badge overlay */}
-        {t && (
-          <div className="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-lg border border-base-600 bg-base-900/80 backdrop-blur text-xs z-10">
-            <Radio size={14} className={t.link_status.health === 'ONLINE' ? 'text-emerald-400' : 'text-red-400'} />
-            <span className="text-slate-300">{t.link_status.type}</span>
-            <span className="text-slate-500">·</span>
-            <span className="text-slate-300">{t.link_status.latency_ms}ms</span>
-            <span
-              className={`ml-1 px-2 py-0.5 rounded-full font-semibold ${
-                t.link_status.health === 'ONLINE'
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : 'bg-red-500/15 text-red-400'
-              }`}
-            >
-              {t.link_status.health}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <main className="flex-1 px-4 sm:px-6 py-6 max-w-6xl mx-auto w-full space-y-6">
-        {/* Alert header */}
-        <div className="rounded-2xl border border-base-700 bg-base-900 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-3">
-              <ShieldAlert
-                size={22}
-                className={
-                  t?.risk.severity === 'CRITICAL'
-                    ? 'text-red-400'
-                    : t?.risk.severity === 'ADVISORY'
-                      ? 'text-amber-400'
-                      : 'text-emerald-400'
-                }
-              />
-              <h2 className="font-semibold text-lg">Anomaly &amp; Mitigation Status</h2>
-            </div>
-            {t ? <SeverityBadge severity={t.risk.severity} score={t.risk.anomaly_score} /> : (
-              <span className="text-xs text-slate-500 animate-pulse">Awaiting first telemetry frame…</span>
-            )}
-          </div>
-
-          {t && t.risk.prescribed_actions.length > 0 ? (
-            <div className="space-y-2">
-              {t.risk.prescribed_actions.map((action) => {
-                const done = executed.has(action)
-                return (
-                  <div
-                    key={action}
-                    className="flex items-center justify-between gap-3 rounded-lg border border-base-700 bg-base-850 px-4 py-3"
-                  >
-                    <p className="text-sm text-slate-300">{action}</p>
-                    <button
-                      onClick={() => handleExecute(action)}
-                      disabled={done}
-                      className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                        done
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/40'
-                          : 'bg-ice-600 hover:bg-ice-500 text-white'
-                      }`}
-                    >
-                      {done ? <CheckCircle2 size={14} /> : <Zap size={14} />}
-                      {done ? 'Executed' : ACTION_LABELS[action] ?? 'Approve & Execute'}
-                    </button>
-                  </div>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-500">No mitigation actions prescribed — station nominal.</p>
-          )}
-        </div>
-
-        {/* Scenario injection tray */}
-        <div className="rounded-2xl border border-base-700 bg-base-900 p-5">
-          <h2 className="font-semibold text-sm text-slate-300 mb-3 uppercase tracking-wide">
-            Scenario Injection · Pitch Demo Tray
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {SCENARIOS.map((sc) => (
-              <button
-                key={sc.key}
-                id={`scenario-${sc.key.toLowerCase()}`}
-                onClick={() => handleScenario(sc.key)}
-                className={`flex items-center gap-2 justify-center px-4 py-3 rounded-lg border text-sm font-medium transition-colors ${
-                  lastInjected === sc.key
-                    ? 'border-ice-500 bg-ice-600/20 text-ice-300'
-                    : 'border-base-600 bg-base-800 hover:border-ice-600 hover:text-ice-300 text-slate-300'
+      <main className="flex-1 px-4 sm:px-6 md:px-8 py-6 max-w-7xl mx-auto w-full space-y-6">
+        {/* Anomaly Alert Header Banner */}
+        <div
+          className={`rounded-2xl border p-5 transition-all duration-300 ${
+            isCritical
+              ? 'bg-red-950/40 border-red-500/60 shadow-glow-red animate-pulse-red'
+              : isAdvisory
+              ? 'bg-amber-950/30 border-amber-500/50 shadow-glow'
+              : 'bg-base-900/80 border-base-700 shadow-md'
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div
+                className={`h-11 w-11 rounded-xl flex items-center justify-center border ${
+                  isCritical
+                    ? 'bg-red-500/20 text-red-400 border-red-500/40'
+                    : isAdvisory
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+                    : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                 }`}
               >
-                {sc.icon}
-                {sc.label}
-              </button>
-            ))}
+                {isCritical ? (
+                  <ShieldAlert size={24} />
+                ) : isAdvisory ? (
+                  <AlertTriangle size={24} />
+                ) : (
+                  <CheckCircle2 size={24} />
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-bold tracking-wide">
+                    {isCritical
+                      ? 'CRITICAL RISK PROTOCOL ENGAGED'
+                      : isAdvisory
+                      ? 'OPERATIONAL ADVISORY ACTIVE'
+                      : 'ALL STATION SUBSYSTEMS NOMINAL'}
+                  </h2>
+
+                  <SeverityBadge
+                    severity={severity}
+                    score={
+                      t?.risk?.anomaly_score
+                    }
+                  />
+                </div>
+
+                <p className="text-xs text-slate-300 font-mono mt-0.5">
+                  AI Isolation Forest Decision Function:{' '}
+                  <strong
+                    className={
+                      isCritical
+                        ? 'text-red-300 font-bold'
+                        : isAdvisory
+                        ? 'text-amber-300'
+                        : 'text-emerald-400'
+                    }
+                  >
+                    {t?.risk?.anomaly_score !==
+                    undefined
+                      ? t.risk.anomaly_score.toFixed(
+                          4
+                        )
+                      : '+0.0620'}
+                  </strong>{' '}
+                  (positive ≈ inlier baseline,
+                  negative ≈ anomaly outlier)
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Metrics Capsule */}
+            <div className="flex items-center gap-3 font-mono text-xs">
+              <div className="px-3 py-1.5 rounded-lg bg-base-950/70 border border-base-700">
+                <span className="text-slate-500 block text-[10px]">
+                  WIND GALE
+                </span>
+
+                <span className="text-white font-bold">
+                  {t?.ambient?.wind_speed_knots?.toFixed(
+                    1
+                  )}{' '}
+                  kt
+                </span>
+              </div>
+
+              <div className="px-3 py-1.5 rounded-lg bg-base-950/70 border border-base-700">
+                <span className="text-slate-500 block text-[10px]">
+                  HABITAT TEMP
+                </span>
+
+                <span
+                  className={`font-bold ${
+                    t?.thermal?.internal_temp_c <
+                    16
+                      ? 'text-red-400'
+                      : 'text-emerald-400'
+                  }`}
+                >
+                  {t?.thermal?.internal_temp_c?.toFixed(
+                    1
+                  )}
+                  °C
+                </span>
+              </div>
+
+              <div className="px-3 py-1.5 rounded-lg bg-base-950/70 border border-base-700">
+                <span className="text-slate-500 block text-[10px]">
+                  DAYS AUTONOMY
+                </span>
+
+                <span
+                  className={`font-bold ${
+                    t?.fuel?.days_of_autonomy <
+                    15
+                      ? 'text-red-400'
+                      : 'text-white'
+                  }`}
+                >
+                  {t?.fuel?.days_of_autonomy?.toFixed(
+                    0
+                  )}
+                  d
+                </span>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3">
-            Posts to <code className="text-slate-400">POST /api/scenario/inject</code> in production — simulated
-            locally here for offline demo.
-          </p>
         </div>
 
-        {/* Quick telemetry strip */}
-        {t && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <MiniStat label="Internal Temp" value={`${t.thermal.internal_temp_c.toFixed(1)}°C`} />
-            <MiniStat label="Wind Speed" value={`${t.ambient.wind_speed_knots.toFixed(0)} kt`} />
-            <MiniStat label="Fuel Autonomy" value={`${t.fuel.days_of_autonomy.toFixed(0)} d`} />
-            <MiniStat label="Total Load" value={`${t.microgrid.total_load_kva} kVA`} />
-          </div>
-        )}
-      </main>
-    </div>
-  )
-}
+        {/* Proactive Operations Intelligence */}
+        {proactive &&
+          proactive.status !== 'CLEAR' && (
+            <div className="proactive-alert rounded-2xl border border-ice-500/40 bg-base-900/90 p-5 shadow-xl">
+              <div className="proactive-alert__header flex flex-wrap items-center justify-between gap-3">
+                <span className="text-xs font-mono font-bold tracking-[0.18em] text-ice-300">
+                  PROACTIVE OPERATIONS
+                </span>
 
-function MiniStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-base-700 bg-base-900 px-4 py-3">
-      <p className="text-[11px] uppercase tracking-wide text-slate-500 mb-1">{label}</p>
-      <p className="text-lg font-semibold text-slate-100">{value}</p>
+                <strong
+                  className={`text-xs font-mono px-2.5 py-1 rounded-md border ${
+                    proactive.status ===
+                    'ACTIVE'
+                      ? 'text-red-300 bg-red-500/20 border-red-500/40'
+                      : proactive.status ===
+                        'IMMINENT'
+                      ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
+                      : 'text-ice-300 bg-ice-500/20 border-ice-500/40'
+                  }`}
+                >
+                  {proactive.status}
+                </strong>
+              </div>
+
+              <div className="proactive-alert__hazard mt-3 text-xl font-bold tracking-wide text-white">
+                {proactive.hazard}
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-300">
+                {proactive.eta_minutes !=
+                  null && (
+                  <div className="rounded-lg border border-base-700 bg-base-950/70 p-3">
+                    <span className="block text-[10px] text-slate-500 mb-1">
+                      ESTIMATED ESCALATION
+                    </span>
+
+                    <strong className="text-white">
+                      {proactive.eta_minutes}{' '}
+                      min
+                    </strong>
+                  </div>
+                )}
+
+                {proactive.confidence >
+                  0 && (
+                  <div className="rounded-lg border border-base-700 bg-base-950/70 p-3">
+                    <span className="block text-[10px] text-slate-500 mb-1">
+                      FORECAST CONFIDENCE
+                    </span>
+
+                    <strong className="text-white">
+                      {Math.round(
+                        proactive.confidence *
+                          100
+                      )}
+                      %
+                    </strong>
+                  </div>
+                )}
+              </div>
+
+              {proactive.recommended_actions
+                ?.length > 0 && (
+                <div className="proactive-alert__actions mt-4 rounded-xl border border-base-700 bg-base-950/70 p-4">
+                  <strong className="block text-xs font-mono tracking-wide text-ice-300 mb-2">
+                    RECOMMENDED NOW
+                  </strong>
+
+                  <div className="space-y-1.5 text-xs text-slate-300">
+                    {proactive.recommended_actions.map(
+                      (action: string) => (
+                        <div
+                          key={action}
+                        >
+                          • {action}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+        <LiveTwinViewport />
+
+        {/* Closed-Loop Command Grid: SOP Mitigations & Scenario Injections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* SOP Mitigation Actions Drawer */}
+          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-xl flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <ShieldAlert
+                  size={20}
+                  className="text-ice-400"
+                />
+
+                <div>
+                  <h3 className="text-sm font-mono font-bold tracking-wider text-slate-200 uppercase">
+                    Antarctic SOP Prescriptive Mitigation Drawer
+                  </h3>
+
+                  <p className="text-xs text-slate-400 font-mono">
+                    Deterministic SOP rule matrix triggered by Isolation Forest & sensor cliffs
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-base-800 border border-base-700 text-ice-300">
+                {prescribedActions.length}{' '}
+                Pending
+              </span>
+            </div>
+
+            <div className="space-y-3 flex-1">
+              {prescribedActions.length ===
+              0 ? (
+                <div className="h-44 rounded-xl border border-dashed border-base-700 bg-base-950/40 flex flex-col items-center justify-center text-center p-6">
+                  <CheckCircle2
+                    size={32}
+                    className="text-emerald-400/70 mb-2"
+                  />
+
+                  <p className="text-sm font-semibold text-slate-300">
+                    No Emergency SOP Mitigations Required
+                  </p>
+
+                  <p className="text-xs text-slate-500 font-mono mt-1 max-w-sm">
+                    All environmental conditions and microgrid loads remain within nominal operating safety bounds.
+                  </p>
+                </div>
+              ) : (
+                prescribedActions.map(
+                  (
+                    action: string,
+                    idx: number
+                  ) => {
+                    const details =
+                      MITIGATION_MAP[
+                        action
+                      ] || {
+                        label: action,
+                        actuator:
+                          'controls: updated',
+                      }
+
+                    const isDone =
+                      executedActions.has(
+                        action
+                      )
+
+                    const isExecuting =
+                      executingAction ===
+                      action
+
+                    // Match citation from Supabase if applicable
+                    const citation = citations.find((c: any) => {
+                      if (!c) return false;
+                      const ruleKey = (c.rule_key || '').toLowerCase();
+                      const actionLower = (action || '').toLowerCase();
+                      const mandated = c.mandated_action || '';
+
+                      return (
+                        (ruleKey && actionLower.includes(ruleKey)) ||
+                        mandated === action ||
+                        (c.rule_key === 'STRUCTURAL' && actionLower.includes('hatch')) ||
+                        (c.rule_key === 'THERMAL' && actionLower.includes('auxiliary')) ||
+                        (c.rule_key === 'FUEL_CRIT' && (actionLower.includes('scientific') || actionLower.includes('summer')))
+                      );
+                    });
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`p-4 rounded-xl border transition-all ${
+                          isDone
+                            ? 'bg-base-950/40 border-base-800 opacity-60'
+                            : 'bg-base-950/80 border-ice-500/40 shadow-glow'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div>
+                            <div className="text-xs font-bold text-ice-300 font-mono tracking-wide">
+                              {action}
+                            </div>
+
+                            <div className="text-xs text-slate-300 mt-1">
+                              Action:{' '}
+                              <strong className="text-white">
+                                {
+                                   details.label
+                                }
+                              </strong>
+                            </div>
+
+                            <div className="text-[10px] font-mono text-slate-500 mt-0.5">
+                              Dispatches actuator payload:{' '}
+                              <span className="text-ice-400 font-mono">
+                                {
+                                  details.actuator
+                                }
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            disabled={
+                              isDone ||
+                              isExecuting
+                            }
+                            onClick={() =>
+                              handleExecute(
+                                action
+                              )
+                            }
+                            className={`shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold flex items-center gap-1.5 transition-all ${
+                              isDone
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-default'
+                                : 'bg-ice-600 hover:bg-ice-500 text-white shadow-glow'
+                            }`}
+                          >
+                            {isDone ? (
+                              <>
+                                <Check
+                                  size={
+                                    14
+                                  }
+                                />{' '}
+                                EXECUTED
+                              </>
+                            ) : isExecuting ? (
+                              <span>
+                                SENDING...
+                              </span>
+                            ) : (
+                              <>
+                                <Send
+                                  size={
+                                    13
+                                  }
+                                />{' '}
+                                APPROVE &amp;
+                                EXECUTE
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* --- Authoritative SOP Citation Box (Supabase RAG) --- */}
+                        {citation && (
+                          <div className="mt-3 pt-2.5 border-t border-base-800/80 bg-base-900/60 p-2.5 rounded-lg border border-slate-800">
+                            <div className="flex items-center justify-between text-[11px] mb-1">
+                              <span className="font-semibold text-amber-300 flex items-center gap-1.5 font-mono">
+                                <BookOpen size={13} className="text-amber-400" />
+                                {citation.clause}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400 bg-base-950 px-1.5 py-0.5 rounded border border-base-800">
+                                {citation.source_path}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 flex items-center gap-1 mb-1.5">
+                              <FileText size={11} className="text-slate-500" />
+                              <span>{citation.document_title}</span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 italic bg-base-950/70 p-2 rounded border border-base-800/60 leading-relaxed font-sans">
+                              "{citation.excerpt}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                )
+              )}
+            </div>
+
+            {/* Actuator States Capsule */}
+            <div className="mt-4 pt-4 border-t border-base-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
+              <div className="p-2 rounded bg-base-950 border border-base-800">
+                <span className="text-slate-500 block text-[9px]">
+                  HATCHES
+                </span>
+
+                <span
+                  className={
+                    t?.controls
+                      ?.hatch_lockdown
+                      ? 'text-red-400 font-bold'
+                      : 'text-emerald-400'
+                  }
+                >
+                  {t?.controls
+                    ?.hatch_lockdown
+                    ? 'LOCKED'
+                    : 'UNLOCKED'}
+                </span>
+              </div>
+
+              <div className="p-2 rounded bg-base-950 border border-base-800">
+                <span className="text-slate-500 block text-[9px]">
+                  SCIENCE PAYLOAD
+                </span>
+
+                <span
+                  className={
+                    t?.controls
+                      ?.science_instruments_online
+                      ? 'text-emerald-400'
+                      : 'text-amber-400 font-bold'
+                  }
+                >
+                  {t?.controls
+                    ?.science_instruments_online
+                    ? 'ONLINE'
+                    : 'SHEDDED'}
+                </span>
+              </div>
+
+              <div className="p-2 rounded bg-base-950 border border-base-800">
+                <span className="text-slate-500 block text-[9px]">
+                  SUMMER WING
+                </span>
+
+                <span
+                  className={
+                    t?.controls
+                      ?.summer_wing_isolated
+                      ? 'text-amber-400 font-bold'
+                      : 'text-emerald-400'
+                  }
+                >
+                  {t?.controls
+                    ?.summer_wing_isolated
+                    ? 'ISOLATED'
+                    : 'ACTIVE'}
+                </span>
+              </div>
+
+              <div className="p-2 rounded bg-base-950 border border-base-800">
+                <span className="text-slate-500 block text-[9px]">
+                  AUX GENERATOR
+                </span>
+
+                <span
+                  className={
+                    t?.controls
+                      ?.aux_generator_active
+                      ? 'text-ice-400 font-bold'
+                      : 'text-slate-400'
+                  }
+                >
+                  {t?.controls
+                    ?.aux_generator_active
+                    ? 'RUNNING'
+                    : 'STANDBY'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Scenario Injection Utility Tray */}
+          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  <Sliders
+                    size={20}
+                    className="text-ice-400"
+                  />
+
+                  <div>
+                    <h3 className="text-sm font-mono font-bold tracking-wider text-slate-200 uppercase">
+                      Scenario Injection Utility Tray
+                    </h3>
+
+                    <p className="text-xs text-slate-400 font-mono">
+                      Inject stress-test anomalies to demonstrate real-time closed loop response
+                    </p>
+                  </div>
+                </div>
+
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-ice-600/20 text-ice-300 border border-ice-500/30">
+                  Pitch Demo
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                {SCENARIOS.map((sc) => {
+                  const isActive =
+                    activeScenario ===
+                    sc.key
+
+                  return (
+                    <button
+                      key={sc.key}
+                      onClick={() =>
+                        handleScenario(
+                          sc.key
+                        )
+                      }
+                      className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden ${
+                        isActive
+                          ? 'bg-ice-600 text-white border-ice-300 shadow-glow scale-[1.02]'
+                          : 'bg-base-950/80 border-base-700 hover:border-ice-500/50 hover:bg-base-900'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        {sc.icon}
+
+                        <h4 className="text-xs font-bold font-mono tracking-wide">
+                          {sc.label}
+                        </h4>
+                      </div>
+
+                      <p className="text-[11px] text-slate-400 leading-snug">
+                        {sc.desc}
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Ingestion & Satellite Latency Footer Notice */}
+            <div className="p-3.5 rounded-xl border border-base-800 bg-base-950/80 text-xs font-mono space-y-1">
+              <div className="flex justify-between text-slate-400 text-[11px]">
+                <span>
+                  ANTARCTICA EDGE SIMULATOR:
+                </span>
+
+                <span className="text-ice-300 font-semibold">
+                  PORT 8001 (ODE Engine)
+                </span>
+              </div>
+
+              <div className="flex justify-between text-slate-400 text-[11px]">
+                <span>
+                  POLARIS HQ DIGITAL TWIN:
+                </span>
+
+                <span className="text-ice-300 font-semibold">
+                  PORT 8000 (Scikit-Learn ML)
+                </span>
+              </div>
+
+              <div className="flex justify-between text-slate-400 text-[11px]">
+                <span>
+                  SATELLITE DELAY:
+                </span>
+
+                <span className="text-white font-semibold">
+                  400–800 ms round trip injected
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ContactShadows } from '@react-three/drei'
 
@@ -14,6 +14,7 @@ import { usePolarisStore } from '../store/usePolarisStore'
 import OperationalState from './components/OperationalState'
 import CameraRig from './components/CameraRig'
 import WorldPins from '../intelligence/WorldPins'
+import FeatureWarnings from './components/FeatureWarnings'
 
 export default function StationScene() {
   const orbitRoot = useRef(null)
@@ -25,12 +26,7 @@ export default function StationScene() {
     (state) => state.telemetry[selectedStation],
   )
 
-  const connectTelemetry = usePolarisStore(
-    (state) => state.connectTelemetry,
-  )
-  useEffect(() => {
-    connectTelemetry()
-  }, [connectTelemetry])
+  // Telemetry WebSocket is owned by App.jsx on this branch.
   const isBharati = selectedStation === 'BHARATI'
 
   return (
@@ -38,14 +34,18 @@ export default function StationScene() {
       <Canvas
         key={selectedStation}
         shadows
-        dpr={[1, 2]}
+        dpr={[1, 1.75]}
         eventSource={orbitRoot}
         eventPrefix="client"
-        gl={{ antialias: true }}
+        gl={{
+          antialias: true,
+          powerPreference: 'high-performance',
+          logarithmicDepthBuffer: false,
+        }}
         camera={
           isBharati
-            ? { position: [82, 54, 68], fov: 42, near: 0.1, far: 720 }
-            : { position: [0, 15.5, 38], fov: 38, near: 0.1, far: 320 }
+            ? { position: [82, 54, 68], fov: 42, near: 0.5, far: 4200 }
+            : { position: [0, 15.5, 38], fov: 38, near: 0.3, far: 2000 }
         }
         onCreated={({ camera }) => {
           if (isBharati) {
@@ -81,6 +81,7 @@ export default function StationScene() {
 
         <CameraRig />
         <WorldPins />
+        <FeatureWarnings />
 
         <OperationalState
           telemetry={telemetry}

@@ -17,12 +17,15 @@ c:\projects\polaris\datasets\
 │   ├── openmeteo_hourly_2023_maitri.json       # 8,760 hourly records (T2m, DNI, wind speed/gust, P, RH)
 │   ├── openmeteo_hourly_2023_bharati.json      # 8,760 hourly records (coastal wind, blizzards, DNI)
 │   ├── openmeteo_hourly_2023_novolazarevskaya.json # Hourly proxy validation series
-│   └── openmeteo_hourly_2023_progress.json     # Hourly proxy validation series
+│   ├── openmeteo_hourly_2023_progress.json     # Hourly proxy validation series
+│   ├── openmeteo_live_bharati.json             # Latest Open-Meteo forecast poll (Bharati)
+│   └── openmeteo_live_maitri.json              # Latest Open-Meteo forecast poll (Maitri)
 │
 ├── space_weather\                   # Magnetosphere, Solar Radiation & HF Comms
 │   ├── planetary_k_index_1m.json               # NOAA SWPC 1-min real-time planetary Kp index
 │   ├── solar_xray_flux_6h.json                 # NOAA GOES-Primary high-cadence X-ray flux (solar flares)
-│   └── noaa_space_weather_scales.json          # G-scale (geomagnetic), S-scale (radiation), R-scale (radio)
+│   ├── noaa_space_weather_scales.json          # G-scale (geomagnetic), S-scale (radiation), R-scale (radio)
+│   └── noaa_live_snapshot.json                 # Latest Kp + GOES X-ray poll
 │
 ├── geospatial_hazards\              # Topography, Cryosphere, Hazard Logs & Geometries
 │   ├── bharati_blizzard_log_imd.json           # IMD ground-truth log of all 9 blizzard events (2017-2018)

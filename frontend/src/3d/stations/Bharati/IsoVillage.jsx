@@ -42,19 +42,19 @@ export default function IsoVillage() {
   return (
     <InteractiveAsset id="CONTAINERS">
       <group>
-        <IsoBox x={-31} z={-16} color="#d25a24" />
-        <IsoBox x={-31} z={-19.1} color="#c94c18" />
-        <IsoBox x={-31} z={-22.2} color="#e8e2d4" stacked />
-        <IsoBox x={-38} z={-16} color="#1d4f8a" />
-        <IsoBox x={-38} z={-19.1} color="#d25a24" stacked />
-        <IsoBox x={-24.5} z={-20.5} color="#c9b58a" rotation={0.14} />
-        <IsoBox x={-45} z={-14} color="#d25a24" rotation={-0.1} />
-        <IsoBox x={-38} z={-24.4} color="#1d4f8a" />
-        <IsoBox x={-24.5} z={-16} color="#e8e2d4" />
-        <IsoBox x={34} z={-20} color="#d25a24" />
-        <IsoBox x={34} z={-23.1} color="#e8e2d4" />
-        <IsoBox x={40.6} z={-20} color="#1d4f8a" stacked />
-        <IsoBox x={40.6} z={-23.1} color="#c9b58a" />
+        <IsoBox x={-31} z={-16} color="#f05a14" />
+        <IsoBox x={-31} z={-19.1} color="#e84810" />
+        <IsoBox x={-31} z={-22.2} color="#f2c14b" stacked />
+        <IsoBox x={-38} z={-16} color="#0b5cad" />
+        <IsoBox x={-38} z={-19.1} color="#f05a14" stacked />
+        <IsoBox x={-24.5} z={-20.5} color="#138a6a" rotation={0.14} />
+        <IsoBox x={-45} z={-14} color="#f05a14" rotation={-0.1} />
+        <IsoBox x={-38} z={-24.4} color="#0b5cad" />
+        <IsoBox x={-24.5} z={-16} color="#f2c14b" />
+        <IsoBox x={34} z={-20} color="#f05a14" />
+        <IsoBox x={34} z={-23.1} color="#f2c14b" />
+        <IsoBox x={40.6} z={-20} color="#0b5cad" stacked />
+        <IsoBox x={40.6} z={-23.1} color="#138a6a" />
       </group>
     </InteractiveAsset>
   )

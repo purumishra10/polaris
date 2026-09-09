@@ -47,39 +47,83 @@ export function maitriHeightAt(x, z) {
   const ridgeN = Math.max(0, 4.5 - Math.hypot(x + 55, z + 48) * 0.06)
   const ridgeS = Math.max(0, 3.8 - Math.hypot(x - 50, z - 42) * 0.055)
 
-  let h = 0.15 + hills + ridgeN * 0.4 + ridgeS * 0.35 - lakeDip - padFlat
+  const detail = (noise(x * 0.24, z * 0.24) - 0.5) * 0.22
 
-  if (radial > 95) {
-    h = -0.8 + noise(x * 0.025, z * 0.025) * 0.5
-  } else if (radial > 75) {
-    const t = (radial - 75) / 20
-    h = h * (1 - t) + (-0.5) * t
+  let h = 0.15 + hills + ridgeN * 0.4 + ridgeS * 0.35 - lakeDip - padFlat + detail
+
+  // Schirmacher Oasis: a rocky strip with the continental ice sheet rising
+  // behind it. Past the oasis the surface becomes ice and climbs with distance.
+  const iceSheet = () => {
+    const rise = Math.max(0, radial - 110)
+    const swell =
+      noise(x * 0.012 + 4, z * 0.012) * 7 * Math.min(1, rise / 260) +
+      noise(x * 0.05, z * 0.05) * 0.9
+    return -0.8 + rise * 0.05 + swell
+  }
+
+  if (radial > 110) {
+    h = iceSheet()
+  } else if (radial > 78) {
+    const t = (radial - 78) / 32
+    const s = t * t * (3 - 2 * t)
+    h = h * (1 - s) + iceSheet() * s
   }
 
   return h
 }
 
+export const MAITRI_ICE_EDGE = 96
+
 export function maitriWaterLevel() {
   return maitriHeightAt(MAITRI_LAKE.x, MAITRI_LAKE.z) + 0.6
 }
 
+function mix3(a, b, t) {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]
+}
+
+function maitriSlope(x, z) {
+  const e = 0.8
+  const dx = maitriHeightAt(x + e, z) - maitriHeightAt(x - e, z)
+  const dz = maitriHeightAt(x, z + e) - maitriHeightAt(x, z - e)
+  return 1 - (2 * e) / Math.hypot(dx, 2 * e, dz)
+}
+
+const ICE = [0.9, 0.94, 0.97]
+const OASIS_ROCK = [0.32, 0.29, 0.26]
+const M_SNOW = [0.9, 0.93, 0.95]
+
 export function maitriTerrainColor(x, z, y) {
+  const radial = Math.hypot(x, z)
   const lakeDist = Math.hypot(x - MAITRI_LAKE.x, z - MAITRI_LAKE.z)
   if (lakeDist < MAITRI_LAKE.radius * 0.92 && y < 0.3) {
     return [0.72, 0.82, 0.86]
   }
 
-  const snowNoise = noise(x * 0.055 + 3, z * 0.055 + 7)
-  const snowPatch =
-    snowNoise > 0.62 ||
-    (snowNoise > 0.48 && noise(x * 0.12, z * 0.12) > 0.55)
+  const fine = noise(x * 0.16, z * 0.16)
+  const iceTint = [
+    ICE[0] - fine * 0.05,
+    ICE[1] - fine * 0.035,
+    ICE[2] - fine * 0.015,
+  ]
 
-  if (snowPatch && y > -0.2) {
-    return [0.88, 0.91, 0.92]
+  // Continental ice beyond the oasis
+  if (radial > MAITRI_ICE_EDGE + 30) return iceTint
+
+  const slope = maitriSlope(x, z)
+  const snowNoise = noise(x * 0.055 + 3, z * 0.055 + 7)
+  let snowAmount =
+    Math.max(0, Math.min(1, (snowNoise - 0.4) * 2.4)) * (1 - Math.min(1, slope * 3))
+
+  // Blend into the ice sheet at the oasis edge
+  if (radial > MAITRI_ICE_EDGE) {
+    snowAmount = Math.max(snowAmount, (radial - MAITRI_ICE_EDGE) / 30)
   }
 
-  const grit = noise(x * 0.14, z * 0.14)
-  return [0.38 + grit * 0.1, 0.34 + grit * 0.07, 0.3 + grit * 0.05]
+  const grit = fine * 0.12
+  const rock = [OASIS_ROCK[0] + grit, OASIS_ROCK[1] + grit * 0.7, OASIS_ROCK[2] + grit * 0.5]
+  const snow = [M_SNOW[0] - fine * 0.04, M_SNOW[1] - fine * 0.03, M_SNOW[2] - fine * 0.02]
+  return mix3(rock, snow, Math.pow(snowAmount, 0.8))
 }
 
 export { hash, noise }

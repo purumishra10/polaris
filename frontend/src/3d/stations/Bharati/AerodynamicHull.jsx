@@ -8,6 +8,7 @@ import {
   hullUnderside,
   glassDay,
   pileSteel,
+  indiaSaffron,
 } from './materials'
 
 const LENGTH = 53.2
@@ -45,11 +46,8 @@ function HullShell() {
       <mesh geometry={geometry} castShadow receiveShadow>
         <meshPhysicalMaterial
           {...hullMetal}
-          color="#c5ced4"
-          metalness={0.78}
-          roughness={0.32}
-          clearcoat={0.22}
-          clearcoatRoughness={0.48}
+          clearcoat={0.35}
+          clearcoatRoughness={0.38}
           flatShading
         />
       </mesh>
@@ -93,11 +91,11 @@ function WindowBands() {
         <group key={x}>
           <mesh position={[x, 12.35, 15.24]}>
             <boxGeometry args={[0.07, 2.5, 0.05]} />
-            <meshStandardMaterial color="#b7c2c8" metalness={0.82} roughness={0.24} />
+            <meshStandardMaterial color="#c8d0d4" metalness={0.84} roughness={0.22} />
           </mesh>
           <mesh position={[x, 8.85, 15.24]}>
             <boxGeometry args={[0.07, 2.12, 0.05]} />
-            <meshStandardMaterial color="#b7c2c8" metalness={0.82} roughness={0.24} />
+            <meshStandardMaterial color="#c8d0d4" metalness={0.84} roughness={0.22} />
           </mesh>
           <mesh position={[x, 10.3, 15.2]}>
             <boxGeometry args={[0.06, 9.4, 0.04]} />
@@ -113,6 +111,14 @@ function WindowBands() {
       <mesh position={[0, 10.6, 15.22]}>
         <boxGeometry args={[46, 0.08, 0.06]} />
         <meshStandardMaterial {...hullTrim} />
+      </mesh>
+      <mesh position={[0, 6.35, 15.18]}>
+        <boxGeometry args={[46.4, 0.22, 0.08]} />
+        <meshStandardMaterial {...indiaSaffron} />
+      </mesh>
+      <mesh position={[0, 6.35, -15.18]}>
+        <boxGeometry args={[42.4, 0.22, 0.08]} />
+        <meshStandardMaterial {...indiaSaffron} />
       </mesh>
 
       <mesh position={[26.55, 10.6, 0]} rotation={[0, 0, -0.26]}>
@@ -134,8 +140,8 @@ function RecessedEntrance() {
         <boxGeometry args={[1.7, 3.1, 0.12]} />
         <meshStandardMaterial
           color="#101418"
-          emissive="#c9a56a"
-          emissiveIntensity={0.18}
+          emissive="#1a2830"
+          emissiveIntensity={0.12}
         />
       </mesh>
       {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -166,11 +172,11 @@ function RoofPlant() {
       <group position={[-7.5, 15.55, 0]}>
         <mesh castShadow>
           <boxGeometry args={[16.5, 1.2, 8.4]} />
-          <meshStandardMaterial color="#8b969e" metalness={0.7} roughness={0.4} />
+          <meshStandardMaterial color="#e8eef2" metalness={0.82} roughness={0.22} />
         </mesh>
         <mesh position={[0, 0.78, 0]}>
           <boxGeometry args={[11, 0.32, 5.8]} />
-          <meshStandardMaterial color="#5c676e" metalness={0.65} roughness={0.4} />
+          <meshStandardMaterial color="#c5d0d6" metalness={0.78} roughness={0.28} />
         </mesh>
         {[-4.2, 0, 3.8].map((x) => (
           <mesh key={x} position={[x, 1.35, 1.4]}>
@@ -257,11 +263,11 @@ function PileField() {
 
 function UnderHullModules() {
   const modules = [
-    [-22, -4.2, '#2a3035'],
-    [-22, 0, '#1f252a'],
-    [-22, 4.2, '#32383d'],
-    [-16.2, -4.2, '#262c31'],
-    [-16.2, 4.2, '#30363b'],
+    [-22, -4.2, '#f05a14'],
+    [-22, 0, '#0b5cad'],
+    [-22, 4.2, '#f05a14'],
+    [-16.2, -4.2, '#0b5cad'],
+    [-16.2, 4.2, '#f2c14b'],
   ]
 
   return (

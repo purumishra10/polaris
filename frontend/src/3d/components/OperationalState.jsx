@@ -1,6 +1,22 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { useFrame } from '@react-three/fiber'
 
 import { heightAt } from '../environment/terrainHeight'
+import ResupplyAlarm from './ResupplyAlarm'
+
+// Eases a scalar toward `goal` each frame; returns the ref holding the value.
+function useEased(goal, rate = 1.4) {
+  const value = useRef(goal)
+  useFrame((_, delta) => {
+    const diff = goal - value.current
+    if (Math.abs(diff) < 1e-4) {
+      value.current = goal
+      return
+    }
+    value.current += diff * (1 - Math.exp(-Math.min(delta, 0.1) * rate))
+  })
+  return value
+}
 
 function severityColor(severity) {
   if (severity === 'CRITICAL') return '#ff4055'
@@ -37,22 +53,48 @@ function LockdownMarkers({ station }) {
   )
 }
 
-function FuelLevel({ level, station }) {
-  const normalized = Math.max(
-    0,
-    Math.min(1, level / 600000),
-  )
+function FuelLevel({ level, station, scarcity = 0 }) {
+  const normalized = Math.max(0, Math.min(1, level / 600000))
+  // Ease the fill so a resupply-delay injection drains visibly, not instantly
+  const eased = useEased(normalized, 0.9)
+  const fill = useRef()
+  const fillMat = useRef()
 
-  if (station === 'BHARATI') {
+  const isBharati = station === 'BHARATI'
+  const height = isBharati ? 3.4 : 2.8
+  const radius = isBharati ? 1.52 : 0.7 * 0.85
+
+  useFrame(({ clock }) => {
+    if (!fill.current) return
+    const h = Math.max(0.03, eased.current * height)
+    fill.current.scale.y = h
+    fill.current.position.y = isBharati ? h / 2 : -height / 2 + h / 2
+    if (fillMat.current) {
+      // Fuel glow shifts from cyan to warning amber/red as reserves fall
+      const warn = Math.max(0, Math.min(1, scarcity))
+      const pulse = 0.5 + 0.5 * Math.sin(clock.elapsedTime * 3.2)
+      fillMat.current.color.setRGB(
+        0.34 + warn * 0.66,
+        0.73 - warn * 0.5,
+        0.85 - warn * 0.6,
+      )
+      fillMat.current.emissive.setRGB(
+        0.12 + warn * 0.85,
+        0.55 - warn * 0.4,
+        0.68 - warn * 0.55,
+      )
+      fillMat.current.emissiveIntensity = 1.5 + warn * (1.2 + pulse * 1.6)
+    }
+  })
+
+  if (isBharati) {
     const ground = heightAt(-52, -28)
-    const height = 3.4
-    const fillH = Math.max(0.04, normalized * height)
-
     return (
       <group position={[-52, ground, -28]}>
-        <mesh position={[0, fillH / 2, 0]}>
-          <cylinderGeometry args={[1.52, 1.52, fillH, 24]} />
+        <mesh ref={fill} position={[0, height / 2, 0]}>
+          <cylinderGeometry args={[radius, radius, 1, 24]} />
           <meshStandardMaterial
+            ref={fillMat}
             color="#56b9d8"
             emissive="#1e8cad"
             emissiveIntensity={1.6}
@@ -64,14 +106,10 @@ function FuelLevel({ level, station }) {
     )
   }
 
-  const position = [-18, 1.5, 1.5]
-  const height = 2.8
-  const radius = 0.7
-
   return (
-    <group position={position}>
+    <group position={[-18, 1.5, 1.5]}>
       <mesh>
-        <cylinderGeometry args={[radius, radius, height, 32]} />
+        <cylinderGeometry args={[0.7, 0.7, height, 32]} />
         <meshStandardMaterial
           color="#18232a"
           metalness={0.8}
@@ -79,19 +117,10 @@ function FuelLevel({ level, station }) {
         />
       </mesh>
 
-      <mesh
-        position={[0, -height / 2 + normalized * (height / 2), 0]}
-      >
-        <cylinderGeometry
-          args={[
-            radius * 0.85,
-            radius * 0.85,
-            Math.max(0.03, normalized * height),
-            24,
-          ]}
-        />
-
+      <mesh ref={fill} position={[0, 0, 0]}>
+        <cylinderGeometry args={[radius, radius, 1, 24]} />
         <meshStandardMaterial
+          ref={fillMat}
           color="#56b9d8"
           emissive="#1e8cad"
           emissiveIntensity={1.5}
@@ -144,6 +173,15 @@ export default function OperationalState({
     [severity],
   )
 
+  const days = telemetry?.fuel?.days_of_autonomy ?? 999
+  const scarcityGoal = Math.max(0, Math.min(1, (30 - days) / 18))
+  const scarcity = useEased(scarcityGoal, 1.1)
+  const [alarm, setAlarm] = useState(scarcityGoal)
+  useFrame(() => {
+    if (Math.abs(scarcity.current - alarm) > 0.01) setAlarm(scarcity.current)
+    else if (scarcity.current === 0 && alarm !== 0) setAlarm(0)
+  })
+
   if (!telemetry) return null
 
   const beaconY = station === 'BHARATI' ? 17.2 : 7.5
@@ -169,18 +207,22 @@ export default function OperationalState({
       />
 
       <FuelLevel
-        level={telemetry.fuel.tank_level_liters}
+        level={telemetry.fuel?.tank_level_liters ?? 0}
         station={station}
+        scarcity={alarm}
       />
+
+      <ResupplyAlarm station={station} intensity={alarm} />
 
       <GeneratorState
-        active={telemetry.controls.aux_generator_active}
+        active={Boolean(telemetry.controls?.aux_generator_active)}
         station={station}
       />
 
-      {telemetry.controls.hatch_lockdown && (
+      {telemetry.controls.hatch_lockdown ||
+      telemetry.lockouts?.outdoor === 'LOCKED' ? (
         <LockdownMarkers station={station} />
-      )}
+      ) : null}
     </group>
   )
 }

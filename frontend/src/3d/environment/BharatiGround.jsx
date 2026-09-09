@@ -10,32 +10,60 @@ import {
   SEA_LEVEL,
   hash,
 } from './terrainHeight'
+import {
+  displacedPlane,
+  displacedRing,
+  surfaceNormal,
+  alignToNormal,
+} from './terrainMesh'
 
-function DisplacedField() {
-  const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(520, 420, 180, 140)
-    const pos = geo.attributes.position
-    const colors = new Float32Array(pos.count * 3)
+const INNER_SIZE = 300
+const FAR_RADIUS = 3800
 
-    for (let i = 0; i < pos.count; i += 1) {
-      const x = pos.getX(i)
-      const z = pos.getY(i)
-      const y = heightAt(x, z)
-      pos.setZ(i, y)
-      const [r, g, b] = terrainColor(x, z, y)
-      colors[i * 3] = r
-      colors[i * 3 + 1] = g
-      colors[i * 3 + 2] = b
-    }
-
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    geo.computeVertexNormals()
-    return geo
-  }, [])
-
+/** High-detail island terrain around the station. */
+function IslandField() {
+  const geometry = useMemo(
+    () => displacedPlane(INNER_SIZE, 220, heightAt, terrainColor),
+    [],
+  )
   return (
     <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <meshStandardMaterial vertexColors roughness={0.96} metalness={0.02} />
+      <meshStandardMaterial vertexColors roughness={0.94} metalness={0.02} />
+    </mesh>
+  )
+}
+
+/** Coarse sea floor stretching to the horizon so there is never an edge. */
+function FarField() {
+  const geometry = useMemo(
+    () =>
+      displacedRing(140, FAR_RADIUS, 160, 36, heightAt, terrainColor, () => -0.15),
+    [],
+  )
+  return (
+    <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]}>
+      <meshStandardMaterial vertexColors roughness={0.95} metalness={0.02} />
+    </mesh>
+  )
+}
+
+/** Reflective open-water surface from the shoreline out past the fog line. */
+function SeaSurface() {
+  return (
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, SEA_LEVEL + 0.02, 0]}
+      receiveShadow
+    >
+      <ringGeometry args={[100, FAR_RADIUS, 128, 1]} />
+      <meshStandardMaterial
+        color="#1f4453"
+        roughness={0.2}
+        metalness={0.6}
+        envMapIntensity={1.3}
+        transparent
+        opacity={0.96}
+      />
     </mesh>
   )
 }
@@ -50,8 +78,8 @@ function MeltPond() {
           <circleGeometry args={[POND.radius * 0.92, 48]} />
           <meshStandardMaterial
             color="#2f7f93"
-            roughness={0.16}
-            metalness={0.38}
+            roughness={0.14}
+            metalness={0.42}
           />
         </mesh>
         <mesh
@@ -62,7 +90,7 @@ function MeltPond() {
           <circleGeometry args={[POND.radius * 0.92, 40]} />
           <meshPhysicalMaterial
             color="#8fd4e2"
-            roughness={0.08}
+            roughness={0.06}
             metalness={0.15}
             transparent
             opacity={0.55}
@@ -93,7 +121,7 @@ function PackedTracks() {
   return (
     <group>
       {tracks.map(([x, z, rot, w, len], i) => {
-        const y = heightAt(x, z) + 0.04
+        const y = heightAt(x, z) + 0.05
         return (
           <mesh
             key={i}
@@ -109,70 +137,146 @@ function PackedTracks() {
   )
 }
 
+/** Boulders seated into the slope (on land only, aligned to the surface). */
 function RockScatter() {
   const meshRef = useRef()
-  const count = 90
+  const count = 170
   const dummy = useMemo(() => new THREE.Object3D(), [])
+  const normal = useMemo(() => new THREE.Vector3(), [])
 
   useLayoutEffect(() => {
     if (!meshRef.current) return
     let placed = 0
     let i = 0
-    while (placed < count && i < 500) {
+    while (placed < count && i < 1400) {
       i += 1
-      const x = ((i * 47) % 360) - 180
-      const z = ((i * 89) % 280) - 140
-      if (Math.hypot(x, z) < 22) continue
+      const angle = hash(i * 7.3) * Math.PI * 2
+      const radius = 24 + Math.sqrt(hash(i * 3.1)) * 94
+      const x = Math.cos(angle) * radius
+      const z = Math.sin(angle) * radius
+      if (Math.hypot(x - POND.x, z - POND.z) < POND.radius + 2) continue
       const surface = heightAt(x, z)
-      if (surface < SEA_LEVEL + 0.6) continue
-      const s = 0.55 + hash(i) * 1.8
-      dummy.position.set(x, surface + s * 0.22, z)
-      dummy.scale.set(s * 1.5, s * 0.38, s * 1.1)
-      dummy.rotation.set(hash(i * 2) * 0.4, hash(i * 3) * Math.PI, hash(i * 5) * 0.3)
+      if (surface < SEA_LEVEL + 2.2) continue
+
+      const s = 0.45 + Math.pow(hash(i), 2.2) * 2.6
+      surfaceNormal(heightAt, x, z, 0.9, normal)
+      dummy.position.set(x, surface - s * 0.14, z)
+      dummy.scale.set(s * 1.4, s * 0.62, s * 1.1)
+      alignToNormal(dummy, normal, hash(i * 3) * Math.PI * 2)
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(placed, dummy.matrix)
       placed += 1
     }
     meshRef.current.count = placed
     meshRef.current.instanceMatrix.needsUpdate = true
+  }, [dummy, normal])
+
+  return (
+    <instancedMesh ref={meshRef} args={[null, null, count]} castShadow receiveShadow>
+      <dodecahedronGeometry args={[1, 1]} />
+      <meshStandardMaterial color="#4a3f36" roughness={0.97} flatShading />
+    </instancedMesh>
+  )
+}
+
+/** Broken sea ice drifting just off the coast. */
+function PackIce() {
+  const meshRef = useRef()
+  const count = 110
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+
+  useLayoutEffect(() => {
+    if (!meshRef.current) return
+    for (let i = 0; i < count; i += 1) {
+      const angle = hash(i * 11.7 + 1) * Math.PI * 2
+      const radius = 128 + Math.pow(hash(i * 5.3 + 2), 1.6) * 260
+      const x = Math.cos(angle) * radius
+      const z = Math.sin(angle) * radius
+      const w = 3 + hash(i * 2.9) * 20
+      const d = 3 + hash(i * 4.1) * 15
+      dummy.position.set(x, SEA_LEVEL + 0.12, z)
+      dummy.scale.set(w, 0.55 + hash(i) * 0.5, d)
+      dummy.rotation.set(0, hash(i * 6.7) * Math.PI, 0)
+      dummy.updateMatrix()
+      meshRef.current.setMatrixAt(i, dummy.matrix)
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true
   }, [dummy])
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]} castShadow receiveShadow>
-      <dodecahedronGeometry args={[1, 0]} />
-      <meshStandardMaterial color="#6a5848" roughness={0.98} flatShading />
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#e9f0f4" roughness={0.82} />
     </instancedMesh>
   )
 }
 
 function Icebergs() {
-  const bergs = [
-    [148, 110, 18, 9, 22],
-    [162, -40, 14, 11, 16],
-    [-130, 128, 20, 8, 18],
-    [120, -132, 11, 7, 14],
-    [-155, -80, 16, 10, 20],
-    [95, 155, 9, 6, 12],
-    [-90, 170, 13, 8, 15],
-  ]
+  const bergs = useMemo(() => {
+    const list = []
+    for (let i = 0; i < 16; i += 1) {
+      const angle = hash(i * 13.1 + 5) * Math.PI * 2
+      const radius = 170 + Math.pow(hash(i * 7.7 + 3), 1.4) * 1150
+      const size = 10 + hash(i * 3.3) * 22 + radius * 0.012
+      list.push({
+        x: Math.cos(angle) * radius,
+        z: Math.sin(angle) * radius,
+        sx: size * (0.8 + hash(i * 1.7) * 0.7),
+        sy: size * (0.35 + hash(i * 2.3) * 0.45),
+        sz: size * (0.7 + hash(i * 4.9) * 0.8),
+        rot: hash(i * 9.1) * Math.PI,
+      })
+    }
+    return list
+  }, [])
 
   return (
     <group>
-      {bergs.map(([x, z, sx, sy, sz], i) => {
-        const y = SEA_LEVEL + sy * 0.28
-        return (
-          <group key={i} position={[x, y, z]} rotation={[0, i * 0.7, 0]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[sx, sy, sz]} />
-              <meshStandardMaterial color="#e8eef2" roughness={0.72} />
-            </mesh>
-            <mesh position={[sx * 0.18, sy * 0.22, -sz * 0.12]} castShadow>
-              <octahedronGeometry args={[Math.min(sx, sz) * 0.42, 0]} />
-              <meshStandardMaterial color="#d5e4ea" roughness={0.55} />
-            </mesh>
-          </group>
-        )
-      })}
+      {bergs.map((b, i) => (
+        <mesh
+          key={i}
+          position={[b.x, SEA_LEVEL + b.sy * 0.22, b.z]}
+          scale={[b.sx, b.sy, b.sz]}
+          rotation={[hash(i) * 0.12, b.rot, hash(i * 2) * 0.1]}
+          castShadow
+          receiveShadow
+        >
+          <dodecahedronGeometry args={[1, 1]} />
+          <meshStandardMaterial color="#e6edf2" roughness={0.7} flatShading />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+/** Continental ice sheet silhouetted on the horizon behind the station. */
+function IceSheetHorizon() {
+  const domes = useMemo(() => {
+    const list = []
+    for (let i = 0; i < 18; i += 1) {
+      const t = i / 17
+      const angle = THREE.MathUtils.degToRad(115 + t * 235) + (hash(i * 3.7) - 0.5) * 0.12
+      const radius = 850 + hash(i * 5.1) * 750
+      const rx = 260 + hash(i * 2.1) * 320
+      const ry = 55 + hash(i * 4.3) * 110 + (radius - 850) * 0.04
+      const rz = 240 + hash(i * 6.9) * 300
+      list.push({ x: Math.cos(angle) * radius, z: Math.sin(angle) * radius, rx, ry, rz })
+    }
+    return list
+  }, [])
+
+  return (
+    <group>
+      {domes.map((d, i) => (
+        <mesh
+          key={i}
+          position={[d.x, SEA_LEVEL - d.ry * 0.22, d.z]}
+          scale={[d.rx, d.ry, d.rz]}
+        >
+          <sphereGeometry args={[1, 28, 18]} />
+          <meshStandardMaterial color="#e6eef5" roughness={0.96} />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -187,11 +291,15 @@ export default function BharatiGround() {
         store.setCameraPreset('droneAerial')
       }}
     >
-      <DisplacedField />
+      <IslandField />
+      <FarField />
+      <SeaSurface />
       <MeltPond />
       <PackedTracks />
       <RockScatter />
+      <PackIce />
       <Icebergs />
+      <IceSheetHorizon />
     </group>
   )
 }

@@ -1,9 +1,46 @@
 import { create } from 'zustand'
 import {
-  connectTelemetrySocket,
+  applyControls as apiApplyControls,
   injectScenario as apiInjectScenario,
   switchStation as apiSwitchStation,
+  replayAug2018 as apiReplayAug2018,
+  setClock as apiSetClock,
+  liveNow as apiLiveNow,
+  updateStationControls as apiUpdateControls,
 } from '../api/telemetry'
+import { actionToControls } from '../lib/climateLook'
+import {
+  applyReplaySnapshot,
+  clearReplay,
+  findReplayPreset,
+  REPLAY_PRESETS,
+} from '../lib/replayCatalog'
+import {
+  pushSample,
+  seedLiveSeries,
+  seedStormSeries,
+  applyLiveDrift,
+} from '../lib/telemetrySeries'
+import { SOP, applyVoyageOverlay, opsDate } from '../ops/decisions'
+import { applyPlantDoctrine } from '../ops/plantDoctrine'
+import { exportSitrep } from '../ops/exportSitrep'
+
+function decorateStation(telemetry, station, plantMode, delayDays) {
+  const date = opsDate(telemetry)
+  return applyVoyageOverlay(
+    applyPlantDoctrine(telemetry, station, plantMode, date),
+    station,
+    date,
+    delayDays,
+  )
+}
+
+function decoratePair(map, plantMode, delayDays) {
+  return {
+    BHARATI: decorateStation(map.BHARATI, 'BHARATI', plantMode, delayDays),
+    MAITRI: decorateStation(map.MAITRI, 'MAITRI', plantMode, delayDays),
+  }
+}
 
 const createTelemetry = (station) => ({
   station_id: station,
@@ -57,6 +94,40 @@ const createTelemetry = (station) => ({
     severity: 'NOMINAL',
     prescribed_actions: [],
   },
+
+  replay: {
+    active: false,
+    scenario_id: null,
+    clock: null,
+    citation: null,
+    source_type: null,
+    occupancy: null,
+    note: null,
+    mode: 'LIVE',
+    polar: null,
+    season: null,
+    voyage_air: null,
+    voyage_sea: null,
+    isolation: null,
+    hazards: [],
+    facts: [],
+    wind_tag: null,
+    temp_tag: null,
+  },
+
+  lockouts: {
+    outdoor: 'OPEN',
+    heli: 'OPEN',
+    convoy: 'OPEN',
+    field: 'OPEN',
+    reasons: [],
+  },
+
+  occupancy: station === 'MAITRI' ? 25 : 47,
+  plant: {
+    mode: 'CURRENT',
+    tag: station === 'MAITRI' ? 'SYNTHETIC · occupancy AL/03' : 'SYNTHETIC · occupancy AL/02',
+  },
 })
 
 const createStationTelemetry = () => ({
@@ -64,14 +135,92 @@ const createStationTelemetry = () => ({
   MAITRI: createTelemetry('MAITRI'),
 })
 
-export const usePolarisStore = create((set) => ({
+const seedAllSeries = (telemetry, mode = 'live') => ({
+  BHARATI:
+    mode === 'storm'
+      ? seedStormSeries(telemetry.BHARATI)
+      : seedLiveSeries('BHARATI', telemetry.BHARATI),
+  MAITRI:
+    mode === 'storm'
+      ? seedStormSeries(telemetry.MAITRI)
+      : seedLiveSeries('MAITRI', telemetry.MAITRI),
+})
+
+function applyLocalScenario(scenario, current) {
+  if (scenario === 'BLIZZARD_80KT') {
+    return {
+      ...current,
+      ambient: {
+        ...current.ambient,
+        wind_speed_knots: 80,
+        temp_c: Math.min(current.ambient.temp_c ?? -12, -12),
+        solar_flux_w_m2: 12,
+      },
+      lockouts: {
+        ...current.lockouts,
+        outdoor: 'LOCKED',
+        heli: 'LOCKED',
+        field: 'LOCKED',
+      },
+      risk: {
+        ...current.risk,
+        is_anomaly: true,
+        severity: 'CRITICAL',
+        prescribed_actions: [SOP.HATCH, SOP.STOW_SENSORS],
+      },
+    }
+  }
+  if (scenario === 'RESUPPLY_DELAY') {
+    return {
+      ...current,
+      fuel: {
+        ...current.fuel,
+        days_of_autonomy: 12.4,
+        tank_level_liters: 26500,
+      },
+      controls: {
+        ...current.controls,
+        science_instruments_online: false,
+        summer_wing_isolated: true,
+      },
+      risk: {
+        ...current.risk,
+        is_anomaly: true,
+        severity: 'CRITICAL',
+        prescribed_actions: [SOP.SHED_SCIENCE, SOP.ISOLATE_DEPRESSURIZE],
+      },
+    }
+  }
+  if (scenario === 'POLAR_NIGHT') {
+    return {
+      ...current,
+      ambient: {
+        ...current.ambient,
+        solar_flux_w_m2: 0,
+        temp_c: Math.min(current.ambient.temp_c ?? -18, -22),
+      },
+    }
+  }
+  return current
+}
+
+const initialTelemetry = createStationTelemetry()
+
+export const usePolarisStore = create((set, get) => ({
   selectedStation: 'BHARATI',
   selectedSubsystem: null,
+  showTelemetry: true,
   isThermalView: false,
+  linkMode: 'REALTIME',
   cameraPreset: 'droneAerial',
   cameraTick: 0,
   flySource: 'preset',
   flyComplete: true,
+  hudTab: 'live',
+  hoveredSubsystem: null,
+  criticalAck: null,
+  voyageDelayDays: 0,
+  plantMode: 'CURRENT',
 
   connection: {
     status: 'SIMULATION',
@@ -79,7 +228,9 @@ export const usePolarisStore = create((set) => ({
     last_update: null,
   },
 
-  telemetry: createStationTelemetry(),
+  telemetry: initialTelemetry,
+  series: seedAllSeries(initialTelemetry),
+  baseline: initialTelemetry,
 
   setSelectedStation: async (station) => {
     if (!['BHARATI', 'MAITRI'].includes(station)) {
@@ -87,54 +238,75 @@ export const usePolarisStore = create((set) => ({
       return
     }
 
-    const currentStation = usePolarisStore.getState().selectedStation
-
-    if (station === currentStation) {
-      return
-    }
-
     set((state) => ({
-      connection: {
-        ...state.connection,
-        status: 'SWITCHING',
-      },
+      selectedStation: station,
+      selectedSubsystem: null,
+      cameraPreset: station === 'BHARATI' ? 'droneAerial' : 'hero',
+      flySource: 'preset',
+      cameraTick: state.cameraTick + 1,
+      flyComplete: true,
     }))
 
     try {
       await apiSwitchStation(station)
-
-      set((state) => ({
-        selectedStation: station,
-        selectedSubsystem: null,
-        cameraPreset:
-          station === 'BHARATI' ? 'droneAerial' : 'hero',
-        flySource: 'preset',
-        cameraTick: state.cameraTick + 1,
-        flyComplete: true,
-        connection: {
-          ...state.connection,
-          status: 'ONLINE',
-        },
-      }))
-    } catch (error) {
-      console.error('[Twin] Station switch failed', error)
-
-      set((state) => ({
-        connection: {
-          ...state.connection,
-          status: 'OFFLINE',
-        },
-      }))
+    } catch {
+      // Backend may be offline or in fallback mode
     }
   },
 
   setSelectedSubsystem: (subsystem) =>
-    set((state) => ({
-      selectedSubsystem: subsystem,
-      flySource: subsystem ? 'asset' : state.flySource,
-      cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
-      flyComplete: !subsystem,
-    })),
+    set((state) => {
+      if (state.selectedSubsystem === subsystem) return {}
+      return {
+        selectedSubsystem: subsystem,
+        flySource: subsystem ? 'asset' : 'station',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: !subsystem,
+      }
+    }),
+
+  setShowTelemetry: (enabled) =>
+    set({
+      showTelemetry: Boolean(enabled),
+    }),
+
+  setHudTab: (tab) =>
+    set({
+      hudTab: tab,
+    }),
+
+  setHoveredSubsystem: (subsystem) =>
+    set({
+      hoveredSubsystem: subsystem,
+    }),
+
+  ackCritical: (signature) =>
+    set({
+      criticalAck: signature,
+    }),
+
+  tickLive: () =>
+    set((state) => {
+      const station = state.selectedStation
+      const base = state.baseline[station] ?? state.telemetry[station]
+      if (base?.replay?.active) return {}
+      const drifted = decorateStation(
+        applyLiveDrift(base, Date.now()),
+        station,
+        state.plantMode,
+        state.voyageDelayDays,
+      )
+      return {
+        telemetry: {
+          ...state.telemetry,
+          [station]: drifted,
+        },
+        series: {
+          ...state.series,
+          [station]: pushSample(state.series[station], drifted),
+        },
+      }
+    }),
 
   setCameraPreset: (preset) =>
     set((state) => ({
@@ -155,16 +327,165 @@ export const usePolarisStore = create((set) => ({
       isThermalView: enabled,
     }),
 
-  setTelemetry: (station, data) =>
+  toggleThermalView: () =>
+    set((state) => ({
+      isThermalView: !state.isThermalView,
+    })),
+
+  setLinkMode: (mode) =>
+    set({
+      linkMode: mode,
+    }),
+
+  setConnectionStatus: (conn) =>
+    set((state) => ({
+      connection: {
+        ...state.connection,
+        ...conn,
+        last_update: new Date().toISOString(),
+      },
+    })),
+
+  setTelemetryPacket: (packet) => {
+    if (!packet || !packet.station_id) return
+    const station = packet.station_id
+
+    set((state) => {
+      const current = state.telemetry[station]
+      if (current?.replay?.active) {
+        return {
+          connection: {
+            ...state.connection,
+            latency_ms:
+              packet.link_status?.latency_ms || state.connection.latency_ms,
+            last_update: packet.timestamp || new Date().toISOString(),
+          },
+        }
+      }
+
+      const nextBase = decorateStation(
+        {
+          ...(state.baseline[station] ?? current),
+          ...packet,
+          timestamp: packet.timestamp || new Date().toISOString(),
+          replay: current?.replay,
+        },
+        station,
+        state.plantMode,
+        state.voyageDelayDays,
+      )
+      const live = decorateStation(
+        applyLiveDrift(nextBase, Date.now()),
+        station,
+        state.plantMode,
+        state.voyageDelayDays,
+      )
+
+      return {
+        telemetry: {
+          ...state.telemetry,
+          [station]: live,
+        },
+        baseline: {
+          ...state.baseline,
+          [station]: nextBase,
+        },
+        series: {
+          ...state.series,
+          [station]: pushSample(state.series[station], live),
+        },
+        connection: {
+          ...state.connection,
+          latency_ms:
+            packet.link_status?.latency_ms || state.connection.latency_ms,
+          last_update: packet.timestamp || new Date().toISOString(),
+        },
+      }
+    })
+  },
+
+  executeMitigation: async (actionText) => {
+    const station = get().selectedStation
+    const patch = {}
+    if (actionText.includes('Hatch') || actionText.includes('hatch')) {
+      patch.hatch_lockdown = true
+    }
+    if (actionText.includes('Science') || actionText.includes('scientific')) {
+      patch.science_instruments_online = false
+    }
+    if (actionText.includes('Summer') || actionText.includes('summer')) {
+      patch.summer_wing_isolated = true
+    }
+    if (actionText.includes('Generator') || actionText.includes('auxiliary')) {
+      patch.aux_generator_active = true
+    }
+
     set((state) => ({
       telemetry: {
         ...state.telemetry,
         [station]: {
           ...state.telemetry[station],
-          ...data,
+          controls: {
+            ...state.telemetry[station].controls,
+            ...patch,
+          },
         },
       },
-    })),
+    }))
+
+    try {
+      await apiApplyControls(patch)
+    } catch (err) {
+      console.warn(
+        'Backend controls POST failed, operating in optimistic mode:',
+        err,
+      )
+    }
+  },
+
+  triggerScenario: async (scenarioKey) => {
+    try {
+      await get().injectScenario(scenarioKey, 60)
+    } catch (error) {
+      console.error('[Twin] Scenario injection failed', error)
+    }
+  },
+
+  executeAction: async (action) => {
+    const controls = actionToControls(action)
+    if (!controls) {
+      console.warn('[Twin] No actuator mapping for', action)
+      return
+    }
+    try {
+      return await apiUpdateControls(controls)
+    } catch (error) {
+      console.error('[Twin] Control update failed', error)
+      throw error
+    }
+  },
+
+  setTelemetry: (station, data) =>
+    set((state) => {
+      const next = {
+        ...state.telemetry[station],
+        ...data,
+      }
+      return {
+        telemetry: {
+          ...state.telemetry,
+          [station]: next,
+        },
+        baseline: {
+          ...state.baseline,
+          [station]: next,
+        },
+        series: {
+          ...state.series,
+          [station]: pushSample(state.series[station], next),
+        },
+      }
+    }),
 
   updateTelemetry: (station, updater) =>
     set((state) => ({
@@ -174,88 +495,30 @@ export const usePolarisStore = create((set) => ({
       },
     })),
 
-  connectTelemetry: () => {
-    set({
-      connection: {
-        status: 'CONNECTING',
-        latency_ms: 0,
-        last_update: null,
-      },
-    })
-
-    const socket = connectTelemetrySocket({
-      onTelemetry: (data) => {
-        const station = data?.station_id
-
-        if (!station) {
-          console.warn(
-            '[Twin WS] Telemetry missing station_id',
-            data,
-          )
-          return
-        }
-
-        set((state) => ({
-          telemetry: {
-            ...state.telemetry,
-            [station]: {
-              ...state.telemetry[station],
-              ...data,
-            },
-          },
-          connection: {
-            status:
-              data.link_status?.health === 'DEGRADED'
-                ? 'DEGRADED'
-                : 'ONLINE',
-            latency_ms: data.link_status?.latency_ms ?? 0,
-            last_update: data.timestamp ?? null,
-          },
-        }))
-      },
-
-      onOpen: () => {
-        set({
-          connection: {
-            status: 'ONLINE',
-            latency_ms: 0,
-            last_update: null,
-          },
-        })
-
-        console.log('[Twin WS] Connected')
-      },
-
-      onError: () => {
-        set({
-          connection: {
-            status: 'OFFLINE',
-            latency_ms: 0,
-            last_update: null,
-          },
-        })
-      },
-
-      onClose: () => {
-        set((state) => ({
-          connection: {
-            ...state.connection,
-            status: 'OFFLINE',
-          },
-        }))
-
-        console.log('[Twin WS] Disconnected')
-      },
-    })
-
-    return socket
-  },
-
   injectScenario: async (scenario, durationSeconds = 60) => {
     if (scenario === 'NOMINAL') {
-      console.warn(
-        '[Twin] NOMINAL is not a backend scenario and cannot be injected.',
-      )
+      try {
+        await apiLiveNow()
+      } catch {
+        // Backend may not support clock API yet
+      }
+      set((state) => {
+        const reset = decoratePair(
+          {
+            BHARATI: clearReplay(createTelemetry('BHARATI')),
+            MAITRI: clearReplay(createTelemetry('MAITRI')),
+          },
+          state.plantMode,
+          state.voyageDelayDays,
+        )
+        return {
+          telemetry: reset,
+          baseline: reset,
+          series: seedAllSeries(reset),
+          hudTab: state.hudTab,
+          criticalAck: null,
+        }
+      })
       return
     }
 
@@ -270,7 +533,300 @@ export const usePolarisStore = create((set) => ({
       return result
     } catch (error) {
       console.error('[Twin] Scenario injection failed', error)
+      if (
+        scenario === 'BLIZZARD_80KT' ||
+        scenario === 'RESUPPLY_DELAY' ||
+        scenario === 'POLAR_NIGHT'
+      ) {
+        set((state) => {
+          const station = state.selectedStation
+          const next = decorateStation(
+            applyLocalScenario(scenario, state.telemetry[station]),
+            station,
+            state.plantMode,
+            state.voyageDelayDays,
+          )
+          return {
+            telemetry: {
+              ...state.telemetry,
+              [station]: next,
+            },
+            baseline: {
+              ...state.baseline,
+              [station]: next,
+            },
+            series: {
+              ...state.series,
+              [station]:
+                scenario === 'BLIZZARD_80KT'
+                  ? seedStormSeries(next)
+                  : pushSample(state.series[station], next),
+            },
+            hudTab: 'live',
+            criticalAck: null,
+          }
+        })
+        return { local: true, scenario }
+      }
       throw error
+    }
+  },
+
+  replayAug2018: async () => {
+    try {
+      await apiReplayAug2018()
+    } catch {
+      // Fall back to the local replay catalog
+    }
+    const preset = REPLAY_PRESETS[0]
+    set((state) => {
+      const next = decoratePair(
+        {
+          BHARATI: applyReplaySnapshot(
+            state.telemetry.BHARATI,
+            preset.snapshot,
+            'BHARATI',
+          ),
+          MAITRI: applyReplaySnapshot(
+            state.telemetry.MAITRI,
+            preset.snapshot,
+            'MAITRI',
+          ),
+        },
+        state.plantMode,
+        state.voyageDelayDays,
+      )
+      return {
+        selectedStation: 'BHARATI',
+        selectedSubsystem: null,
+        showTelemetry: true,
+        hudTab: 'live',
+        cameraPreset: 'droneAerial',
+        flySource: 'preset',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: true,
+        telemetry: next,
+        baseline: next,
+        series: seedAllSeries(next, 'storm'),
+        criticalAck: null,
+      }
+    })
+  },
+
+  setClock: async (clock) => {
+    const preset = findReplayPreset(clock)
+
+    try {
+      await apiSetClock(clock)
+    } catch {
+      // Fall back to local replay catalog
+    }
+
+    if (preset) {
+      set((state) => {
+        const next = decoratePair(
+          {
+            BHARATI: applyReplaySnapshot(
+              state.telemetry.BHARATI,
+              preset.snapshot,
+              'BHARATI',
+            ),
+            MAITRI: applyReplaySnapshot(
+              state.telemetry.MAITRI,
+              preset.snapshot,
+              'MAITRI',
+            ),
+          },
+          state.plantMode,
+          state.voyageDelayDays,
+        )
+        return {
+          selectedStation: 'BHARATI',
+          selectedSubsystem: null,
+          showTelemetry: true,
+          hudTab: 'live',
+          cameraPreset: 'droneAerial',
+          flySource: 'preset',
+          cameraTick: state.cameraTick + 1,
+          flyComplete: true,
+          telemetry: next,
+          baseline: next,
+          series: seedAllSeries(next, 'storm'),
+          criticalAck: null,
+        }
+      })
+      return preset
+    }
+
+    console.warn('[Twin] No local replay preset for clock:', clock)
+    return null
+  },
+
+  liveNow: async () => {
+    try {
+      await apiLiveNow()
+    } catch {
+      // Fall back to local reset
+    }
+
+    set((state) => {
+      const reset = decoratePair(
+        {
+          BHARATI: clearReplay(createTelemetry('BHARATI')),
+          MAITRI: clearReplay(createTelemetry('MAITRI')),
+        },
+        state.plantMode,
+        state.voyageDelayDays,
+      )
+      return {
+        telemetry: reset,
+        baseline: reset,
+        series: seedAllSeries(reset),
+        criticalAck: null,
+      }
+    })
+  },
+
+  setVoyageDelay: (days) =>
+    set((state) => {
+      const voyageDelayDays = Math.max(0, Math.min(21, Number(days) || 0))
+      const telemetry = decoratePair(
+        state.telemetry,
+        state.plantMode,
+        voyageDelayDays,
+      )
+      return {
+        voyageDelayDays,
+        telemetry,
+        baseline: telemetry,
+      }
+    }),
+
+  setPlantMode: (mode) =>
+    set((state) => {
+      const plantMode = mode === 'MAITRI_II' ? 'MAITRI_II' : 'CURRENT'
+      let map = state.telemetry
+      if (plantMode === 'CURRENT' && state.plantMode === 'MAITRI_II') {
+        const fresh = createTelemetry('MAITRI')
+        map = {
+          ...map,
+          MAITRI: {
+            ...map.MAITRI,
+            microgrid: fresh.microgrid,
+            fuel: fresh.fuel,
+            confidence: map.MAITRI?.replay?.active
+              ? map.MAITRI.confidence
+              : 'modeled',
+          },
+        }
+      }
+      const telemetry = decoratePair(
+        map,
+        plantMode,
+        state.voyageDelayDays,
+      )
+      return {
+        plantMode,
+        telemetry,
+        baseline: telemetry,
+        series: {
+          ...state.series,
+          MAITRI: pushSample(state.series.MAITRI, telemetry.MAITRI),
+        },
+      }
+    }),
+
+  updateControls: async (controls) => {
+    try {
+      await apiUpdateControls(controls)
+    } catch (error) {
+      console.error('[Twin] Control update failed', error)
+      throw error
+    }
+  },
+
+  applyVoiceAction: async (action) => {
+    if (!action || typeof action !== 'object') return
+    const store = usePolarisStore.getState()
+    const kind = action.type
+
+    if (kind === 'select_station') {
+      await store.setSelectedStation(action.station)
+      return
+    }
+    if (kind === 'select_subsystem') {
+      store.setSelectedSubsystem(action.subsystem)
+      return
+    }
+    if (kind === 'camera_preset') {
+      store.setCameraPreset(action.preset)
+      return
+    }
+    if (kind === 'thermal_view') {
+      store.setThermalView(Boolean(action.enabled))
+      return
+    }
+    if (kind === 'inject_scenario') {
+      await store.injectScenario(action.scenario)
+      return
+    }
+    if (kind === 'set_controls') {
+      await store.updateControls(action.controls ?? {})
+      return
+    }
+    if (kind === 'live_now') {
+      await store.liveNow()
+      return
+    }
+    if (kind === 'replay_2018') {
+      store.replayAug2018()
+      return
+    }
+    if (kind === 'set_clock') {
+      await store.setClock(action.clock)
+      return
+    }
+    if (kind === 'show_telemetry') {
+      store.setShowTelemetry(action.enabled !== false)
+      return
+    }
+    if (kind === 'set_hud_tab') {
+      store.setShowTelemetry(true)
+      store.setHudTab(action.tab || 'live')
+      return
+    }
+    if (kind === 'export_sitrep') {
+      store.setShowTelemetry(true)
+      exportSitrep({
+        station: store.selectedStation,
+        telemetry: store.telemetry[store.selectedStation],
+        delayDays: store.voyageDelayDays,
+        plantMode: store.plantMode,
+      })
+      return
+    }
+    if (kind === 'close_brief') {
+      store.setSelectedSubsystem(null)
+      return
+    }
+    if (kind === 'set_voyage_delay') {
+      store.setVoyageDelay(action.days)
+      store.setShowTelemetry(true)
+      store.setHudTab('map')
+      return
+    }
+    if (kind === 'set_plant_mode') {
+      store.setPlantMode(action.mode)
+      await store.setSelectedStation('MAITRI')
+      store.setHudTab('live')
+    }
+  },
+
+  applyVoiceActions: async (actions) => {
+    if (!Array.isArray(actions) || actions.length === 0) return
+    const store = usePolarisStore.getState()
+    for (const action of actions) {
+      await store.applyVoiceAction(action)
     }
   },
 }))
