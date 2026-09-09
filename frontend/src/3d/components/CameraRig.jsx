@@ -16,7 +16,7 @@ function isUiTarget(target) {
   return Boolean(
     target instanceof Element &&
       target.closest(
-        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .cinematic-brief-rail, .letterbox, .title-slam, .twin-live-chrome, .twin-exit-fullscreen',
+        'button, input, textarea, a, .station-panel, .telemetry-panel, .scenario-panel, .camera-presets, .subsystem-card, .telemetry-toggle, .cinematic-brief, .cinematic-brief-rail, .twin-left-rail, .analysis-desk, .station-analysis-btn, .voice-dock, .letterbox, .title-slam, .twin-live-chrome, .twin-exit-fullscreen',
       ),
   )
 }
@@ -53,7 +53,6 @@ export default function CameraRig() {
   const goalTarget = useRef(new THREE.Vector3(...defaultTarget))
   const panRight = useRef(new THREE.Vector3())
   const panUp = useRef(new THREE.Vector3())
-  const previousSubsystem = useRef(selectedSubsystem)
 
   const apply = () => {
     spherical.current.makeSafe()
@@ -122,6 +121,15 @@ export default function CameraRig() {
       )
       goalTarget.current.set(tx, ty, tz)
       autoSpin.current = false
+      return
+    }
+
+    // Deselect / return home: orbit the station at its centre again.
+    if (flySource === 'station' || !selectedSubsystem) {
+      goalPos.current.set(...defaultPos)
+      goalTarget.current.set(...defaultTarget)
+      autoSpin.current = false
+      announced.current = true
     }
   }, [
     cameraPreset,
@@ -236,20 +244,6 @@ export default function CameraRig() {
       window.removeEventListener('keydown', onKey)
     }
   }, [camera, invalidate, minRadius, maxRadius])
-
-  // Deselecting a component: keep the camera where it is but swing the orbit
-  // pivot back to the station centre, so drags revolve around the station again.
-  useEffect(() => {
-    const was = previousSubsystem.current
-    previousSubsystem.current = selectedSubsystem
-    if (!was || selectedSubsystem) return
-    goalPos.current.copy(camera.position)
-    goalTarget.current.set(...defaultTarget)
-    autoSpin.current = false
-    announced.current = true
-    flying.current = true
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSubsystem])
 
   useFrame((_, delta) => {
     if (autoSpin.current && !dragging.current && !flying.current) {
