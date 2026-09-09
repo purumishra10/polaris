@@ -17,6 +17,16 @@ class StationPhysicsSimulator:
             wind_speed_knots=24.0,
             solar_flux_w_m2=145.0
         )
+        self.live_ambient: dict | None = None
+        self.weather_source = "synthetic"
+
+    def set_live_ambient(self, ambient: dict | None, source: str = "OPEN_METEO_FORECAST") -> None:
+        self.live_ambient = ambient
+        if ambient:
+            self.weather_source = source
+            self.ambient.temp_c = float(ambient["temp_c"])
+            self.ambient.wind_speed_knots = float(ambient["wind_speed_knots"])
+            self.ambient.solar_flux_w_m2 = float(ambient["solar_flux_w_m2"])
 
     def step(self, active_scenario: str | None, dt_seconds: float = 2.0):
         # 1. Environmental Weather Dynamics & Scenario Modifiers
@@ -28,16 +38,29 @@ class StationPhysicsSimulator:
             self.ambient.solar_flux_w_m2 = 0.0
             self.ambient.temp_c = -28.0
             self.ambient.wind_speed_knots += (28.0 - self.ambient.wind_speed_knots) * 0.05
-        elif active_scenario == "RESUPPLY_DELAY":
+        elif active_scenario == "RESUPPLY_DELAY" and not self.live_ambient:
             # Weather normal, fuel artificially drawn down via manual injection hook
             self.ambient.solar_flux_w_m2 = 110.0
             self.ambient.wind_speed_knots += (22.0 - self.ambient.wind_speed_knots) * 0.05
             self.ambient.temp_c += (-14.0 - self.ambient.temp_c) * 0.05
+        elif self.live_ambient:
+            target = self.live_ambient
+            self.ambient.wind_speed_knots += (
+                float(target["wind_speed_knots"]) - self.ambient.wind_speed_knots
+            ) * 0.25
+            self.ambient.temp_c += (
+                float(target["temp_c"]) - self.ambient.temp_c
+            ) * 0.25
+            self.ambient.solar_flux_w_m2 += (
+                float(target["solar_flux_w_m2"]) - self.ambient.solar_flux_w_m2
+            ) * 0.25
+            self.weather_source = "OPEN_METEO_FORECAST"
         else:
             # Nominal relaxation back to baseline
             self.ambient.wind_speed_knots += (24.0 - self.ambient.wind_speed_knots) * 0.08
             self.ambient.temp_c += (-14.2 - self.ambient.temp_c) * 0.08
             self.ambient.solar_flux_w_m2 = 145.0
+            self.weather_source = "synthetic"
 
         # 2. Microgrid Electrical Loads
         essential_load = 180.0

@@ -89,11 +89,9 @@ export function applyPlantDoctrine(telemetry, station, plantMode, date) {
   return {
     ...telemetry,
     occupancy: occ.now,
-    source: 'synthetic',
-    confidence: 'planned',
     plant: {
       mode: 'MAITRI_II',
-      tag: 'PLANNED / SYNTHETIC · Maitri-II brief 25 Jul 2024',
+      tag: 'PLANNED / SYNTHETIC plant · Maitri-II brief 25 Jul 2024',
     },
     controls: {
       ...telemetry.controls,

@@ -89,6 +89,9 @@ class AudioSession:
         self.assistant_speaking = False
         self.barge_in_speech_ms = 0
         self.interrupted = False
+        self.browser_stt = False
+        self.speak_started = 0.0
+        self.ignore_vad_until = 0.0
         self.history: list[dict[str, str]] = []
 
     def add_chunk(self, chunk: bytes) -> None:
@@ -131,6 +134,7 @@ def transcribe(pcm: np.ndarray) -> str:
             transcription = groq_client.audio.transcriptions.create(
                 file=wav_io,
                 model="whisper-large-v3",
+                language="en",
                 prompt=STT_PROMPT,
             )
             text = (transcription.text or "").strip()
@@ -141,6 +145,7 @@ def transcribe(pcm: np.ndarray) -> str:
         pcm_float = pcm.astype(np.float32) / 32768.0
         segments, _ = local_whisper.transcribe(
             pcm_float,
+            language="en",
             vad_filter=True,
             beam_size=5,
             initial_prompt=STT_PROMPT,
@@ -182,6 +187,7 @@ async def speak(websocket: WebSocket, session: AudioSession, text: str) -> None:
     session.assistant_speaking = True
     session.barge_in_speech_ms = 0
     session.interrupted = False
+    session.speak_started = time.time()
     await websocket.send_json(
         {"type": "transcript", "text": text, "final": True, "speaker": "assistant"}
     )
@@ -193,16 +199,22 @@ async def speak(websocket: WebSocket, session: AudioSession, text: str) -> None:
             return
         if audio_bytes:
             await websocket.send_bytes(audio_bytes)
+            return
+        print("[TTS] no audio — client will use local speech")
+        await websocket.send_json({"type": "tts_fallback", "text": text})
     except WebSocketDisconnect:
         session.assistant_speaking = False
     except Exception as exc:
         print(f"[TTS] {exc}")
-        session.assistant_speaking = False
-        if not session.interrupted:
-            try:
-                await websocket.send_json({"type": "status", "message": "listening"})
-            except Exception:
-                pass
+        try:
+            await websocket.send_json({"type": "tts_fallback", "text": text})
+        except Exception:
+            session.assistant_speaking = False
+            if not session.interrupted:
+                try:
+                    await websocket.send_json({"type": "status", "message": "listening"})
+                except Exception:
+                    pass
 
 
 async def run_ops_turn(websocket: WebSocket, session: AudioSession, user_text: str) -> None:
@@ -300,12 +312,34 @@ async def voice_socket(websocket: WebSocket):
                 kind = data.get("type")
                 if kind == "playback_ended":
                     session.assistant_speaking = False
+                    session.speak_started = 0.0
+                    session.reset_after_transcript()
+                    session.silence_ms = 0
+                    session.last_frame_had_speech = False
+                    session.barge_in_speech_ms = 0
                     if not session.interrupted:
                         await websocket.send_json({"type": "status", "message": "listening"})
+                elif kind == "browser_stt":
+                    session.browser_stt = bool(data.get("enabled"))
                 elif kind == "text" and data.get("text"):
+                    session.reset_after_transcript()
+                    session.silence_ms = 0
+                    session.last_frame_had_speech = False
+                    session.ignore_vad_until = time.time() + 1.6
                     await run_ops_turn(websocket, session, str(data["text"]))
 
             now = time.time()
+            if (
+                session.assistant_speaking
+                and session.speak_started
+                and now - session.speak_started > 20
+            ):
+                print("[Voice] speaking timeout — returning to listen")
+                session.assistant_speaking = False
+                session.speak_started = 0.0
+                session.reset_after_transcript()
+                await websocket.send_json({"type": "status", "message": "listening"})
+
             if now - last_check < 0.15:
                 continue
             last_check = now
@@ -333,7 +367,10 @@ async def voice_socket(websocket: WebSocket):
                     session.barge_in_speech_ms = 0
                 continue
 
-            speaking_now = has_speech(pcm, window_ms=300, threshold=550)
+            if now < session.ignore_vad_until:
+                continue
+
+            speaking_now = has_speech(pcm, window_ms=300, threshold=400)
             if speaking_now:
                 session.silence_ms = 0
                 session.last_frame_had_speech = True

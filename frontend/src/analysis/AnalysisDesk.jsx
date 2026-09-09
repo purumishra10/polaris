@@ -228,7 +228,16 @@ export default function AnalysisDesk() {
   )
   const occNow = telemetry?.occupancy ?? facts.winter
   const fuelTag = telemetry?.plant?.tag ?? (replayOn ? 'MODELED' : 'SYNTHETIC')
-  const climateTag = replayOn ? 'IMD / HISTORICAL' : 'SYNTHETIC DRIFT'
+  const src = String(telemetry?.source || '').toUpperCase()
+  const climateTag = replayOn
+    ? 'IMD / HISTORICAL'
+    : src.includes('OPEN_METEO')
+      ? 'OPEN-METEO FORECAST'
+      : src.includes('NASA')
+        ? 'NASA POWER'
+        : src && src !== 'SYNTHETIC'
+          ? src
+          : 'SYNTHETIC DRIFT'
 
   return (
     <section className="analysis-desk">

@@ -2350,6 +2350,25 @@
   letter-spacing: 0.14em;
 }
 
+.voice-meter {
+  margin-top: 8px;
+  height: 3px;
+  background: rgba(129, 175, 190, 0.16);
+  overflow: hidden;
+}
+
+.voice-meter-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background: #5ad0a5;
+}
+
+.voice-hint-live {
+  color: #73d6a7;
+}
+
 .voice-sources {
   display: grid;
   gap: 4px;

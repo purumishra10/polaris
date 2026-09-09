@@ -70,6 +70,13 @@ export function formatSeriesClock(t) {
 
 export function applyLiveDrift(telemetry, now = Date.now()) {
   if (!telemetry || telemetry?.replay?.active) return telemetry
+  const src = String(telemetry.source || '').toUpperCase()
+  if (src && src !== 'SYNTHETIC' && !src.includes('SYNTHETIC')) {
+    return {
+      ...telemetry,
+      timestamp: new Date(now).toISOString(),
+    }
+  }
   const t = now / 1000
   const temp = Number(telemetry.ambient?.temp_c ?? -14)
   const wind = Number(telemetry.ambient?.wind_speed_knots ?? 18)

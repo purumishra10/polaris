@@ -21,6 +21,7 @@ export default function VoiceDock() {
     sources,
     ragMode,
     fallback,
+    micLevel,
     draft,
     setDraft,
     startCall,
@@ -47,12 +48,24 @@ export default function VoiceDock() {
             </div>
           )}
 
+          {connected && (
+            <div className="voice-meter" aria-hidden>
+              <span
+                className="voice-meter-fill"
+                style={{ transform: `scaleX(${Math.min(1, micLevel * 8)})` }}
+              />
+            </div>
+          )}
+
           <div className="voice-transcript">
             {lines.length === 0 && (
               <p className="voice-hint">
                 Give an order: fuel, blizzard, ship +14, Maitri-II, fifth of August,
                 export sitrep. If the sidecar dies I still brief from the desk.
               </p>
+            )}
+            {connected && status === 'listening' && (
+              <p className="voice-hint voice-hint-live">Mic open — speak now.</p>
             )}
             {lines.map((line, index) => (
               <div
