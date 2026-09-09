@@ -255,12 +255,15 @@ export const usePolarisStore = create((set, get) => ({
   },
 
   setSelectedSubsystem: (subsystem) =>
-    set((state) => ({
-      selectedSubsystem: subsystem,
-      flySource: subsystem ? 'asset' : state.flySource,
-      cameraTick: subsystem ? state.cameraTick + 1 : state.cameraTick,
-      flyComplete: !subsystem,
-    })),
+    set((state) => {
+      if (state.selectedSubsystem === subsystem) return {}
+      return {
+        selectedSubsystem: subsystem,
+        flySource: subsystem ? 'asset' : 'station',
+        cameraTick: state.cameraTick + 1,
+        flyComplete: !subsystem,
+      }
+    }),
 
   setShowTelemetry: (enabled) =>
     set({
@@ -371,11 +374,17 @@ export const usePolarisStore = create((set, get) => ({
         state.plantMode,
         state.voyageDelayDays,
       )
+      const live = decorateStation(
+        applyLiveDrift(nextBase, Date.now()),
+        station,
+        state.plantMode,
+        state.voyageDelayDays,
+      )
 
       return {
         telemetry: {
           ...state.telemetry,
-          [station]: nextBase,
+          [station]: live,
         },
         baseline: {
           ...state.baseline,
@@ -383,7 +392,7 @@ export const usePolarisStore = create((set, get) => ({
         },
         series: {
           ...state.series,
-          [station]: pushSample(state.series[station], nextBase),
+          [station]: pushSample(state.series[station], live),
         },
         connection: {
           ...state.connection,

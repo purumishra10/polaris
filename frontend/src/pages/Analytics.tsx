@@ -52,7 +52,21 @@ interface TelemetryHistoryPoint {
   wind_knots: number
 }
 
-const HISTORY_LIMIT = 30
+const HISTORY_LIMIT = 48
+
+function formatLiveClock(at: number) {
+  return new Date(at).toISOString().slice(11, 19)
+}
+
+function paddedExtent(values: number[], minSpan: number, pad = 0.28): [number, number] {
+  const nums = values.filter((value) => Number.isFinite(value))
+  if (!nums.length) return [0, minSpan]
+  const lo = Math.min(...nums)
+  const hi = Math.max(...nums)
+  const span = Math.max(minSpan, hi - lo)
+  const extra = Math.max(span * pad, minSpan * 0.2)
+  return [lo - extra, hi + extra]
+}
 
 export default function Analytics({ onNavigate }: Props) {
   const {
@@ -69,15 +83,12 @@ export default function Analytics({ onNavigate }: Props) {
     if (!t) return
     tickRef.current += 1
 
-    const now = new Date()
-    const timeStr = `${now.getUTCMinutes().toString().padStart(2, '0')}:${now.getUTCSeconds().toString().padStart(2, '0')}`
-
     setHistory((prev) => {
       const nextPoint: TelemetryHistoryPoint = {
         t: tickRef.current,
-        timeStr,
-        internal_temp_c: Number(t.thermal.internal_temp_c.toFixed(1)),
-        ambient_temp_c: Number(t.ambient.temp_c.toFixed(1)),
+        timeStr: formatLiveClock(Date.now()),
+        internal_temp_c: Number(t.thermal.internal_temp_c.toFixed(2)),
+        ambient_temp_c: Number(t.ambient.temp_c.toFixed(2)),
         total_load_kva: Number(t.microgrid.total_load_kva.toFixed(1)),
         essential_load: Number(t.microgrid.essential_load_kva.toFixed(1)),
         science_load: Number(t.microgrid.science_load_kva.toFixed(1)),
@@ -85,15 +96,34 @@ export default function Analytics({ onNavigate }: Props) {
         heat_loss_kw: Number(t.thermal.heat_loss_kw.toFixed(1)),
         chp_thermal_kw: Number(t.thermal.chp_thermal_output_kw.toFixed(1)),
         fuel_level_l: Math.round(t.fuel.tank_level_liters),
-        burn_rate_lph: Number(t.fuel.burn_rate_lph.toFixed(1)),
+        burn_rate_lph: Number(t.fuel.burn_rate_lph.toFixed(2)),
         wind_knots: Number(t.ambient.wind_speed_knots.toFixed(1)),
+      }
+      const last = prev[prev.length - 1]
+      if (
+        last &&
+        last.burn_rate_lph === nextPoint.burn_rate_lph &&
+        last.total_load_kva === nextPoint.total_load_kva &&
+        last.internal_temp_c === nextPoint.internal_temp_c &&
+        last.timeStr === nextPoint.timeStr
+      ) {
+        return prev
       }
       return [...prev, nextPoint].slice(-HISTORY_LIMIT)
     })
-  }, [t?.timestamp])
+  }, [
+    t?.timestamp,
+    t?.fuel?.burn_rate_lph,
+    t?.microgrid?.total_load_kva,
+    t?.thermal?.internal_temp_c,
+    t?.ambient?.temp_c,
+    t?.ambient?.wind_speed_knots,
+  ])
 
-  // Reset history on station switch to prevent mixed plots
+  const prevStation = useRef(selectedStation)
   useEffect(() => {
+    if (prevStation.current === selectedStation) return
+    prevStation.current = selectedStation
     setHistory([])
     tickRef.current = 0
   }, [selectedStation])
@@ -101,6 +131,23 @@ export default function Analytics({ onNavigate }: Props) {
   const daysRemaining = t?.fuel?.days_of_autonomy ?? 150
   const tankCapacity = 600000 // Liters
   const tankPercent = Math.min(100, Math.max(0, ((t?.fuel?.tank_level_liters ?? 500000) / tankCapacity) * 100))
+  const sourceLabel = String(t?.source || 'synthetic').replace(/_/g, ' ')
+  const burnDomain = paddedExtent(history.map((point) => point.burn_rate_lph), 18)
+  const loadCeiling = Math.max(
+    420,
+    ...history.map((point) => point.total_load_kva),
+    Number(t?.microgrid?.total_load_kva ?? 360),
+  )
+  const tempDomain = paddedExtent(
+    [
+      ...history.map((point) => point.internal_temp_c),
+      ...history.map((point) => point.ambient_temp_c),
+      Number(t?.thermal?.internal_temp_c ?? 20),
+      Number(t?.ambient?.temp_c ?? -14),
+      16,
+    ],
+    12,
+  )
 
   return (
     <div className="min-h-screen flex flex-col bg-base-950 text-white">
@@ -121,7 +168,9 @@ export default function Analytics({ onNavigate }: Props) {
 
           <div className="flex items-center gap-2 text-slate-400 text-[11px]">
             <Database size={13} className="text-ice-400" />
-            <span className="px-2 py-0.5 rounded bg-base-800 border border-base-700 text-slate-300">source: synthetic</span>
+            <span className="px-2 py-0.5 rounded bg-base-800 border border-base-700 text-slate-300">
+              source: {sourceLabel}
+            </span>
             <span className="px-2 py-0.5 rounded bg-base-800 border border-base-700 text-slate-300">confidence: modeled</span>
             <span className="px-2 py-0.5 rounded bg-base-800 border border-base-700 text-ice-300">2s ODE physics clock</span>
           </div>
@@ -208,13 +257,15 @@ export default function Analytics({ onNavigate }: Props) {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={['auto', 'auto']} />
+                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
+                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={burnDomain} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
                   />
-                  <Area type="monotone" dataKey="burn_rate_lph" stroke="#5eb8ff" strokeWidth={2} fillOpacity={1} fill="url(#burnGrad)" name="Burn Rate (L/h)" />
-                  <ReferenceLine y={180} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'High Burn Alert (180 L/h)', fill: '#ef4444', fontSize: 10 }} />
+                  <Area type="monotone" dataKey="burn_rate_lph" stroke="#5eb8ff" strokeWidth={2} fillOpacity={1} fill="url(#burnGrad)" name="Burn Rate (L/h)" isAnimationActive={false} />
+                  {burnDomain[1] >= 170 && (
+                    <ReferenceLine y={180} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'High Burn Alert (180 L/h)', fill: '#ef4444', fontSize: 10 }} />
+                  )}
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -259,15 +310,15 @@ export default function Analytics({ onNavigate }: Props) {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={[0, 700]} />
+                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
+                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={[0, Math.ceil(loadCeiling * 1.15)]} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                  <Area type="monotone" dataKey="essential_load" stackId="1" stroke="#3b82f6" fill="url(#essentialGrad)" name="Essential (kVA)" />
-                  <Area type="monotone" dataKey="science_load" stackId="1" stroke="#00f0ff" fill="url(#scienceGrad)" name="Science (kVA)" />
-                  <Area type="monotone" dataKey="comfort_load" stackId="1" stroke="#818cf8" fill="url(#comfortGrad)" name="Comfort (kVA)" />
+                  <Area type="monotone" dataKey="essential_load" stackId="1" stroke="#3b82f6" fill="url(#essentialGrad)" name="Essential (kVA)" isAnimationActive={false} />
+                  <Area type="monotone" dataKey="science_load" stackId="1" stroke="#00f0ff" fill="url(#scienceGrad)" name="Science (kVA)" isAnimationActive={false} />
+                  <Area type="monotone" dataKey="comfort_load" stackId="1" stroke="#818cf8" fill="url(#comfortGrad)" name="Comfort (kVA)" isAnimationActive={false} />
                   <ReferenceLine y={600} stroke="#ef4444" strokeDasharray="4 4" label={{ value: 'CHP Limit (600 kVA)', fill: '#ef4444', fontSize: 10 }} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -300,14 +351,14 @@ export default function Analytics({ onNavigate }: Props) {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={[-45, 30]} />
+                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
+                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={tempDomain} />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
                   />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                  <Line type="monotone" dataKey="internal_temp_c" stroke="#34d399" strokeWidth={2.5} dot={false} name="Habitat Temp (°C)" />
-                  <Line type="monotone" dataKey="ambient_temp_c" stroke="#38bdf8" strokeWidth={2} strokeDasharray="4 4" dot={false} name="Ambient Temp (°C)" />
+                  <Line type="monotone" dataKey="internal_temp_c" stroke="#34d399" strokeWidth={2.5} dot={false} name="Habitat Temp (°C)" isAnimationActive={false} />
+                  <Line type="monotone" dataKey="ambient_temp_c" stroke="#38bdf8" strokeWidth={2} strokeDasharray="4 4" dot={false} name="Ambient Temp (°C)" isAnimationActive={false} />
                   <ReferenceLine y={16} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'SOP Critical Minimum (16°C)', fill: '#ef4444', fontSize: 10 }} />
                 </LineChart>
               </ResponsiveContainer>

@@ -57,6 +57,7 @@ class StationPhysicsSimulator:
         )
         self.live_ambient: dict | None = None
         self.weather_source = "synthetic"
+        self._tick_count = 0
 
     def set_live_ambient(
         self,
@@ -127,6 +128,9 @@ class StationPhysicsSimulator:
             fuel,
             controls
         """
+
+        self._tick_count += 1
+        phase = self._tick_count * dt_seconds
 
         # ===================================================================
         # 1. Environmental weather dynamics
@@ -282,22 +286,29 @@ class StationPhysicsSimulator:
                 0.0 - self.communication_stress
             ) * 0.08
 
+            self.ambient.wind_speed_knots += 1.6 * math.sin(phase / 7.4)
+            self.ambient.temp_c += 0.22 * math.sin(phase / 9.1)
+            self.ambient.solar_flux_w_m2 = max(
+                0.0,
+                self.ambient.solar_flux_w_m2 + 6.0 * math.sin(phase / 13.0),
+            )
+
         # ===================================================================
         # 2. Electrical loads
         # ===================================================================
 
-        essential_load = 180.0
+        essential_load = 180.0 + 10.0 * math.sin(phase / 11.0)
 
         science_load = (
-            120.0
+            118.0 + 12.0 * math.sin(phase / 7.5) + 4.0 * math.sin(phase / 3.1)
             if self.controls.science_instruments_online
             else 0.0
         )
 
         comfort_load = (
-            60.0
+            58.0 + 16.0 * math.sin(phase / 9.0) + 6.0 * math.sin(phase / 3.4)
             if not self.controls.summer_wing_isolated
-            else 15.0
+            else 15.0 + 3.0 * math.sin(phase / 8.0)
         )
 
         total_electrical_load = (
@@ -340,6 +351,13 @@ class StationPhysicsSimulator:
             total_electrical_load
             * 0.52
             * self.chp_health
+        )
+
+        setpoint = 18.5 if self.station_id == "MAITRI" else 20.4
+        overshoot = max(0.0, self.internal_temp_c - setpoint)
+        chp_thermal_kw = max(
+            28.0,
+            chp_thermal_kw * math.exp(-overshoot / 6.0),
         )
 
         aux_heater_kw = (
@@ -426,9 +444,9 @@ class StationPhysicsSimulator:
                 total_electrical_load,
                 1,
             ),
-            essential_load_kva=essential_load,
-            science_load_kva=science_load,
-            comfort_load_kva=comfort_load,
+            essential_load_kva=round(essential_load, 1),
+            science_load_kva=round(science_load, 1),
+            comfort_load_kva=round(comfort_load, 1),
             chp_capacity_kva=round(
                 600.0 * self.chp_health,
                 1,
