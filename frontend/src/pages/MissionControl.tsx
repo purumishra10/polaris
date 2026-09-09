@@ -14,6 +14,8 @@ import {
   Send,
   Sliders,
   Cpu,
+  BookOpen,
+  FileText,
 } from 'lucide-react'
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
@@ -183,6 +185,8 @@ export default function MissionControl({
 
   const prescribedActions =
     t?.risk?.prescribed_actions ?? []
+  const citations =
+    t?.risk?.citations ?? []
 
   return (
     <div className="min-h-screen flex flex-col bg-base-950 text-white">
@@ -511,6 +515,22 @@ export default function MissionControl({
                       executingAction ===
                       action
 
+                    // Match citation from Supabase if applicable
+                    const citation = citations.find((c: any) => {
+                      if (!c) return false;
+                      const ruleKey = (c.rule_key || '').toLowerCase();
+                      const actionLower = (action || '').toLowerCase();
+                      const mandated = c.mandated_action || '';
+
+                      return (
+                        (ruleKey && actionLower.includes(ruleKey)) ||
+                        mandated === action ||
+                        (c.rule_key === 'STRUCTURAL' && actionLower.includes('hatch')) ||
+                        (c.rule_key === 'THERMAL' && actionLower.includes('auxiliary')) ||
+                        (c.rule_key === 'FUEL_CRIT' && (actionLower.includes('scientific') || actionLower.includes('summer')))
+                      );
+                    });
+
                     return (
                       <div
                         key={idx}
@@ -530,7 +550,7 @@ export default function MissionControl({
                               Action:{' '}
                               <strong className="text-white">
                                 {
-                                  details.label
+                                   details.label
                                 }
                               </strong>
                             </div>
@@ -587,6 +607,28 @@ export default function MissionControl({
                             )}
                           </button>
                         </div>
+
+                        {/* --- Authoritative SOP Citation Box (Supabase RAG) --- */}
+                        {citation && (
+                          <div className="mt-3 pt-2.5 border-t border-base-800/80 bg-base-900/60 p-2.5 rounded-lg border border-slate-800">
+                            <div className="flex items-center justify-between text-[11px] mb-1">
+                              <span className="font-semibold text-amber-300 flex items-center gap-1.5 font-mono">
+                                <BookOpen size={13} className="text-amber-400" />
+                                {citation.clause}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-400 bg-base-950 px-1.5 py-0.5 rounded border border-base-800">
+                                {citation.source_path}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 flex items-center gap-1 mb-1.5">
+                              <FileText size={11} className="text-slate-500" />
+                              <span>{citation.document_title}</span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 italic bg-base-950/70 p-2 rounded border border-base-800/60 leading-relaxed font-sans">
+                              "{citation.excerpt}"
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )
                   }

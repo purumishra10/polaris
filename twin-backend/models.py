@@ -157,11 +157,23 @@ class LinkStatus(BaseModel):
     health: LinkHealth
 
 
+class SOPCitation(BaseModel):
+    rule_key: str = ""
+    document_title: str
+    clause: str
+    source_path: str
+    mandated_action: str
+    excerpt: str
+
+
 class Risk(BaseModel):
     anomaly_score: float
     is_anomaly: bool
     severity: Severity
     prescribed_actions: list[str] = Field(
+        default_factory=list
+    )
+    citations: list[SOPCitation] = Field(
         default_factory=list
     )
 
@@ -274,4 +286,4 @@ class TwinHealthResponse(BaseModel):
     model_loaded: bool
     last_ingest_utc: Optional[str]
     connected_clients: int
-    consecutive_edge_failures: int
+    consecutive_edge_failures: int
