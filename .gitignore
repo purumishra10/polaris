@@ -5,3 +5,5 @@ __pycache__/
 *.log
 infra/postgres/data/
 scripts/_inspect_sources.py
+
+.venv311/

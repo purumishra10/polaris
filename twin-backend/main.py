@@ -18,6 +18,7 @@ import satellite
 from anomaly import AnomalyScorer
 from config import settings
 from ingest import ConnectionManager, TwinState
+from validation import validate_all_blizzard_events, validate_event_by_id
 from models import (
     VALID_STATIONS,
     ClockRequest,
@@ -216,6 +217,52 @@ async def scenario_inject(payload: ScenarioInjectRequest) -> ScenarioInjectRespo
 @app.post("/api/station/switch/{station_id}", response_model=StationSwitchResponse)
 async def station_switch(station_id: str) -> StationSwitchResponse:
     return await _switch_station(_normalise_station(station_id))
+
+
+# --------------------------------------------------------------------------- #
+# indicative replay validation (P0 historical validation)
+# --------------------------------------------------------------------------- #
+
+@app.get("/api/validate/blizzard-events")
+async def get_blizzard_validation() -> dict[str, Any]:
+    """Score all 9 published IMD Bharati blizzard events against the IF and SOP rules.
+
+    IMPORTANT: 3 of 5 IF input features are physics-modeled (synthetic nominal).
+    Results are indicative replay validation only — not empirical ML accuracy.
+    Precision / recall / F1 are intentionally omitted: no non-event dataset exists.
+    """
+    results = validate_all_blizzard_events(scorer, station_id="BHARATI")
+    return {
+        "disclaimer": (
+            "Indicative replay validation — 3 of 5 IF features are physics-modeled. "
+            "No non-event dataset exists; precision/recall/F1 are not calculated."
+        ),
+        "model_loaded": scorer.loaded,
+        "event_count": len(results),
+        "events": [r.to_dict() for r in results],
+    }
+
+
+@app.get("/api/validate/blizzard-events/{event_id}")
+async def get_blizzard_validation_event(event_id: str) -> dict[str, Any]:
+    """Score a single IMD blizzard event by its event_id (e.g. BLZ-2018-04).
+
+    Same limitations as the full endpoint apply.
+    """
+    result = validate_event_by_id(event_id, scorer, station_id="BHARATI")
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Event '{event_id}' not found in bharati_blizzard_log_imd.json",
+        )
+    return {
+        "disclaimer": (
+            "Indicative replay validation — 3 of 5 IF features are physics-modeled. "
+            "No non-event dataset exists; precision/recall/F1 are not calculated."
+        ),
+        "model_loaded": scorer.loaded,
+        "event": result.to_dict(),
+    }
 
 
 # --------------------------------------------------------------------------- #

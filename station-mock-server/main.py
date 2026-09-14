@@ -431,33 +431,51 @@ def _apply_snapshot(
 async def set_clock(
     payload: ClockRequest,
 ):
-    global clock_offset_seconds
-    global clock_mode
+    """
+    Resolve the requested simulator clock.
 
-    clock_mode = payload.mode
+    live=true returns the simulator to live operation.
+    live=false resolves the requested historical clock and applies
+    the corresponding replay snapshot.
+    """
 
-    if payload.mode == "LIVE":
+    if payload.live:
+        scenario_mgr.clear()
+        _reset_current_station()
 
-        clock_offset_seconds = 0.0
+        return {
+            "status": "clock_updated",
+            "mode": "LIVE",
+            "station_id": simulator.station_id,
+        }
 
-    elif payload.mode == "OFFSET":
-
-        clock_offset_seconds = payload.offset_seconds
-
-    else:
-
+    if not payload.clock:
         raise HTTPException(
             status_code=400,
-            detail=(
-                f"Unsupported clock mode: "
-                f"{payload.mode}"
-            ),
+            detail="clock is required when live=false",
         )
+
+    try:
+        snapshot = resolve_clock(payload.clock)
+
+        _apply_snapshot(
+            snapshot=snapshot,
+            station_id=simulator.station_id,
+        )
+
+    except (KeyError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unable to resolve clock '{payload.clock}': {exc}",
+        ) from exc
 
     return {
         "status": "clock_updated",
-        "mode": clock_mode,
-        "offset_seconds": clock_offset_seconds,
+        "mode": "REPLAY",
+        "clock": snapshot.get("clock"),
+        "scenario": snapshot.get("scenario_id"),
+        "citation": snapshot.get("citation"),
+        "station_id": simulator.station_id,
     }
 
 

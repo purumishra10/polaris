@@ -82,7 +82,9 @@ export async function liveNow() {
 export async function getClockCatalog() {
   return apiRequest('/api/clock/catalog')
 }
-
+export async function getBlizzardValidation() {
+  return apiRequest('/api/validate/blizzard-events')
+}
 export async function clearReplay() {
   return apiRequest('/api/replay/clear', { method: 'POST' })
 }

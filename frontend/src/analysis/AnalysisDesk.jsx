@@ -529,8 +529,10 @@ export default function AnalysisDesk({ onClose }) {
                         cursor="pointer"
                         onClick={(data) => {
                           const event = data?.payload ?? data
+                          // Set the historical clock only — do NOT inject BLIZZARD_80KT.
+                          // clock.py:resolve() will load the IMD event's observed wind/temp.
+                          // Injecting the synthetic scenario would overwrite historical conditions.
                           if (event?.clock) setClock(event.clock)
-                          injectScenario('BLIZZARD_80KT').catch(() => {})
                           setHudTab('live')
                         }}
                       >
@@ -548,9 +550,10 @@ export default function AnalysisDesk({ onClose }) {
 
               <LockoutBacktest
                 onReplay={(row) => {
+                  // Use the dedicated replay for 2018-08-05; for all other IMD events
+                  // set the historical clock only — do NOT inject BLIZZARD_80KT.
                   if (row.id === '2018-08-05') replayAug2018()
                   else if (row.clock) setClock(row.clock)
-                  injectScenario('BLIZZARD_80KT').catch(() => {})
                   setHudTab('live')
                 }}
               />

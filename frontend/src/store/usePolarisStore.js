@@ -24,7 +24,27 @@ import {
 import { SOP, applyVoyageOverlay, opsDate } from '../ops/decisions'
 import { applyPlantDoctrine } from '../ops/plantDoctrine'
 import { exportSitrep } from '../ops/exportSitrep'
+const CRITICAL_ACK_KEY = 'polaris:critical-ack'
 
+function loadCriticalAck() {
+  try {
+    return window.localStorage.getItem(CRITICAL_ACK_KEY)
+  } catch {
+    return null
+  }
+}
+
+function saveCriticalAck(signature) {
+  try {
+    if (signature) {
+      window.localStorage.setItem(CRITICAL_ACK_KEY, signature)
+    } else {
+      window.localStorage.removeItem(CRITICAL_ACK_KEY)
+    }
+  } catch {
+    // Ignore storage failures; in-memory acknowledgement still works.
+  }
+}
 function decorateStation(telemetry, station, plantMode, delayDays) {
   const date = opsDate(telemetry)
   return applyVoyageOverlay(
@@ -218,7 +238,7 @@ export const usePolarisStore = create((set, get) => ({
   flyComplete: true,
   hudTab: 'live',
   hoveredSubsystem: null,
-  criticalAck: null,
+  criticalAck: loadCriticalAck(),
   voyageDelayDays: 0,
   plantMode: 'CURRENT',
 
@@ -280,10 +300,13 @@ export const usePolarisStore = create((set, get) => ({
       hoveredSubsystem: subsystem,
     }),
 
-  ackCritical: (signature) =>
-    set({
-      criticalAck: signature,
-    }),
+  ackCritical: (signature) => {
+  saveCriticalAck(signature)
+
+  set({
+    criticalAck: signature,
+  })
+},
 
   tickLive: () =>
     set((state) => {
@@ -353,15 +376,49 @@ export const usePolarisStore = create((set, get) => ({
     set((state) => {
       const current = state.telemetry[station]
       if (current?.replay?.active) {
-        return {
-          connection: {
-            ...state.connection,
-            latency_ms:
-              packet.link_status?.latency_ms || state.connection.latency_ms,
-            last_update: packet.timestamp || new Date().toISOString(),
-          },
-        }
-      }
+  const replayBase = {
+    ...current,
+    ...packet,
+    timestamp: packet.timestamp || new Date().toISOString(),
+    replay: {
+      ...current.replay,
+      ...(packet.replay ?? {}),
+      active: true,
+    },
+  }
+
+  const replayTelemetry = decorateStation(
+    replayBase,
+    station,
+    state.plantMode,
+    state.voyageDelayDays,
+  )
+
+  return {
+    telemetry: {
+      ...state.telemetry,
+      [station]: replayTelemetry,
+    },
+    baseline: {
+      ...state.baseline,
+      [station]: replayTelemetry,
+    },
+    series: {
+      ...state.series,
+      [station]: pushSample(
+        state.series[station],
+        replayTelemetry,
+      ),
+    },
+    connection: {
+      ...state.connection,
+      latency_ms:
+        packet.link_status?.latency_ms || state.connection.latency_ms,
+      last_update:
+        packet.timestamp || new Date().toISOString(),
+    },
+  }
+}
 
       const nextBase = decorateStation(
         {
@@ -516,7 +573,7 @@ export const usePolarisStore = create((set, get) => ({
           baseline: reset,
           series: seedAllSeries(reset),
           hudTab: state.hudTab,
-          criticalAck: null,
+          criticalAck: loadCriticalAck(),
         }
       })
       return
@@ -563,7 +620,7 @@ export const usePolarisStore = create((set, get) => ({
                   : pushSample(state.series[station], next),
             },
             hudTab: 'live',
-            criticalAck: null,
+            criticalAck: loadCriticalAck(),
           }
         })
         return { local: true, scenario }
@@ -608,7 +665,7 @@ export const usePolarisStore = create((set, get) => ({
         telemetry: next,
         baseline: next,
         series: seedAllSeries(next, 'storm'),
-        criticalAck: null,
+        criticalAck: loadCriticalAck(),
       }
     })
   },
@@ -617,49 +674,33 @@ export const usePolarisStore = create((set, get) => ({
     const preset = findReplayPreset(clock)
 
     try {
-      await apiSetClock(clock)
-    } catch {
-      // Fall back to local replay catalog
-    }
+      const result = await apiSetClock(clock)
 
-    if (preset) {
-      set((state) => {
-        const next = decoratePair(
-          {
-            BHARATI: applyReplaySnapshot(
-              state.telemetry.BHARATI,
-              preset.snapshot,
-              'BHARATI',
-            ),
-            MAITRI: applyReplaySnapshot(
-              state.telemetry.MAITRI,
-              preset.snapshot,
-              'MAITRI',
-            ),
+      // Backend is authoritative when available.
+      // Do NOT overwrite the backend historical state with
+      // the local replay catalog.
+      return result
+    } catch (error) {
+      // Backend unavailable: use the local replay catalog as fallback.
+      if (preset) {
+        set((state) => ({
+          clock,
+          telemetry: {
+            ...state.telemetry,
+            [preset.station_id ?? 'BHARATI']: preset.snapshot,
           },
-          state.plantMode,
-          state.voyageDelayDays,
-        )
-        return {
-          selectedStation: 'BHARATI',
-          selectedSubsystem: null,
-          showTelemetry: true,
-          hudTab: 'live',
-          cameraPreset: 'droneAerial',
-          flySource: 'preset',
-          cameraTick: state.cameraTick + 1,
-          flyComplete: true,
-          telemetry: next,
-          baseline: next,
-          series: seedAllSeries(next, 'storm'),
-          criticalAck: null,
-        }
-      })
-      return preset
-    }
+        }))
 
-    console.warn('[Twin] No local replay preset for clock:', clock)
-    return null
+        return preset
+      }
+
+      console.warn(
+        `Unable to set clock '${clock}' and no local replay preset exists.`,
+        error,
+      )
+
+      return null
+    }
   },
 
   liveNow: async () => {
@@ -682,7 +723,7 @@ export const usePolarisStore = create((set, get) => ({
         telemetry: reset,
         baseline: reset,
         series: seedAllSeries(reset),
-        criticalAck: null,
+        ccriticalAck: loadCriticalAck(),
       }
     })
   },

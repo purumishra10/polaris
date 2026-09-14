@@ -10,6 +10,6 @@
   "contamination": 0.03,
   "random_state": 42,
   "n_estimators": 200,
-  "sklearn_version": "1.9.0",
+  "sklearn_version": "1.6.1",
   "score_semantics": "decision_function: positive ~ inlier, negative ~ outlier"
 }
