@@ -22,6 +22,7 @@ export default function VoiceDock() {
     ragMode,
     fallback,
     micLevel,
+    micActive,
     draft,
     setDraft,
     startCall,
@@ -32,14 +33,14 @@ export default function VoiceDock() {
   const label = STATUS_LABEL[status] ?? status.toUpperCase()
 
   return (
-    <div className={`voice-dock ${open ? 'open' : ''} ${connected ? 'live' : ''}`}>
+    <div className={`voice-dock ${open ? 'open' : ''} ${connected || micActive ? 'live' : ''}`}>
       {open && (
         <div className="voice-panel">
           <div className="voice-panel-head">
             <span>POLARIS AI</span>
             <strong className={`voice-status status-${status}`}>{label}</strong>
           </div>
-          {(ragMode || fallback) && (
+          {(fallback || (ragMode && ragMode !== 'ops')) && (
             <div className="voice-rag">
               {fallback || ragMode === 'local-fallback'
                 ? 'LOCAL SOP BRIEF · LLM OFF'
@@ -48,7 +49,7 @@ export default function VoiceDock() {
             </div>
           )}
 
-          {connected && (
+          {micActive && (
             <div className="voice-meter" aria-hidden>
               <span
                 className="voice-meter-fill"
@@ -64,8 +65,10 @@ export default function VoiceDock() {
                 export sitrep. If the sidecar dies I still brief from the desk.
               </p>
             )}
-            {connected && status === 'listening' && (
-              <p className="voice-hint voice-hint-live">Mic open — speak now.</p>
+            {micActive && status === 'listening' && (
+              <p className="voice-hint voice-hint-live">
+                Mic open. Say fuel, blizzard, or map.
+              </p>
             )}
             {lines.map((line, index) => (
               <div
@@ -107,7 +110,7 @@ export default function VoiceDock() {
           </form>
 
           <div className="voice-actions">
-            {connected ? (
+            {micActive ? (
               <button type="button" className="voice-end" onClick={endCall}>
                 END
               </button>
@@ -140,11 +143,10 @@ export default function VoiceDock() {
             return
           }
           setOpen(true)
-          startCall()
         }}
         title="Polaris station AI"
       >
-        {connected ? 'LIVE' : 'AI'}
+        {connected || micActive ? 'LIVE' : 'AI'}
       </button>
     </div>
   )

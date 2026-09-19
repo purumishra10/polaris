@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
@@ -11,10 +12,8 @@ from openai import OpenAI
 
 import briefing
 import knowledge
-import rag
 import twin_client
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 MODEL_NAME = os.getenv("LLM_MODEL", "openai/gpt-oss-20b")
 FALLBACK_MODELS = [
     MODEL_NAME,
@@ -103,9 +102,14 @@ If uplink is down: "Twin engine is not answering. I still have the station notes
 """
 
 
+def _groq_key() -> str:
+    return os.getenv("GROQ_API_KEY", "").strip()
+
+
 def _client() -> OpenAI | None:
-    if GROQ_API_KEY:
-        return OpenAI(base_url="https://api.groq.com/openai/v1", api_key=GROQ_API_KEY)
+    key = _groq_key()
+    if key:
+        return OpenAI(base_url="https://api.groq.com/openai/v1", api_key=key)
     try:
         return OpenAI(base_url="http://127.0.0.1:11434/v1", api_key="ollama")
     except Exception:
@@ -605,10 +609,49 @@ LIVE_OVERRIDE_RE = re.compile(
 )
 
 
+OPS_HINT_RE = re.compile(
+    r"fuel|tank|jet|map|gis|blizzard|maitri|bharati|weather|wind|power|"
+    r"microgrid|sitrep|august|replay|heli|hatch|radome|comm|thermal|roof|"
+    r"water|resupply|ship|autonomy|live now|polar|temperature|cold|storm|"
+    r"generator|kva|load|clock|dossier|dataset",
+    re.I,
+)
+
+
 def _is_knowledge_query(text: str) -> bool:
     if LIVE_OVERRIDE_RE.search(text) and re.search(r"fuel|wind|temp|tank|load", text.lower()):
         return False
     return bool(KNOWLEDGE_RE.search(text))
+
+
+def is_ops_utterance(text: str) -> bool:
+    raw = _sanitize(text)
+    if not raw or len(raw) < 3:
+        return False
+    if keyword_actions(raw) or _is_knowledge_query(raw):
+        return True
+    return bool(OPS_HINT_RE.search(raw))
+
+
+def _pack_result(
+    reply: str,
+    actions: list[dict[str, Any]],
+    *,
+    sources: list[dict[str, Any]] | None = None,
+    rag_mode: str = "ops",
+    snap: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    spoken = briefing.strip_link_talk(reply or "")
+    if len(spoken) > 420:
+        spoken = spoken[:417].rsplit(" ", 1)[0] + "."
+    return {
+        "reply": spoken,
+        "actions": actions,
+        "sources": sources or [],
+        "rag": rag_mode,
+        "station": (snap or {}).get("station_id"),
+        "uplink": "LIVE" if snap else "DOWN",
+    }
 
 
 async def handle_turn(
@@ -626,23 +669,55 @@ async def handle_turn(
     except twin_client.TwinUnreachable as exc:
         uplink_error = str(exc)
 
-    live_block = briefing.format_snapshot(snap, include_link=_wants_comms(user_text))
-    packed = knowledge.retrieve(user_text, limit=5)
-    hits = packed.get("hits") or []
-    docs = rag.format_context(hits) or knowledge.DIGEST[:1800]
-    rag_mode = packed.get("mode") or "local-md"
+    # Voice orders (fuel / map / blizzard / replay) never wait on RAG or the LLM.
+    if routed and not knowledge_q:
+        actions = _dedupe(routed)
+        reply = briefing.spoken_for_actions(snap, actions) or _fallback_reply(
+            user_text, snap, actions
+        )
+        return _pack_result(reply, actions, snap=snap)
 
     if knowledge_q:
+        packed = knowledge.retrieve(user_text, limit=3)
+        hits = packed.get("hits") or []
         routed.append({"type": "show_telemetry", "enabled": True})
         routed.append({"type": "set_hud_tab", "tab": "dossier"})
-        routed = _dedupe(routed)
+        actions = _dedupe(routed)
+        if hits:
+            snippet = re.sub(r"\s+", " ", hits[0].get("content") or "")
+            heading = hits[0].get("heading") or "the station notes"
+            source = hits[0].get("source") or "knowledge base"
+            reply = f"{snippet[:240].rstrip(' .,;')}. That's from {heading}, in {source}."
+        else:
+            reply = _fallback_reply(user_text, snap, actions)
+        sources = [
+            {
+                "heading": item.get("heading"),
+                "source": item.get("source"),
+                "score": round(float(item.get("score") or 0), 3),
+            }
+            for item in hits[:3]
+        ]
+        return _pack_result(
+            reply,
+            actions,
+            sources=sources,
+            rag_mode=packed.get("mode") or "local-md",
+            snap=snap,
+        )
 
+    if not is_ops_utterance(user_text):
+        return _pack_result(
+            "Say fuel, blizzard, map, or the fifth of August.",
+            [],
+            snap=snap,
+        )
+
+    live_block = briefing.format_snapshot(snap, include_link=_wants_comms(user_text))
     client = _client()
     parsed: dict[str, Any] | None = None
     if client and user_text:
-        system = (
-            f"{PERSONA}\n\n{live_block}\n\nSTATION KNOWLEDGE (RAG {rag_mode}):\n{docs[:3800]}"
-        )
+        system = f"{PERSONA}\n\n{live_block}"
         if uplink_error:
             system += f"\n\nUPLINK ERROR: {uplink_error}"
         if _is_historical(user_text):
@@ -651,17 +726,18 @@ async def handle_turn(
                 + briefing.REPLAY_2018_BRIEF
             )
         messages = [{"role": "system", "content": system}]
-        for turn in (history or [])[-8:]:
+        for turn in (history or [])[-4:]:
             role = turn.get("role")
             content = turn.get("content")
             if role in {"user", "assistant"} and content:
-                messages.append({"role": role, "content": str(content)[:600]})
+                messages.append({"role": role, "content": str(content)[:400]})
         messages.append({"role": "user", "content": user_text})
         try:
-            raw = _complete(client, messages)
+            raw = await asyncio.wait_for(
+                asyncio.to_thread(_complete, client, messages),
+                timeout=8,
+            )
             parsed = _parse_json(raw)
-            if raw and not parsed:
-                print(f"[Ops] unparsed LLM output: {raw[:500]}")
         except Exception as exc:
             print(f"[Ops] LLM error: {exc}")
 
@@ -670,55 +746,11 @@ async def handle_turn(
     if parsed:
         reply = str(parsed.get("reply") or "").strip()
         llm_actions = sanitize_actions(parsed.get("actions"), user_text)
-        if not reply:
-            print(f"[Ops] parsed JSON without reply: {parsed}")
 
     actions = _merge_actions(llm_actions, routed, user_text)
     grounded = briefing.spoken_for_actions(snap, actions)
-    if grounded and not knowledge_q:
+    if grounded:
         reply = grounded
     elif not reply:
-        if knowledge_q:
-            snippet = re.sub(r"\s+", " ", (hits[0].get("content") if hits else docs) or "")
-            heading = (hits[0].get("heading") if hits else "the station notes")
-            source = (hits[0].get("source") if hits else "knowledge base")
-            reply = (
-                f"{snippet[:280].rstrip(' .,;')}. "
-                f"That's from {heading}, in {source}."
-            )
-        else:
-            spec_question = bool(
-                re.search(
-                    r"how many|what is|what's|where is|design|planned|maitri-?ii|made of",
-                    user_text.lower(),
-                )
-            )
-            if spec_question:
-                snippet = re.sub(r"\s+", " ", docs.split("---")[0])[:420]
-                reply = snippet or _fallback_reply(user_text, snap, actions)
-            else:
-                reply = _fallback_reply(user_text, snap, actions)
-
-    if not _wants_comms(user_text):
-        reply = briefing.strip_link_talk(reply)
-
-    if len(reply) > 900:
-        reply = reply[:897].rsplit(" ", 1)[0] + "."
-
-    sources = [
-        {
-            "heading": item.get("heading"),
-            "source": item.get("source"),
-            "score": round(float(item.get("score") or 0), 3),
-        }
-        for item in hits[:4]
-    ]
-
-    return {
-        "reply": reply,
-        "actions": actions,
-        "sources": sources,
-        "rag": rag_mode,
-        "station": (snap or {}).get("station_id"),
-        "uplink": "LIVE" if snap else "DOWN",
-    }
+        reply = _fallback_reply(user_text, snap, actions)
+    return _pack_result(reply, actions, snap=snap)
