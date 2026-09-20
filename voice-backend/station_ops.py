@@ -18,7 +18,7 @@ MODEL_NAME = os.getenv("LLM_MODEL", "openai/gpt-oss-20b")
 FALLBACK_MODELS = [
     MODEL_NAME,
     "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
+    "qwen/qwen3.8-27b",
     "openai/gpt-oss-120b",
 ]
 
@@ -53,8 +53,13 @@ You are NOT a clinic receptionist. Never mention appointments, doctors, patients
 How you speak:
 - Compact, certain, Jarvis-like: "Done. Fuel is two hundred and twenty days. I've opened the farm."
 - Speak every headline number they asked for. Fuel: tank liters, kiloliters, burn, days. Weather: temp, wind, indoor. Power: loads and plant size.
+- If they asked why / explain / how, give 4 to 7 spoken sentences: the live number, what it means, the SOP floor, and what you just did on the desk.
+- Fuel SOP (30 / 15 day floors) is NOT the station banner. If nowcast status is WATCH or IMMINENT, the banner is a 6-hour gust watch. Do NOT say fuel SOP is advisory unless FUEL_SOP says below 30 days.
+- Isolation Forest is not the live banner. Do not cite anomaly_score as a fuel problem.
+- Tank liters, kVA, indoor T are modeled plant. Wind and outdoor T are Open-Meteo.
+- Heli lock while the ship is away is voyage SOP (Kamov is ship-based), not wind.
 - Do NOT mention satellite link, latency, C-band, or "connection" unless they asked about comms or the radome.
-- Two to four short sentences. Contractions. No markdown, bullets, emoji, or shouting in caps.
+- Two to four short sentences for orders. Contractions. No markdown, bullets, emoji, or shouting in caps.
 - Confirm the action you took. If you opened MAP, say so. If you injected a blizzard, say the SOP is on screen.
 - Never read JSON keys.
 
@@ -556,7 +561,7 @@ def _complete(client: OpenAI, messages: list[dict[str, str]]) -> str:
                 "model": model,
                 "messages": messages,
                 "temperature": 0.7,
-                "max_tokens": 700,
+                "max_tokens": 1200,
             }
             try:
                 result = client.chat.completions.create(
@@ -580,6 +585,7 @@ def _complete(client: OpenAI, messages: list[dict[str, str]]) -> str:
             if not text:
                 dumped = message.model_dump() if hasattr(message, "model_dump") else str(message)
                 print(f"[Ops] empty content from {model}: {dumped}")
+                continue
             return text
         except Exception as exc:
             print(f"[Ops] model {model} failed: {exc}")
@@ -596,7 +602,7 @@ def _wants_comms(text: str) -> bool:
 
 KNOWLEDGE_RE = re.compile(
     r"how many|what is|what's|whats|where is|who (?:built|designed)|"
-    r"tell me about|explain|why does|when (?:was|did|does)|"
+    r"tell me about|when (?:was|did|does)|"
     r"al/?0[23]|maitri-?ii|imd|mausam|blizzard log|"
     r"polar (?:day|night)|occupancy|containers|design wind|"
     r"paper|knowledge|dataset|dossier",
@@ -605,6 +611,12 @@ KNOWLEDGE_RE = re.compile(
 
 LIVE_OVERRIDE_RE = re.compile(
     r"\b(live|right now|current|tank|fuel farm|autonomy|wind now|how cold|days of fuel|fuel days)\b",
+    re.I,
+)
+
+EXPLAIN_RE = re.compile(
+    r"\b(explain|why|how come|what does that mean|what's going on|whats going on|"
+    r"tell me (?:about|why)|walk me through|break it down|analyse|analyze)\b",
     re.I,
 )
 
@@ -618,8 +630,17 @@ OPS_HINT_RE = re.compile(
 )
 
 
+def _wants_explain(text: str) -> bool:
+    return bool(EXPLAIN_RE.search(text or ""))
+
+
 def _is_knowledge_query(text: str) -> bool:
     if LIVE_OVERRIDE_RE.search(text) and re.search(r"fuel|wind|temp|tank|load", text.lower()):
+        return False
+    if _wants_explain(text) and re.search(
+        r"fuel|wind|nowcast|sop|lockout|autonomy|tank|gust|weather",
+        text.lower(),
+    ):
         return False
     return bool(KNOWLEDGE_RE.search(text))
 
@@ -640,10 +661,12 @@ def _pack_result(
     sources: list[dict[str, Any]] | None = None,
     rag_mode: str = "ops",
     snap: dict[str, Any] | None = None,
+    explain: bool = False,
 ) -> dict[str, Any]:
     spoken = briefing.strip_link_talk(reply or "")
-    if len(spoken) > 420:
-        spoken = spoken[:417].rsplit(" ", 1)[0] + "."
+    limit = 720 if explain else 420
+    if len(spoken) > limit:
+        spoken = spoken[: limit - 3].rsplit(" ", 1)[0] + "."
     return {
         "reply": spoken,
         "actions": actions,
@@ -654,6 +677,45 @@ def _pack_result(
     }
 
 
+async def _ask_llm(
+    user_text: str,
+    history: list[dict[str, str]] | None,
+    snap: dict[str, Any] | None,
+    uplink_error: str | None,
+    extra: str = "",
+) -> dict[str, Any] | None:
+    client = _client()
+    if not client or not user_text:
+        return None
+    live_block = briefing.format_snapshot(snap, include_link=_wants_comms(user_text))
+    system = f"{PERSONA}\n\n{live_block}"
+    if extra:
+        system += f"\n\n{extra}"
+    if uplink_error:
+        system += f"\n\nUPLINK ERROR: {uplink_error}"
+    if _is_historical(user_text):
+        system += (
+            "\n\nHISTORICAL CARD (use these numbers, ignore live wind):\n"
+            + briefing.REPLAY_2018_BRIEF
+        )
+    messages = [{"role": "system", "content": system}]
+    for turn in (history or [])[-4:]:
+        role = turn.get("role")
+        content = turn.get("content")
+        if role in {"user", "assistant"} and content:
+            messages.append({"role": role, "content": str(content)[:400]})
+    messages.append({"role": "user", "content": user_text})
+    try:
+        raw = await asyncio.wait_for(
+            asyncio.to_thread(_complete, client, messages),
+            timeout=18,
+        )
+        return _parse_json(raw)
+    except Exception as exc:
+        print(f"[Ops] LLM error: {exc}")
+        return None
+
+
 async def handle_turn(
     user_text: str,
     history: list[dict[str, str]] | None = None,
@@ -661,6 +723,7 @@ async def handle_turn(
     user_text = _sanitize(user_text)
     routed = keyword_actions(user_text)
     knowledge_q = _is_knowledge_query(user_text)
+    explain = _wants_explain(user_text)
 
     snap: dict[str, Any] | None = None
     uplink_error = None
@@ -669,27 +732,21 @@ async def handle_turn(
     except twin_client.TwinUnreachable as exc:
         uplink_error = str(exc)
 
-    # Voice orders (fuel / map / blizzard / replay) never wait on RAG or the LLM.
-    if routed and not knowledge_q:
+    # Fast orders skip the LLM unless they asked why / explain.
+    if routed and not knowledge_q and not explain:
         actions = _dedupe(routed)
         reply = briefing.spoken_for_actions(snap, actions) or _fallback_reply(
             user_text, snap, actions
         )
         return _pack_result(reply, actions, snap=snap)
 
-    if knowledge_q:
+    knowledge_extra = ""
+    sources: list[dict[str, Any]] = []
+    rag_mode = "ops"
+    if knowledge_q or explain:
         packed = knowledge.retrieve(user_text, limit=3)
         hits = packed.get("hits") or []
-        routed.append({"type": "show_telemetry", "enabled": True})
-        routed.append({"type": "set_hud_tab", "tab": "dossier"})
-        actions = _dedupe(routed)
-        if hits:
-            snippet = re.sub(r"\s+", " ", hits[0].get("content") or "")
-            heading = hits[0].get("heading") or "the station notes"
-            source = hits[0].get("source") or "knowledge base"
-            reply = f"{snippet[:240].rstrip(' .,;')}. That's from {heading}, in {source}."
-        else:
-            reply = _fallback_reply(user_text, snap, actions)
+        rag_mode = packed.get("mode") or "local-md"
         sources = [
             {
                 "heading": item.get("heading"),
@@ -698,49 +755,28 @@ async def handle_turn(
             }
             for item in hits[:3]
         ]
-        return _pack_result(
-            reply,
-            actions,
-            sources=sources,
-            rag_mode=packed.get("mode") or "local-md",
-            snap=snap,
-        )
+        if knowledge_q:
+            routed.append({"type": "show_telemetry", "enabled": True})
+            routed.append({"type": "set_hud_tab", "tab": "dossier"})
+        if hits:
+            passages = []
+            for item in hits[:3]:
+                snippet = re.sub(r"\s+", " ", item.get("content") or "")[:420]
+                passages.append(
+                    f"{item.get('heading') or 'note'} ({item.get('source') or 'kb'}): {snippet}"
+                )
+            knowledge_extra = "STATION KNOWLEDGE — explain these passages in spoken English:\n" + "\n".join(
+                passages
+            )
 
-    if not is_ops_utterance(user_text):
+    if not is_ops_utterance(user_text) and not explain and not knowledge_q:
         return _pack_result(
             "Say fuel, blizzard, map, or the fifth of August.",
             [],
             snap=snap,
         )
 
-    live_block = briefing.format_snapshot(snap, include_link=_wants_comms(user_text))
-    client = _client()
-    parsed: dict[str, Any] | None = None
-    if client and user_text:
-        system = f"{PERSONA}\n\n{live_block}"
-        if uplink_error:
-            system += f"\n\nUPLINK ERROR: {uplink_error}"
-        if _is_historical(user_text):
-            system += (
-                "\n\nHISTORICAL CARD (use these numbers, ignore live wind):\n"
-                + briefing.REPLAY_2018_BRIEF
-            )
-        messages = [{"role": "system", "content": system}]
-        for turn in (history or [])[-4:]:
-            role = turn.get("role")
-            content = turn.get("content")
-            if role in {"user", "assistant"} and content:
-                messages.append({"role": role, "content": str(content)[:400]})
-        messages.append({"role": "user", "content": user_text})
-        try:
-            raw = await asyncio.wait_for(
-                asyncio.to_thread(_complete, client, messages),
-                timeout=8,
-            )
-            parsed = _parse_json(raw)
-        except Exception as exc:
-            print(f"[Ops] LLM error: {exc}")
-
+    parsed = await _ask_llm(user_text, history, snap, uplink_error, knowledge_extra)
     reply = ""
     llm_actions: list[dict[str, Any]] = []
     if parsed:
@@ -748,9 +784,27 @@ async def handle_turn(
         llm_actions = sanitize_actions(parsed.get("actions"), user_text)
 
     actions = _merge_actions(llm_actions, routed, user_text)
-    grounded = briefing.spoken_for_actions(snap, actions)
-    if grounded:
-        reply = grounded
-    elif not reply:
-        reply = _fallback_reply(user_text, snap, actions)
-    return _pack_result(reply, actions, snap=snap)
+    if not reply:
+        if sources:
+            heading = sources[0].get("heading") or "the station notes"
+            source = sources[0].get("source") or "knowledge base"
+            packed_hits = knowledge.retrieve(user_text, limit=1).get("hits") or []
+            snippet = re.sub(r"\s+", " ", (packed_hits[0].get("content") if packed_hits else "") or "")
+            reply = f"{snippet[:280].rstrip(' .,;')}. That's from {heading}, in {source}."
+        else:
+            reply = briefing.spoken_for_actions(snap, actions) or _fallback_reply(
+                user_text, snap, actions
+            )
+    elif not explain:
+        grounded = briefing.spoken_for_actions(snap, actions)
+        if grounded and not knowledge_q:
+            reply = grounded
+    return _pack_result(
+        reply,
+        actions,
+        sources=sources,
+        rag_mode=rag_mode if sources else "ops",
+        snap=snap,
+        explain=explain or knowledge_q,
+    )
+

@@ -142,7 +142,7 @@ export default function VoiceDock() {
             setOpen(false)
             return
           }
-          setOpen(true)
+          void startCall()
         }}
         title="Polaris station AI"
       >

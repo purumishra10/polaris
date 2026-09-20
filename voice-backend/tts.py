@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import os
 import re
+import tempfile
 
 import edge_tts
 
@@ -14,7 +15,8 @@ PITCH = os.getenv("POLARIS_TTS_PITCH", "-8Hz")
 FALLBACK_VOICE = "en-IN-PrabhatNeural"
 # Whole-stream collection budget. A 40-word brief is ~20 s of audio, so a short
 # timeout here silently drops the primary voice on every long reply.
-TTS_TIMEOUT_SEC = float(os.getenv("POLARIS_TTS_TIMEOUT", "20"))
+TTS_TIMEOUT_SEC = float(os.getenv("POLARIS_TTS_TIMEOUT", "28"))
+TTS_WATERMARK = os.getenv("TTS_WATERMARK", "").strip().lower() in ("1", "true", "yes")
 _phrase_cache: dict[tuple[str, str], bytes] = {}
 
 
@@ -92,7 +94,19 @@ def _speechify(text: str) -> str:
     for old, new in swaps:
         spoken = spoken.replace(old, new)
     spoken = re.sub(r"\s+", " ", spoken).strip()
+    if spoken and spoken[-1] not in ".?!":
+        spoken += "."
     return spoken
+
+
+def split_spoken_sentences(text: str) -> list[str]:
+    """Split prepared speech so Edge TTS can start on the first sentence."""
+    spoken = _speechify(text)
+    if not spoken:
+        return []
+    parts = re.split(r"(?<=[.!?])\s+", spoken)
+    chunks = [part.strip() for part in parts if part and part.strip()]
+    return chunks or [spoken]
 
 
 async def _collect(voice: str, rate: str, pitch: str, spoken: str) -> bytes:
@@ -102,7 +116,20 @@ async def _collect(voice: str, rate: str, pitch: str, spoken: str) -> bytes:
         if chunk.get("type") == "audio" and chunk.get("data"):
             chunks.append(chunk["data"])
     data = b"".join(chunks)
-    return _watermark(data) if data else b""
+    if not data:
+        communicate = edge_tts.Communicate(spoken, voice, rate=rate, pitch=pitch)
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp:
+            tmp_path = tmp.name
+        try:
+            await communicate.save(tmp_path)
+            with open(tmp_path, "rb") as handle:
+                data = handle.read()
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+    if data and TTS_WATERMARK:
+        return _watermark(data)
+    return data or b""
 
 
 async def warm_cache(phrases: list[str]) -> None:

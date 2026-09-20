@@ -28,6 +28,7 @@ def format_snapshot(snap: dict[str, Any] | None, include_link: bool = False) -> 
     link = snap.get("link_status") or {}
     risk = snap.get("risk") or {}
     lockouts = snap.get("lockouts") or {}
+    forecast = snap.get("forecast") or {}
     days = fuel.get("days_of_autonomy")
     try:
         days_f = float(days)
@@ -42,20 +43,38 @@ def format_snapshot(snap: dict[str, Any] | None, include_link: bool = False) -> 
     else:
         sop = "NOMINAL — above 30-day SOP floor"
 
+    wx = str(forecast.get("status") or "CLEAR")
+    driver = str(risk.get("driver") or "")
+    if not driver:
+        if wx in {"WATCH", "IMMINENT"} and days_f is not None and days_f >= 30:
+            driver = "nowcast"
+        elif days_f is not None and days_f < 30:
+            driver = "fuel"
+        else:
+            driver = str(risk.get("severity") or "nominal").lower()
+
     actions = risk.get("prescribed_actions") or []
     action_line = "; ".join(str(item) for item in actions) if actions else "none"
+    p23 = forecast.get("p_lockout_23")
+    p23_pct = "unknown"
+    try:
+        p23_pct = f"{round(float(p23) * 100)}%"
+    except (TypeError, ValueError):
+        pass
 
     block = f"""LIVE TELEMETRY (quote these numbers; do not round into fiction)
 station: {snap.get("station_id")}
 timestamp: {snap.get("timestamp")}
 source: {snap.get("source")}  confidence: {snap.get("confidence")}
-ambient: {_n(ambient.get("temp_c"))} C, wind {_n(ambient.get("wind_speed_knots"), 0)} kt, solar {_n(ambient.get("solar_flux_w_m2"), 0)} W/m2
-thermal: internal {_n(thermal.get("internal_temp_c"))} C, CHP heat {_n(thermal.get("chp_thermal_output_kw"), 0)} kW, aux heater {_n(thermal.get("aux_heater_kw"), 0)} kW, heat loss {_n(thermal.get("heat_loss_kw"), 0)} kW
-microgrid: total {_n(micro.get("total_load_kva"), 0)} kVA, essential {_n(micro.get("essential_load_kva"), 0)}, science {_n(micro.get("science_load_kva"), 0)}, comfort {_n(micro.get("comfort_load_kva"), 0)}, CHP cap {_n(micro.get("chp_capacity_kva"), 0)} kVA
-fuel: tank {_n(fuel.get("tank_level_liters"), 0)} L ({_n(float(fuel.get("tank_level_liters") or 0) / 1000, 0)} kL), burn {_n(fuel.get("burn_rate_lph"), 0)} L/h, autonomy {_n(fuel.get("days_of_autonomy"), 0)} days, SOP {sop}
-controls: science={controls.get("science_instruments_online")} summer_wing_isolated={controls.get("summer_wing_isolated")} hatch_lockdown={controls.get("hatch_lockdown")} aux_gen={controls.get("aux_generator_active")}
-risk: severity={risk.get("severity")} anomaly={risk.get("is_anomaly")} score={risk.get("anomaly_score")}
+RULES: Fuel SOP (30/15 d) is independent of the 6h nowcast. Station banner ADVISORY with driver=nowcast means gust watch, NOT a short tank. Isolation Forest is not the live banner.
+ambient: {_n(ambient.get("temp_c"))} C, wind {_n(ambient.get("wind_speed_knots"), 0)} kt, solar {_n(ambient.get("solar_flux_w_m2"), 0)} W/m2  [Open-Meteo]
+thermal: internal {_n(thermal.get("internal_temp_c"))} C, CHP heat {_n(thermal.get("chp_thermal_output_kw"), 0)} kW, aux heater {_n(thermal.get("aux_heater_kw"), 0)} kW, heat loss {_n(thermal.get("heat_loss_kw"), 0)} kW  [MODELED plant]
+microgrid: total {_n(micro.get("total_load_kva"), 0)} kVA, essential {_n(micro.get("essential_load_kva"), 0)}, science {_n(micro.get("science_load_kva"), 0)}, comfort {_n(micro.get("comfort_load_kva"), 0)}, CHP cap {_n(micro.get("chp_capacity_kva"), 0)} kVA  [MODELED]
+fuel: tank {_n(fuel.get("tank_level_liters"), 0)} L ({_n(float(fuel.get("tank_level_liters") or 0) / 1000, 0)} kL), burn {_n(fuel.get("burn_rate_lph"), 0)} L/h, autonomy {_n(fuel.get("days_of_autonomy"), 0)} days, FUEL_SOP {sop}  [MODELED]
+nowcast: model={forecast.get("model") or "off"} status={wx} gust_max_6h={_n(forecast.get("gust_max_6h_kn"), 0)} kt p_lockout_23={p23_pct} temp_min_6h={_n(forecast.get("temp_min_6h_c"))} C
+banner: severity={risk.get("severity")} driver={driver} (nowcast=6h gust watch; fuel=30/15 floor; structural=60 kt)
 prescribed_actions: {action_line}
+controls: science={controls.get("science_instruments_online")} summer_wing_isolated={controls.get("summer_wing_isolated")} hatch_lockdown={controls.get("hatch_lockdown")} aux_gen={controls.get("aux_generator_active")}
 lockouts: outdoor={lockouts.get("outdoor")} heli={lockouts.get("heli")} convoy={lockouts.get("convoy")} field={lockouts.get("field")}
 """
     if include_link:
@@ -114,7 +133,8 @@ def fuel_spoken(snap: dict[str, Any]) -> str:
     return (
         f"Here's the fuel farm at {station}. Tank is {liters} liters, that's about {tank_kl} kiloliters of Jet A-one. "
         f"Burn is {burn} liters an hour, so you've got about {days} days of autonomy. "
-        f"{_sop_line(fuel.get('days_of_autonomy'))}"
+        f"{_sop_line(fuel.get('days_of_autonomy'))} "
+        f"Those tank numbers are modeled plant, not a dipstick."
     )
 
 
@@ -139,13 +159,34 @@ def weather_spoken(snap: dict[str, Any]) -> str:
     thermal = snap.get("thermal") or {}
     risk = snap.get("risk") or {}
     lockouts = snap.get("lockouts") or {}
+    forecast = snap.get("forecast") or {}
+    fuel = snap.get("fuel") or {}
+    wx = str(forecast.get("status") or "CLEAR")
+    driver = str(risk.get("driver") or "")
+    banner = str(risk.get("severity") or "nominal").lower()
+    nowcast_bit = ""
+    if wx in {"WATCH", "IMMINENT"}:
+        p23 = forecast.get("p_lockout_23")
+        try:
+            pct = f"{round(float(p23) * 100)} percent"
+        except (TypeError, ValueError):
+            pct = "unknown"
+        nowcast_bit = (
+            f" Six-hour nowcast is {wx.lower()}: peak gust {_n(forecast.get('gust_max_6h_kn'), 0)} knots, "
+            f"chance of a 23-knot lockout {pct}. That is the weather watch, not the fuel floor."
+        )
+    fuel_bit = f" {_sop_line(fuel.get('days_of_autonomy'))}"
+    driver_bit = ""
+    if driver == "nowcast" or (not driver and wx in {"WATCH", "IMMINENT"}):
+        driver_bit = f" The banner is {banner} because of that gust watch."
+    elif banner != "nominal":
+        driver_bit = f" Station banner is {banner}."
     return (
-        f"Outside it's { _n(ambient.get('temp_c')) } degrees, wind { _n(ambient.get('wind_speed_knots'), 0) } knots, "
-        f"solar { _n(ambient.get('solar_flux_w_m2'), 0) } watts per square meter. "
-        f"Inside we're holding { _n(thermal.get('internal_temp_c')) } degrees. "
-        f"Risk is { str(risk.get('severity') or 'nominal').lower() }. "
-        f"Outdoor lockout is { str(lockouts.get('outdoor') or 'open').lower() }, "
-        f"heli is { str(lockouts.get('heli') or 'open').lower() }."
+        f"Outside it's {_n(ambient.get('temp_c'))} degrees, wind {_n(ambient.get('wind_speed_knots'), 0)} knots. "
+        f"Inside we're holding {_n(thermal.get('internal_temp_c'))} degrees — that's modeled."
+        f"{nowcast_bit}{fuel_bit}{driver_bit} "
+        f"Outdoor lockout is {str(lockouts.get('outdoor') or 'open').lower()}, "
+        f"heli is {str(lockouts.get('heli') or 'open').lower()}."
     ).replace("  ", " ")
 
 

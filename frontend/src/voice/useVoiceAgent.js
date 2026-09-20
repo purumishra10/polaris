@@ -89,6 +89,14 @@ function unlockContext(ctx) {
   return resume.catch(() => {})
 }
 
+function detectAudioMime(buffer) {
+  const bytes = new Uint8Array(buffer.slice(0, 4))
+  if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) {
+    return 'audio/wav'
+  }
+  return 'audio/mpeg'
+}
+
 export function useVoiceAgent() {
   const [open, setOpen] = useState(false)
   const [connected, setConnected] = useState(false)
@@ -121,6 +129,13 @@ export function useVoiceAgent() {
   const bargeInMsRef = useRef(0)
   const handleMessageRef = useRef(null)
   const runLocalTurnRef = useRef(null)
+  const ttsStreamOpenRef = useRef(false)
+  const playbackQueueRef = useRef([])
+  const playbackActiveRef = useRef(false)
+  const playNextQueuedRef = useRef(null)
+  const speechRecRef = useRef(null)
+  const startBrowserSttRef = useRef(() => false)
+  const stopBrowserSttRef = useRef(() => {})
 
   const appendLine = useCallback((speaker, text) => {
     if (!text) return
@@ -158,6 +173,9 @@ export function useVoiceAgent() {
       audioElRef.current = null
     }
     utteranceRef.current = null
+    playbackQueueRef.current = []
+    playbackActiveRef.current = false
+    ttsStreamOpenRef.current = false
     try {
       window.speechSynthesis?.cancel()
     } catch {
@@ -180,6 +198,7 @@ export function useVoiceAgent() {
       ws.send(JSON.stringify({ type: 'playback_ended' }))
     }
     setStatus('listening')
+    startBrowserSttRef.current()
   }, [])
 
   const armSpeakingWatchdog = useCallback(
@@ -203,6 +222,7 @@ export function useVoiceAgent() {
   const enterListening = useCallback(() => {
     speakingRef.current = false
     setStatus('listening')
+    startBrowserSttRef.current()
   }, [])
 
   const speakLocal = useCallback(
@@ -214,6 +234,7 @@ export function useVoiceAgent() {
       }
       speakingRef.current = true
       setStatus('speaking')
+      stopBrowserSttRef.current()
       armSpeakingWatchdog(spoken.split(/\s+/).length * 0.5 + 2)
       try {
         window.speechSynthesis.cancel()
@@ -264,57 +285,66 @@ export function useVoiceAgent() {
     [armSpeakingWatchdog, signalPlaybackEnded],
   )
 
-  const playAudio = useCallback(
-    async (blob) => {
-      const fallbackText = pendingLocalTtsRef.current
-      stopPlayback()
-      speakingRef.current = true
-      setStatus('speaking')
-      try {
-        const audioBlob =
-          blob instanceof Blob && blob.type
-            ? blob
-            : new Blob([blob], { type: 'audio/mpeg' })
-        if (!audioBlob.size) {
-          if (fallbackText) speakLocal(fallbackText)
-          else signalPlaybackEnded()
-          return
-        }
-        const url = URL.createObjectURL(audioBlob)
-        const audio = new Audio(url)
-        audioElRef.current = audio
-        pendingLocalTtsRef.current = ''
-        const armFromDuration = (seconds) => {
-          const safe = Number.isFinite(seconds) && seconds > 0 ? seconds + 1.5 : 8
-          armSpeakingWatchdog(safe)
-        }
-        armFromDuration(Math.max(6, audioBlob.size / 12000))
-        audio.onloadedmetadata = () => armFromDuration(audio.duration)
-        audio.onended = () => {
-          if (audioElRef.current !== audio) return
-          audioElRef.current = null
-          URL.revokeObjectURL(url)
-          signalPlaybackEnded()
-        }
-        audio.onerror = () => {
-          if (audioElRef.current !== audio) return
-          audioElRef.current = null
-          URL.revokeObjectURL(url)
-          if (fallbackText) speakLocal(fallbackText)
-          else signalPlaybackEnded()
-        }
-        await audio.play()
-        if (Number.isFinite(audio.duration) && audio.duration > 0) {
-          armFromDuration(audio.duration)
-        }
-      } catch (err) {
-        console.error('[Voice] playback failed', err)
-        if (fallbackText) speakLocal(fallbackText)
-        else signalPlaybackEnded()
+  const playNextQueued = useCallback(async () => {
+    if (!playbackQueueRef.current.length) {
+      playbackActiveRef.current = false
+      if (ttsStreamOpenRef.current) return
+      signalPlaybackEnded()
+      return
+    }
+    playbackActiveRef.current = true
+    const blob = playbackQueueRef.current.shift()
+    const fallbackText = pendingLocalTtsRef.current
+    speakingRef.current = true
+    setStatus('speaking')
+    try {
+      const raw = blob instanceof ArrayBuffer ? blob : await blob.arrayBuffer()
+      if (!raw || raw.byteLength < 200) {
+        playNextQueuedRef.current?.()
+        return
       }
-    },
-    [armSpeakingWatchdog, signalPlaybackEnded, speakLocal, stopPlayback],
-  )
+      const audioBlob = new Blob([raw], { type: detectAudioMime(raw) })
+      const url = URL.createObjectURL(audioBlob)
+      const audio = new Audio(url)
+      audioElRef.current = audio
+      pendingLocalTtsRef.current = ''
+      const armFromDuration = (seconds) => {
+        const safe = Number.isFinite(seconds) && seconds > 0 ? seconds + 1.5 : 8
+        armSpeakingWatchdog(safe)
+      }
+      armFromDuration(Math.max(4, audioBlob.size / 12000))
+      audio.onloadedmetadata = () => armFromDuration(audio.duration)
+      audio.onended = () => {
+        if (audioElRef.current !== audio) return
+        audioElRef.current = null
+        URL.revokeObjectURL(url)
+        playNextQueuedRef.current?.()
+      }
+      audio.onerror = () => {
+        if (audioElRef.current !== audio) return
+        audioElRef.current = null
+        URL.revokeObjectURL(url)
+        if (fallbackText && !playbackQueueRef.current.length) speakLocal(fallbackText)
+        else playNextQueuedRef.current?.()
+      }
+      await audio.play()
+    } catch (err) {
+      console.error('[Voice] playback failed', err)
+      if (fallbackText && !playbackQueueRef.current.length) speakLocal(fallbackText)
+      else playNextQueuedRef.current?.()
+    }
+  }, [armSpeakingWatchdog, signalPlaybackEnded, speakLocal])
+  playNextQueuedRef.current = playNextQueued
+
+  const playAudio = useCallback((blob) => {
+    speakingRef.current = true
+    setStatus('speaking')
+    stopBrowserSttRef.current()
+    playbackQueueRef.current.push(blob)
+    if (!playbackActiveRef.current) {
+      void playNextQueued()
+    }
+  }, [playNextQueued])
 
   const runLocalTurn = useCallback(
     async (text) => {
@@ -345,11 +375,25 @@ export function useVoiceAgent() {
         } catch {
           return
         }
+        if (data.type === 'tts_stream') {
+          if (data.phase === 'start') {
+            ttsStreamOpenRef.current = true
+            speakingRef.current = true
+            setStatus('speaking')
+          }
+          if (data.phase === 'end') {
+            ttsStreamOpenRef.current = false
+            if (!playbackActiveRef.current && !playbackQueueRef.current.length) {
+              signalPlaybackEnded()
+            }
+          }
+        }
         if (data.type === 'status') {
           const next = data.message || 'listening'
           setStatus(next)
           if (next === 'speaking') {
             speakingRef.current = true
+            stopBrowserSttRef.current()
             armSpeakingWatchdog(0)
           }
           if (next === 'listening') {
@@ -400,24 +444,63 @@ export function useVoiceAgent() {
   )
   handleMessageRef.current = handleMessage
 
-  const maybeLocalBargeIn = useCallback(
-    (level) => {
-      if (!speakingRef.current) {
-        bargeInMsRef.current = 0
+  const stopBrowserStt = useCallback(() => {
+    const rec = speechRecRef.current
+    if (!rec) return
+    rec.onresult = null
+    rec.onend = null
+    rec.onerror = null
+    try {
+      rec.abort()
+    } catch {
+      // ignore
+    }
+    speechRecRef.current = null
+  }, [])
+
+  const startBrowserStt = useCallback(() => {
+    stopBrowserStt()
+    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!Ctor) return false
+    const rec = new Ctor()
+    rec.lang = 'en-IN'
+    rec.continuous = true
+    rec.interimResults = false
+    rec.maxAlternatives = 1
+    rec.onresult = (event) => {
+      if (speakingRef.current) return
+      const result = event.results[event.results.length - 1]
+      if (!result?.isFinal) return
+      const text = String(result[0]?.transcript || '').trim()
+      if (!text) return
+      const ws = wsRef.current
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'text', text }))
         return
       }
-      if (level < 0.055) {
-        bargeInMsRef.current = 0
-        return
+      runLocalTurnRef.current?.(text)
+    }
+    rec.onend = () => {
+      if (!wantMicRef.current || speakingRef.current) return
+      try {
+        rec.start()
+      } catch {
+        // ignore
       }
-      bargeInMsRef.current += 128
-      if (bargeInMsRef.current < 280) return
-      bargeInMsRef.current = 0
-      stopPlayback()
-      signalPlaybackEnded()
-    },
-    [signalPlaybackEnded, stopPlayback],
-  )
+    }
+    speechRecRef.current = rec
+    try {
+      rec.start()
+      return true
+    } catch {
+      speechRecRef.current = null
+      return false
+    }
+  }, [stopBrowserStt])
+  startBrowserSttRef.current = startBrowserStt
+  stopBrowserSttRef.current = stopBrowserStt
+
+  const maybeLocalBargeIn = useCallback(() => {}, [])
 
   const sendPcm = useCallback(
     (buffer) => {
@@ -429,9 +512,10 @@ export function useVoiceAgent() {
         setMicLevel(level)
       }
       maybeLocalBargeIn(level)
+      if (speakingRef.current) return
       const ws = wsRef.current
       if (!ws || ws.readyState !== WebSocket.OPEN) return
-      ws.send(pcm.buffer)
+      ws.send(pcm.buffer.slice(pcm.byteOffset, pcm.byteOffset + pcm.byteLength))
     },
     [maybeLocalBargeIn],
   )
@@ -449,6 +533,7 @@ export function useVoiceAgent() {
       startGraceRef.current = 0
     }
     stopPlayback()
+    stopBrowserSttRef.current()
     if (workletRef.current) {
       workletRef.current.port.onmessage = null
       try {
@@ -515,6 +600,7 @@ export function useVoiceAgent() {
         Math.abs(rec.sampleRate - SAMPLE_RATE) < 1
           ? floatsToPcm16(floats)
           : floatsToPcm16(downsample(floats, rec.sampleRate, SAMPLE_RATE))
+      if (speakingRef.current) return
       ws.send(pcmPayload(pcm))
     }
   }, [maybeLocalBargeIn])
@@ -550,18 +636,22 @@ export function useVoiceAgent() {
 
       if (rec.audioWorklet) {
         try {
-          await rec.audioWorklet.addModule('/audio-processor.js')
+          await rec.audioWorklet.addModule(`/audio-processor.js?v=16k1`)
           const input = rec.createMediaStreamSource(stream)
           inputRef.current = input
           const worklet = new AudioWorkletNode(rec, 'pcm-processor', {
             numberOfInputs: 1,
-            numberOfOutputs: 0,
+            numberOfOutputs: 1,
             channelCount: 1,
-            processorOptions: { bufferSize: 2048 },
+            processorOptions: { bufferSize: 2048, targetRate: SAMPLE_RATE },
           })
           workletRef.current = worklet
           worklet.port.onmessage = (event) => sendPcm(event.data)
           input.connect(worklet)
+          const silent = rec.createGain()
+          silent.gain.value = 0
+          worklet.connect(silent)
+          silent.connect(rec.destination)
           return
         } catch (err) {
           console.warn('[Voice] AudioWorklet unavailable, using ScriptProcessor', err)
@@ -643,6 +733,8 @@ export function useVoiceAgent() {
         setError('')
         setStatus('connected')
         unlockContext(recCtxRef.current)
+        const Rec = window.SpeechRecognition || window.webkitSpeechRecognition
+        ws.send(JSON.stringify({ type: 'browser_stt', enabled: Boolean(Rec) }))
       }
 
       ws.onmessage = (event) => handleMessageRef.current?.(event)
