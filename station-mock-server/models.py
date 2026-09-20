@@ -78,6 +78,7 @@ class RawTelemetryPayload(BaseModel):
     controls: ControlsState
     replay: ReplayState = Field(default_factory=ReplayState)
     lockouts: LockoutsState = Field(default_factory=LockoutsState)
+    weather: dict = Field(default_factory=dict)
 
 class ScenarioInjectRequest(BaseModel):
     scenario_type: str = Field(..., description="BLIZZARD_80KT, RESUPPLY_DELAY, or POLAR_NIGHT")

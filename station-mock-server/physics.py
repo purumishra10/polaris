@@ -70,6 +70,8 @@ class StationPhysicsSimulator:
             self.ambient.temp_c = float(ambient["temp_c"])
             self.ambient.wind_speed_knots = float(ambient["wind_speed_knots"])
             self.ambient.solar_flux_w_m2 = float(ambient["solar_flux_w_m2"])
+            if ambient.get("pressure_hpa") is not None:
+                self.ambient.pressure_hpa = float(ambient["pressure_hpa"])
 
     # -----------------------------------------------------------------------
     # Station profile reset

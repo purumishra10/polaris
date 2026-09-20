@@ -1,0 +1,484 @@
+{
+  "split": {
+    "n_train": 6124,
+    "n_test": 2625,
+    "cut_hour_index": 6129,
+    "test_pos_rate_23kn": 0.1417,
+    "test_pos_rate_40kn": 0.0027,
+    "horizon_hours": 6,
+    "source": "Open-Meteo reanalysis hourly 2023 Bharati, wind converted km/h\u2192kn"
+  },
+  "if_cases": {
+    "live_openmeteo_now": {
+      "score": -0.0258,
+      "predict": -1,
+      "verdict": "OUTLIER",
+      "vector": [
+        -18.2,
+        5.3,
+        349.0,
+        181.48000000000002,
+        76.78
+      ]
+    },
+    "screenshot_live": {
+      "score": -0.0402,
+      "predict": -1,
+      "verdict": "OUTLIER",
+      "vector": [
+        -18.8,
+        4.1,
+        349.0,
+        181.48000000000002,
+        76.78
+      ]
+    },
+    "synthetic_nominal": {
+      "score": 0.1981,
+      "predict": 1,
+      "verdict": "INLIER",
+      "vector": [
+        -14.2,
+        24.0,
+        360.0,
+        187.2,
+        79.2
+      ]
+    },
+    "imd_blizzard_73kn": {
+      "score": 0.0085,
+      "predict": 1,
+      "verdict": "INLIER",
+      "vector": [
+        -10.0,
+        73.0,
+        360.0,
+        187.2,
+        79.2
+      ]
+    },
+    "imd_jan_warm": {
+      "score": -0.0204,
+      "predict": -1,
+      "verdict": "OUTLIER",
+      "vector": [
+        1.6,
+        12.1,
+        360.0,
+        187.2,
+        79.2
+      ]
+    },
+    "polar_night_cold": {
+      "score": 0.0187,
+      "predict": 1,
+      "verdict": "INLIER",
+      "vector": [
+        -28.0,
+        17.0,
+        360.0,
+        187.2,
+        79.2
+      ]
+    }
+  },
+  "if_2023": {
+    "outlier_rate": 0.5887,
+    "score_mean": 0.0119,
+    "score_min": -0.0216,
+    "n_gust_ge_23": 973,
+    "flag_rate_gust_ge_23": 0.0863,
+    "n_gust_ge_40": 44,
+    "flag_rate_gust_ge_40": 0.2045,
+    "n_wind_lt_10": 4223,
+    "flag_rate_wind_lt_10": 0.6964,
+    "flag_rate_wind_20_28": 0.0
+  },
+  "climate": {
+    "BHARATI": {
+      "wind_mean_kn": 10.43,
+      "wind_p50_kn": 10.21,
+      "wind_p95_kn": 18.74,
+      "wind_max_kn": 38.12,
+      "gust_mean_kn": 14.82,
+      "gust_p95_kn": 26.84,
+      "gust_max_kn": 51.73,
+      "hours_gust_ge_23": 973,
+      "frac_gust_ge_23": 0.1111,
+      "hours_gust_ge_40": 44,
+      "frac_gust_ge_40": 0.005,
+      "hours_gust_ge_60": 0,
+      "temp_mean": -11.24,
+      "temp_min": -32.5,
+      "temp_max": 3.8,
+      "pres_min": 957.4,
+      "pres_max": 1015.2
+    },
+    "MAITRI": {
+      "wind_mean_kn": 13.95,
+      "wind_p50_kn": 13.17,
+      "wind_p95_kn": 30.08,
+      "wind_max_kn": 47.89,
+      "gust_mean_kn": 24.69,
+      "gust_p95_kn": 53.46,
+      "gust_max_kn": 83.96,
+      "hours_gust_ge_23": 4455,
+      "frac_gust_ge_23": 0.5086,
+      "hours_gust_ge_40": 1212,
+      "frac_gust_ge_40": 0.1384,
+      "hours_gust_ge_60": 202,
+      "temp_mean": -10.41,
+      "temp_min": -32.6,
+      "temp_max": 5.0,
+      "pres_min": 935.5,
+      "pres_max": 1003.4
+    }
+  },
+  "reg_6h_max_gust_kn": [
+    {
+      "model": "Persistence (current gust)",
+      "mae": 3.6626,
+      "rmse": 5.2705,
+      "r2": 0.3346
+    },
+    {
+      "model": "Ridge",
+      "mae": 4.5652,
+      "rmse": 5.2685,
+      "r2": 0.3352,
+      "fit_s": 0.09
+    },
+    {
+      "model": "RandomForest",
+      "mae": 3.3739,
+      "rmse": 4.1443,
+      "r2": 0.5886,
+      "fit_s": 3.14
+    },
+    {
+      "model": "HistGB",
+      "mae": 4.183,
+      "rmse": 5.1321,
+      "r2": 0.3691,
+      "fit_s": 2.96
+    }
+  ],
+  "cls_23": [
+    {
+      "task": "gust>=23kn in next 6h",
+      "model": "LogReg",
+      "precision": 0.2585,
+      "recall": 0.922,
+      "f1": 0.4038,
+      "roc_auc": 0.8845,
+      "pr_auc": 0.6999,
+      "brier": 0.2823,
+      "tp": 343,
+      "fp": 984,
+      "fn": 29,
+      "tn": 1269
+    },
+    {
+      "task": "gust>=23kn in next 6h",
+      "model": "RandomForest",
+      "precision": 0.5099,
+      "recall": 0.6909,
+      "f1": 0.5868,
+      "roc_auc": 0.8975,
+      "pr_auc": 0.7229,
+      "brier": 0.1038,
+      "tp": 257,
+      "fp": 247,
+      "fn": 115,
+      "tn": 2006
+    },
+    {
+      "task": "gust>=23kn in next 6h",
+      "model": "HistGB",
+      "precision": 0.5695,
+      "recall": 0.5618,
+      "f1": 0.5656,
+      "roc_auc": 0.8569,
+      "pr_auc": 0.6881,
+      "brier": 0.0921,
+      "tp": 209,
+      "fp": 158,
+      "fn": 163,
+      "tn": 2095
+    }
+  ],
+  "cls_40": [
+    {
+      "task": "gust>=40kn in next 6h",
+      "model": "LogReg",
+      "precision": 0.0238,
+      "recall": 1.0,
+      "f1": 0.0465,
+      "roc_auc": 0.9687,
+      "pr_auc": 0.1114,
+      "brier": 0.084,
+      "tp": 7,
+      "fp": 287,
+      "fn": 0,
+      "tn": 2331
+    },
+    {
+      "task": "gust>=40kn in next 6h",
+      "model": "RandomForest",
+      "precision": 0.0909,
+      "recall": 0.2857,
+      "f1": 0.1379,
+      "roc_auc": 0.9179,
+      "pr_auc": 0.1601,
+      "brier": 0.0098,
+      "tp": 2,
+      "fp": 20,
+      "fn": 5,
+      "tn": 2598
+    },
+    {
+      "task": "gust>=40kn in next 6h",
+      "model": "HistGB",
+      "precision": 0.1176,
+      "recall": 0.2857,
+      "f1": 0.1667,
+      "roc_auc": 0.9165,
+      "pr_auc": 0.0637,
+      "brier": 0.0063,
+      "tp": 2,
+      "fp": 15,
+      "fn": 5,
+      "tn": 2603
+    }
+  ],
+  "persist_cls": [
+    {
+      "task": "gust>=23kn in next 6h",
+      "model": "Persistence (current gust>=thresh)",
+      "precision": 0.8394,
+      "recall": 0.4355,
+      "f1": 0.5735
+    },
+    {
+      "task": "gust>=40kn in next 6h",
+      "model": "Persistence (current gust>=thresh)",
+      "precision": 0.5,
+      "recall": 0.1429,
+      "f1": 0.2222
+    }
+  ],
+  "unsup_vs_gust40_now": [
+    {
+      "model": "IsolationForest trained on 2023 weather",
+      "precision": 0.0204,
+      "recall": 1.0,
+      "f1": 0.04,
+      "flag_rate": 0.0373,
+      "contamination": 0.01
+    },
+    {
+      "model": "LocalOutlierFactor novelty",
+      "precision": 0.05,
+      "recall": 0.5,
+      "f1": 0.0909,
+      "flag_rate": 0.0076,
+      "contamination": 0.01
+    },
+    {
+      "model": "OneClassSVM",
+      "precision": 0.0126,
+      "recall": 1.0,
+      "f1": 0.0248,
+      "flag_rate": 0.0606,
+      "contamination": 0.01
+    },
+    {
+      "model": "Current IF (synthetic idle + plant)",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "flag_rate": 0.6069,
+      "contamination": 0.01
+    }
+  ],
+  "rf_importance": [
+    [
+      "wind_kn",
+      0.8319
+    ],
+    [
+      "temp_c",
+      0.0221
+    ],
+    [
+      "dP_3h",
+      0.0172
+    ],
+    [
+      "gust_kn",
+      0.0161
+    ],
+    [
+      "rh",
+      0.0159
+    ],
+    [
+      "pres_ma6",
+      0.0115
+    ],
+    [
+      "hour",
+      0.0115
+    ],
+    [
+      "pres_hpa",
+      0.0103
+    ],
+    [
+      "gust_ma6",
+      0.0095
+    ],
+    [
+      "dT_3h",
+      0.0091
+    ],
+    [
+      "month",
+      0.0084
+    ],
+    [
+      "wdir_sin",
+      0.0079
+    ],
+    [
+      "snow",
+      0.0074
+    ],
+    [
+      "dG_3h",
+      0.0057
+    ],
+    [
+      "wdir_cos",
+      0.0055
+    ],
+    [
+      "dW_3h",
+      0.0052
+    ],
+    [
+      "dni",
+      0.0047
+    ]
+  ],
+  "monthly_bharati": [
+    {
+      "month": 1,
+      "temp_2023": -2.55,
+      "temp_imd_2018": 1.6,
+      "d_temp": -4.15,
+      "wind_2023_kn": 10.57,
+      "wind_imd_2018_kn": 12.1,
+      "d_wind": -1.53
+    },
+    {
+      "month": 2,
+      "temp_2023": -4.09,
+      "temp_imd_2018": -1.4,
+      "d_temp": -2.69,
+      "wind_2023_kn": 12.07,
+      "wind_imd_2018_kn": 13.2,
+      "d_wind": -1.13
+    },
+    {
+      "month": 3,
+      "temp_2023": -8.91,
+      "temp_imd_2018": -6.8,
+      "d_temp": -2.11,
+      "wind_2023_kn": 10.66,
+      "wind_imd_2018_kn": 14.6,
+      "d_wind": -3.94
+    },
+    {
+      "month": 4,
+      "temp_2023": -10.22,
+      "temp_imd_2018": -11.2,
+      "d_temp": 0.98,
+      "wind_2023_kn": 14.07,
+      "wind_imd_2018_kn": 15.8,
+      "d_wind": -1.73
+    },
+    {
+      "month": 5,
+      "temp_2023": -18.61,
+      "temp_imd_2018": -15.4,
+      "d_temp": -3.21,
+      "wind_2023_kn": 9.06,
+      "wind_imd_2018_kn": 18.0,
+      "d_wind": -8.94
+    },
+    {
+      "month": 6,
+      "temp_2023": -13.64,
+      "temp_imd_2018": -16.8,
+      "d_temp": 3.16,
+      "wind_2023_kn": 12.14,
+      "wind_imd_2018_kn": 16.2,
+      "d_wind": -4.06
+    },
+    {
+      "month": 7,
+      "temp_2023": -20.4,
+      "temp_imd_2018": -14.2,
+      "d_temp": -6.2,
+      "wind_2023_kn": 8.89,
+      "wind_imd_2018_kn": 15.4,
+      "d_wind": -6.51
+    },
+    {
+      "month": 8,
+      "temp_2023": -22.09,
+      "temp_imd_2018": -13.1,
+      "d_temp": -8.99,
+      "wind_2023_kn": 9.01,
+      "wind_imd_2018_kn": 16.8,
+      "d_wind": -7.79
+    },
+    {
+      "month": 9,
+      "temp_2023": -12.41,
+      "temp_imd_2018": -17.6,
+      "d_temp": 5.19,
+      "wind_2023_kn": 10.98,
+      "wind_imd_2018_kn": 14.4,
+      "d_wind": -3.42
+    },
+    {
+      "month": 10,
+      "temp_2023": -12.58,
+      "temp_imd_2018": -12.4,
+      "d_temp": -0.18,
+      "wind_2023_kn": 9.56,
+      "wind_imd_2018_kn": 15.1,
+      "d_wind": -5.54
+    },
+    {
+      "month": 11,
+      "temp_2023": -6.53,
+      "temp_imd_2018": -6.1,
+      "d_temp": -0.43,
+      "wind_2023_kn": 9.94,
+      "wind_imd_2018_kn": 15.9,
+      "d_wind": -5.96
+    },
+    {
+      "month": 12,
+      "temp_2023": -2.13,
+      "temp_imd_2018": -2.8,
+      "d_temp": 0.67,
+      "wind_2023_kn": 8.56,
+      "wind_imd_2018_kn": 16.4,
+      "d_wind": -7.84
+    }
+  ]
+}

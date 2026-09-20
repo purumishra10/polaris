@@ -184,7 +184,7 @@ async def health() -> TwinHealthResponse:
         status="ONLINE",
         station_id=twin.active_station,
         edge_reachable=twin.edge_reachable,
-        model_loaded=scorer.loaded,
+        model_loaded=scorer.loaded or twin.nowcast.loaded,
         last_ingest_utc=twin.last_ingest_utc,
         connected_clients=manager.count,
         consecutive_edge_failures=twin.consecutive_edge_failures,

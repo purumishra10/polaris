@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
@@ -52,14 +53,22 @@ class AnomalyScorer:
             )
             return
         try:
-            self._model = joblib.load(self._path)
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore",
+                    message="Trying to unpickle estimator",
+                )
+                self._model = joblib.load(self._path)
             meta_path = self._path.with_name("training_meta.json")
             if meta_path.exists():
                 meta = json.loads(meta_path.read_text(encoding="utf-8"))
                 feats = meta.get("features")
                 if isinstance(feats, list) and len(feats) == 5:
                     self._features = [str(f) for f in feats]
-            log.info("Isolation Forest loaded from %s", self._path)
+            log.info(
+                "Isolation Forest loaded from %s (trace-only; live severity is SOP + nowcast)",
+                self._path,
+            )
         except Exception:  # noqa: BLE001
             self._model = None
             log.exception("Failed to load Isolation Forest — running SOP-only")

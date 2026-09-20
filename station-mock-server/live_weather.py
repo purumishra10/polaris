@@ -22,6 +22,13 @@ UA = "PolarisAntarcticDigitalTwin/1.0 (NCPOR SIH 26060)"
 STATIONS = {
     "BHARATI": {"lat": -69.40680, "lon": 76.19525},
     "MAITRI": {"lat": -70.76683367, "lon": 11.73078318},
+    "PROGRESS": {"lat": -69.3750, "lon": 76.3817},
+    "NOVOLAZAREVSKAYA": {"lat": -70.7769, "lon": 11.8239},
+}
+
+NEIGHBOR = {
+    "BHARATI": "PROGRESS",
+    "MAITRI": "NOVOLAZAREVSKAYA",
 }
 
 DATA_DIR = os.path.normpath(
@@ -49,7 +56,8 @@ def fetch_station_forecast(station_id: str) -> dict[str, Any] | None:
         f"latitude={meta['lat']}&longitude={meta['lon']}"
         "&current=temperature_2m,wind_speed_10m,wind_gusts_10m,"
         "shortwave_radiation,relative_humidity_2m,surface_pressure"
-        "&hourly=temperature_2m,wind_speed_10m,wind_gusts_10m,shortwave_radiation"
+        "&hourly=temperature_2m,wind_speed_10m,wind_gusts_10m,shortwave_radiation,"
+        "relative_humidity_2m,surface_pressure,snowfall,wind_direction_10m"
         "&wind_speed_unit=kn&past_days=2&forecast_days=2&timezone=UTC"
     )
     try:
@@ -61,7 +69,18 @@ def fetch_station_forecast(station_id: str) -> dict[str, Any] | None:
     current = data.get("current") or {}
     hourly = data.get("hourly") or {}
     times = hourly.get("time") or []
-    slim_hourly = {key: (hourly.get(key) or [])[-24:] for key in hourly}
+    cursor = str(current.get("time") or "")[:16]
+    idx = 0
+    for i, t in enumerate(times):
+        if str(t)[:16] <= cursor:
+            idx = i
+    start = max(0, idx - 18)
+    end = min(len(times), idx + 12)
+    slim_hourly = {
+        key: (hourly.get(key) or [])[start:end]
+        for key in hourly
+        if isinstance(hourly.get(key), list)
+    }
     obs = {
         "station_id": station_id,
         "fetched_at": datetime.now(timezone.utc).isoformat(),
@@ -118,10 +137,33 @@ def ambient_from_obs(obs: dict[str, Any]) -> dict[str, float] | None:
         solar = float(obs.get("solar_flux_w_m2") or 0)
     except (TypeError, ValueError, KeyError):
         return None
-    return {
+    out = {
         "temp_c": temp,
         "wind_speed_knots": max(0.0, wind),
         "solar_flux_w_m2": max(0.0, solar),
+    }
+    try:
+        out["pressure_hpa"] = float(obs.get("pressure_hpa"))
+    except (TypeError, ValueError):
+        pass
+    return out
+
+
+def weather_context(
+    obs: dict[str, Any] | None,
+    neighbor: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if not obs:
+        return {}
+    return {
+        "provider": obs.get("provider"),
+        "model_time": obs.get("model_time"),
+        "wind_gust_knots": obs.get("wind_gust_knots"),
+        "rh_pct": obs.get("rh_pct"),
+        "pressure_hpa": obs.get("pressure_hpa"),
+        "hourly": obs.get("hourly_tail"),
+        "neighbor_id": (neighbor or {}).get("station_id"),
+        "neighbor_hourly": (neighbor or {}).get("hourly_tail"),
     }
 
 
@@ -136,6 +178,11 @@ class LiveWeather:
 
     def refresh(self, station_id: str) -> bool:
         obs = fetch_station_forecast(station_id)
+        neighbor_id = NEIGHBOR.get(station_id)
+        if neighbor_id:
+            nbr = fetch_station_forecast(neighbor_id)
+            if nbr:
+                self.obs[neighbor_id] = nbr
         if obs and ambient_from_obs(obs):
             self.obs[station_id] = obs
             self.last_ok = datetime.now(timezone.utc).isoformat()

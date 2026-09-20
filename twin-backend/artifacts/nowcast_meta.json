@@ -1,0 +1,469 @@
+{
+  "protocol": "Train 2022\u20132023, test 2024. Features include Russian proxy (Progress for Bharati, Novolazarevskaya for Maitri). Targets: 6h max gust/wind, 6h min temp, P(gust>=23kt in 6h). Sequence models constrained so predicted gust >= predicted wind.",
+  "stations": [
+    {
+      "station": "BHARATI",
+      "neighbor": "PROGRESS",
+      "neighbor_gust_corr": 0.903,
+      "n_train": 17508,
+      "n_test": 8778,
+      "holdout": "calendar year 2024",
+      "horizon_h": 6,
+      "seq_len": 12,
+      "results": [
+        {
+          "name": "Persistence",
+          "kind": "baseline",
+          "gust": {
+            "mae": 3.5958,
+            "rmse": 5.4934,
+            "r2": 0.5338
+          },
+          "lock23": {
+            "precision": 0.8835,
+            "recall": 0.5263,
+            "f1": 0.6597,
+            "roc_auc": 0.7557,
+            "pr_auc": 0.549
+          }
+        },
+        {
+          "name": "Ridge",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 2.9839,
+            "rmse": 4.1656,
+            "r2": 0.7319
+          },
+          "lock23": {},
+          "fit_s": 0.02
+        },
+        {
+          "name": "RandomForest",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.0217,
+            "rmse": 4.1724,
+            "r2": 0.731
+          },
+          "lock23": {
+            "precision": 0.6875,
+            "recall": 0.7905,
+            "f1": 0.7354,
+            "roc_auc": 0.9461,
+            "pr_auc": 0.847
+          },
+          "fit_s": 4.15
+        },
+        {
+          "name": "HistGB",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 2.9616,
+            "rmse": 4.1352,
+            "r2": 0.7358
+          },
+          "lock23": {
+            "precision": 0.7213,
+            "recall": 0.7719,
+            "f1": 0.7457,
+            "roc_auc": 0.9377,
+            "pr_auc": 0.8444
+          },
+          "fit_s": 4.08
+        },
+        {
+          "name": "MLP",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.0542,
+            "rmse": 4.2931,
+            "r2": 0.7152
+          },
+          "lock23": {},
+          "fit_s": 5.76
+        },
+        {
+          "name": "LSTM",
+          "kind": "torch",
+          "gust": {
+            "mae": 2.8752,
+            "rmse": 4.1415,
+            "r2": 0.735
+          },
+          "lock23": {
+            "precision": 0.7247,
+            "recall": 0.5835,
+            "f1": 0.6465,
+            "roc_auc": 0.8742,
+            "pr_auc": 0.7317
+          },
+          "fit_s": 11.8,
+          "epochs_ran": 13,
+          "val_mae": 2.6123
+        },
+        {
+          "name": "BiLSTM",
+          "kind": "torch",
+          "gust": {
+            "mae": 3.078,
+            "rmse": 4.3783,
+            "r2": 0.7038
+          },
+          "lock23": {
+            "precision": 0.9891,
+            "recall": 0.1163,
+            "f1": 0.2082,
+            "roc_auc": 0.904,
+            "pr_auc": 0.7933
+          },
+          "fit_s": 5.6,
+          "epochs_ran": 5,
+          "val_mae": 2.8596
+        },
+        {
+          "name": "LSTM2",
+          "kind": "torch",
+          "gust": {
+            "mae": 2.7908,
+            "rmse": 4.1507,
+            "r2": 0.7338
+          },
+          "lock23": {
+            "precision": 0.7345,
+            "recall": 0.7076,
+            "f1": 0.7208,
+            "roc_auc": 0.92,
+            "pr_auc": 0.8104
+          },
+          "fit_s": 11.9,
+          "epochs_ran": 11,
+          "val_mae": 2.5512
+        }
+      ],
+      "winner": "LSTM2",
+      "winner_kind": "torch",
+      "artifact": "artifacts\\nowcast_bharati.pt",
+      "feature_importance": [],
+      "climate": [
+        {
+          "month": "Jan",
+          "month_num": 1,
+          "temp": -1.87,
+          "wind": 10.59,
+          "gust": 15.2
+        },
+        {
+          "month": "Feb",
+          "month_num": 2,
+          "temp": -4.01,
+          "wind": 12.34,
+          "gust": 17.83
+        },
+        {
+          "month": "Mar",
+          "month_num": 3,
+          "temp": -8.33,
+          "wind": 11.46,
+          "gust": 16.74
+        },
+        {
+          "month": "Apr",
+          "month_num": 4,
+          "temp": -13.25,
+          "wind": 11.06,
+          "gust": 16.04
+        },
+        {
+          "month": "May",
+          "month_num": 5,
+          "temp": -16.63,
+          "wind": 9.36,
+          "gust": 13.32
+        },
+        {
+          "month": "Jun",
+          "month_num": 6,
+          "temp": -13.38,
+          "wind": 12.14,
+          "gust": 17.55
+        },
+        {
+          "month": "Jul",
+          "month_num": 7,
+          "temp": -18.46,
+          "wind": 11.04,
+          "gust": 15.58
+        },
+        {
+          "month": "Aug",
+          "month_num": 8,
+          "temp": -16.3,
+          "wind": 10.35,
+          "gust": 14.6
+        },
+        {
+          "month": "Sep",
+          "month_num": 9,
+          "temp": -14.8,
+          "wind": 10.92,
+          "gust": 15.45
+        },
+        {
+          "month": "Oct",
+          "month_num": 10,
+          "temp": -11.8,
+          "wind": 9.92,
+          "gust": 14.12
+        },
+        {
+          "month": "Nov",
+          "month_num": 11,
+          "temp": -7.17,
+          "wind": 9.25,
+          "gust": 13.21
+        },
+        {
+          "month": "Dec",
+          "month_num": 12,
+          "temp": -1.94,
+          "wind": 8.62,
+          "gust": 12.3
+        }
+      ],
+      "lock23_test_rate": 0.1773
+    },
+    {
+      "station": "MAITRI",
+      "neighbor": "NOVOLAZAREVSKAYA",
+      "neighbor_gust_corr": 0.9896,
+      "n_train": 17508,
+      "n_test": 8778,
+      "holdout": "calendar year 2024",
+      "horizon_h": 6,
+      "seq_len": 12,
+      "results": [
+        {
+          "name": "Persistence",
+          "kind": "baseline",
+          "gust": {
+            "mae": 3.7213,
+            "rmse": 5.7806,
+            "r2": 0.8572
+          },
+          "lock23": {
+            "precision": 0.9737,
+            "recall": 0.835,
+            "f1": 0.899,
+            "roc_auc": 0.9026,
+            "pr_auc": 0.907
+          }
+        },
+        {
+          "name": "Ridge",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.3762,
+            "rmse": 4.583,
+            "r2": 0.9103
+          },
+          "lock23": {},
+          "fit_s": 0.01
+        },
+        {
+          "name": "RandomForest",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.5097,
+            "rmse": 4.6582,
+            "r2": 0.9073
+          },
+          "lock23": {
+            "precision": 0.9572,
+            "recall": 0.8816,
+            "f1": 0.9179,
+            "roc_auc": 0.9691,
+            "pr_auc": 0.9805
+          },
+          "fit_s": 4.26
+        },
+        {
+          "name": "HistGB",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.5249,
+            "rmse": 4.702,
+            "r2": 0.9055
+          },
+          "lock23": {
+            "precision": 0.9441,
+            "recall": 0.8986,
+            "f1": 0.9208,
+            "roc_auc": 0.9687,
+            "pr_auc": 0.9804
+          },
+          "fit_s": 4.1
+        },
+        {
+          "name": "MLP",
+          "kind": "sklearn",
+          "gust": {
+            "mae": 3.5515,
+            "rmse": 4.8147,
+            "r2": 0.9009
+          },
+          "lock23": {},
+          "fit_s": 5.74
+        },
+        {
+          "name": "LSTM",
+          "kind": "torch",
+          "gust": {
+            "mae": 3.1769,
+            "rmse": 4.771,
+            "r2": 0.9027
+          },
+          "lock23": {
+            "precision": 0.8749,
+            "recall": 0.924,
+            "f1": 0.8988,
+            "roc_auc": 0.96,
+            "pr_auc": 0.9749
+          },
+          "fit_s": 9.6,
+          "epochs_ran": 12,
+          "val_mae": 3.0453
+        },
+        {
+          "name": "BiLSTM",
+          "kind": "torch",
+          "gust": {
+            "mae": 3.4195,
+            "rmse": 4.9238,
+            "r2": 0.8964
+          },
+          "lock23": {
+            "precision": 0.8085,
+            "recall": 0.904,
+            "f1": 0.8536,
+            "roc_auc": 0.922,
+            "pr_auc": 0.9497
+          },
+          "fit_s": 8.3,
+          "epochs_ran": 8,
+          "val_mae": 3.2513
+        },
+        {
+          "name": "LSTM2",
+          "kind": "torch",
+          "gust": {
+            "mae": 3.2911,
+            "rmse": 4.8834,
+            "r2": 0.8981
+          },
+          "lock23": {
+            "precision": 0.7058,
+            "recall": 0.9884,
+            "f1": 0.8236,
+            "roc_auc": 0.9654,
+            "pr_auc": 0.9781
+          },
+          "fit_s": 8.9,
+          "epochs_ran": 8,
+          "val_mae": 3.171
+        }
+      ],
+      "winner": "LSTM",
+      "winner_kind": "torch",
+      "artifact": "artifacts\\nowcast_maitri.pt",
+      "feature_importance": [],
+      "climate": [
+        {
+          "month": "Jan",
+          "month_num": 1,
+          "temp": -3.65,
+          "wind": 11.46,
+          "gust": 20.71
+        },
+        {
+          "month": "Feb",
+          "month_num": 2,
+          "temp": -5.94,
+          "wind": 13.06,
+          "gust": 23.21
+        },
+        {
+          "month": "Mar",
+          "month_num": 3,
+          "temp": -8.59,
+          "wind": 15.17,
+          "gust": 26.92
+        },
+        {
+          "month": "Apr",
+          "month_num": 4,
+          "temp": -12.73,
+          "wind": 13.47,
+          "gust": 23.78
+        },
+        {
+          "month": "May",
+          "month_num": 5,
+          "temp": -13.54,
+          "wind": 16.29,
+          "gust": 28.92
+        },
+        {
+          "month": "Jun",
+          "month_num": 6,
+          "temp": -14.85,
+          "wind": 15.59,
+          "gust": 27.77
+        },
+        {
+          "month": "Jul",
+          "month_num": 7,
+          "temp": -16.02,
+          "wind": 15.78,
+          "gust": 27.4
+        },
+        {
+          "month": "Aug",
+          "month_num": 8,
+          "temp": -15.12,
+          "wind": 17.24,
+          "gust": 30.19
+        },
+        {
+          "month": "Sep",
+          "month_num": 9,
+          "temp": -17.41,
+          "wind": 12.94,
+          "gust": 22.56
+        },
+        {
+          "month": "Oct",
+          "month_num": 10,
+          "temp": -11.95,
+          "wind": 15.59,
+          "gust": 27.34
+        },
+        {
+          "month": "Nov",
+          "month_num": 11,
+          "temp": -7.41,
+          "wind": 12.32,
+          "gust": 21.89
+        },
+        {
+          "month": "Dec",
+          "month_num": 12,
+          "temp": -3.07,
+          "wind": 12.81,
+          "gust": 22.7
+        }
+      ],
+      "lock23_test_rate": 0.5697
+    }
+  ]
+}
