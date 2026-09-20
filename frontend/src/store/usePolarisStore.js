@@ -148,6 +148,13 @@ const createTelemetry = (station) => ({
     mode: 'CURRENT',
     tag: station === 'MAITRI' ? 'SYNTHETIC · occupancy AL/03' : 'SYNTHETIC · occupancy AL/02',
   },
+  forecast: {
+    status: 'CLEAR',
+    hazard: 'NONE',
+    p_lockout_23: 0,
+    recommended_actions: [],
+  },
+  weather: {},
 })
 
 const createStationTelemetry = () => ({
@@ -723,7 +730,7 @@ export const usePolarisStore = create((set, get) => ({
         telemetry: reset,
         baseline: reset,
         series: seedAllSeries(reset),
-        ccriticalAck: loadCriticalAck(),
+        criticalAck: loadCriticalAck(),
       }
     })
   },
@@ -838,7 +845,7 @@ export const usePolarisStore = create((set, get) => ({
     }
     if (kind === 'export_sitrep') {
       store.setShowTelemetry(true)
-      exportSitrep({
+      await exportSitrep({
         station: store.selectedStation,
         telemetry: store.telemetry[store.selectedStation],
         delayDays: store.voyageDelayDays,

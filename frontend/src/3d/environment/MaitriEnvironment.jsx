@@ -2,8 +2,6 @@ import { Suspense } from 'react'
 import { Sky, Environment } from '@react-three/drei'
 import {
   EffectComposer,
-  N8AO,
-  SMAA,
   ToneMapping,
   Vignette,
 } from '@react-three/postprocessing'
@@ -21,8 +19,8 @@ function MaitriLights({ climate }) {
         position={climate.sun}
         intensity={climate.sunIntensity}
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-near={1}
         shadow-camera-far={220}
         shadow-camera-left={-80}
@@ -80,33 +78,27 @@ export default function MaitriEnvironment() {
         gale={climate.gale}
         cold={climate.cold}
         count={Math.floor(climate.snowCount * 0.55)}
-        maxCount={3100}
+        maxCount={800}
         extent={[90, 28, 70]}
         size={0.22}
       />
-      <WeatherField
-        gale={climate.gale}
-        cold={climate.cold}
-        count={Math.floor(climate.groundSnowCount * 0.5)}
-        maxCount={1300}
-        extent={[90, 3, 70]}
-        floor={0.1}
-        speed={1.9}
-        size={0.6}
-        opacityScale={0.55}
-        color="#f7fbfe"
-      />
-
-      <EffectComposer multisampling={0}>
-        <N8AO
-          aoRadius={4}
-          intensity={1.35}
-          distanceFalloff={1.1}
-          quality="medium"
-          halfRes
+      {climate.groundSnowCount > 40 && (
+        <WeatherField
+          gale={climate.gale}
+          cold={climate.cold}
+          count={Math.floor(climate.groundSnowCount * 0.5)}
+          maxCount={400}
+          extent={[90, 3, 70]}
+          floor={0.1}
+          speed={1.9}
+          size={0.6}
+          opacityScale={0.55}
+          color="#f7fbfe"
         />
+      )}
+
+      <EffectComposer multisampling={0} enableNormalPass={false}>
         <Vignette eskil={false} offset={0.2} darkness={climate.vignette} />
-        <SMAA />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>
     </>

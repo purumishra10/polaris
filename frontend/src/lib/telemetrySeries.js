@@ -21,7 +21,7 @@ export function sampleFromTelemetry(telemetry, at = Date.now()) {
 export function pushSample(history, telemetry, at = Date.now()) {
   const previous = Array.isArray(history) ? history : []
   const last = previous[previous.length - 1]
-  if (last && at - last.t < 900) {
+  if (last && at - last.t < 2500) {
     return [...previous.slice(0, -1), sampleFromTelemetry(telemetry, at)].slice(
       -MAX_POINTS,
     )

@@ -34,7 +34,7 @@ export default function StationScene() {
       <Canvas
         key={selectedStation}
         shadows
-        dpr={[1, 1.75]}
+        dpr={[1, 1.25]}
         eventSource={orbitRoot}
         eventPrefix="client"
         gl={{

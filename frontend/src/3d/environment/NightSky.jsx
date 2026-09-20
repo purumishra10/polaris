@@ -187,7 +187,7 @@ export default function NightSky({ climate, station = 'BHARATI' }) {
     <group>
       <Stars
         radius={radius}
-        count={isBharati ? 1900 : 1200}
+        count={isBharati ? 900 : 600}
         visibility={climate.starVisibility}
       />
       <Moon position={moonPos} radius={moonRadius} opacity={climate.moon} />

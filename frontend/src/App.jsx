@@ -52,10 +52,14 @@ export default function App() {
     }
   }, [setTelemetryPacket, setConnectionStatus])
 
+  // Soft plant drift only when WS is down. With live packets, 700ms ticks
+  // double-update the store and re-render the whole 3D + desk every cycle.
   useEffect(() => {
     const id = window.setInterval(() => {
+      const status = usePolarisStore.getState().connection?.status
+      if (status === 'CONNECTED_WS' || status === 'CONNECTED') return
       usePolarisStore.getState().tickLive()
-    }, 700)
+    }, 2000)
     return () => window.clearInterval(id)
   }, [])
 

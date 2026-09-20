@@ -44,6 +44,20 @@ export function assetFault(id, telemetry) {
           `${days.toFixed(0)} days of JET A-1 left — below the ${SOP.FUEL_CRITICAL_DAYS}-day SOP floor. Next ship window may close first.`,
         )
       }
+      if (telemetry?.voyage?.miss_window) {
+        return fault(
+          TONE.CRITICAL,
+          'MISSED SEA CALL',
+          'Delayed voyage ETA is after the sea-window close. No bulk resupply this season.',
+        )
+      }
+      if (Number(telemetry?.voyage?.delay_days) > 0 && days < SOP.FUEL_ADVISORY_DAYS) {
+        return fault(
+          TONE.ADVISORY,
+          'DELAY vs FUEL',
+          `Ship +${telemetry.voyage.delay_days} d. Rescore farm against ETA (30/15 SOP).`,
+        )
+      }
       if (days < SOP.FUEL_ADVISORY_DAYS) {
         return fault(
           TONE.ADVISORY,

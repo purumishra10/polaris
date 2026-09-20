@@ -2,8 +2,6 @@ import { Suspense } from 'react'
 import { Sky, Environment, Cloud, Clouds, Sparkles } from '@react-three/drei'
 import {
   EffectComposer,
-  N8AO,
-  SMAA,
   ToneMapping,
   Bloom,
   Vignette,
@@ -23,8 +21,8 @@ function BharatiLights({ climate }) {
         position={climate.sun}
         intensity={climate.sunIntensity}
         castShadow
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-near={2}
         shadow-camera-far={320}
         shadow-camera-left={-120}
@@ -167,47 +165,43 @@ export default function BharatiEnvironment() {
         gale={climate.gale}
         cold={climate.cold}
         count={climate.snowCount}
-        maxCount={5600}
+        maxCount={1200}
         extent={[240, 52, 200]}
       />
       {/* Low, fast ground-blowing snow that only appears in a gale */}
-      <WeatherField
-        gale={climate.gale}
-        cold={climate.cold}
-        count={climate.groundSnowCount}
-        maxCount={2600}
-        extent={[240, 6, 200]}
-        floor={0.15}
-        speed={1.9}
-        size={1.1}
-        opacityScale={0.55}
-        color="#f7fbfe"
-      />
-
-      <Sparkles
-        count={climate.sparkleCount}
-        scale={[220, 36, 180]}
-        size={1.6 + climate.gale * 1.4}
-        speed={climate.sparkleSpeed}
-        opacity={climate.sparkleOpacity}
-        color="#f4fbff"
-      />
-
-      <EffectComposer multisampling={0}>
-        <N8AO
-          aoRadius={6}
-          intensity={1.55}
-          distanceFalloff={1.05}
-          quality="medium"
-          halfRes
+      {climate.groundSnowCount > 40 && (
+        <WeatherField
+          gale={climate.gale}
+          cold={climate.cold}
+          count={climate.groundSnowCount}
+          maxCount={600}
+          extent={[240, 6, 200]}
+          floor={0.15}
+          speed={1.9}
+          size={1.1}
+          opacityScale={0.55}
+          color="#f7fbfe"
         />
+      )}
+
+      {climate.sparkleCount > 0 && (
+        <Sparkles
+          count={climate.sparkleCount}
+          scale={[220, 36, 180]}
+          size={1.6 + climate.gale * 1.4}
+          speed={climate.sparkleSpeed}
+          opacity={climate.sparkleOpacity}
+          color="#f4fbff"
+        />
+      )}
+
+      <EffectComposer multisampling={0} enableNormalPass={false}>
         <Bloom
-          luminanceThreshold={0.72}
-          luminanceSmoothing={0.2}
-          intensity={climate.bloom}
+          luminanceThreshold={0.78}
+          luminanceSmoothing={0.25}
+          intensity={climate.bloom * 0.7}
         />
         <Vignette eskil={false} offset={0.18} darkness={climate.vignette} />
-        <SMAA />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>
     </>

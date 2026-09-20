@@ -25,9 +25,11 @@ import {
   POLAR_WINDOWS,
   STATION_FACTS,
 } from './imdClimate'
+import climateMonthly from './climateMonthly.json'
 import LiveValue from './LiveValue'
 import { parseMarkdown, renderInline, sectionsForStation } from './markdown'
 import FuelDecision from '../ops/FuelDecision'
+import DayClock from '../ops/DayClock'
 import PolarCalendar from '../ops/PolarCalendar'
 import InstrumentRail from '../ops/InstrumentRail'
 import MapDesk from '../ops/MapDesk'
@@ -162,6 +164,7 @@ export default function AnalysisDesk({ onClose }) {
   const setPlantMode = usePolarisStore((state) => state.setPlantMode)
   const voyageDelayDays = usePolarisStore((state) => state.voyageDelayDays)
   const setVoyageDelay = usePolarisStore((state) => state.setVoyageDelay)
+  const fleet = usePolarisStore((state) => state.telemetry)
 
   const [openSection, setOpenSection] = useState(null)
   const [doc, setDoc] = useState('knowledge')
@@ -171,8 +174,18 @@ export default function AnalysisDesk({ onClose }) {
   const replay = telemetry?.replay
   const facts = STATION_FACTS[selectedStation]
   const monthly = selectedStation === 'BHARATI' ? BHARATI_MONTHLY : MAITRI_MONTHLY
+  const eraMonthly = climateMonthly[selectedStation]?.monthly ?? []
+  const imdByMonth = Object.fromEntries(monthly.map((row) => [row.month, row]))
+  const climateChart = eraMonthly.map((row) => ({
+    month: row.month,
+    eraTemp: row.temp,
+    eraWind: row.wind,
+    imdTemp: imdByMonth[row.month]?.temp,
+    imdWind: imdByMonth[row.month]?.wind,
+  }))
   const polar = POLAR_WINDOWS[selectedStation]
   const source = selectedStation === 'BHARATI' ? CLIMATE_SOURCE.bharati : CLIMATE_SOURCE.maitri
+  const forecast = telemetry?.forecast ?? {}
 
   const loadMix = [
     { id: 'ESS', value: telemetry?.microgrid?.essential_load_kva ?? 0, fill: '#64d8a0' },
@@ -225,6 +238,7 @@ export default function AnalysisDesk({ onClose }) {
     selectedStation,
     clockDate,
     voyageDelayDays,
+    fleet,
   )
   const occNow = telemetry?.occupancy ?? facts.winter
   const fuelTag = telemetry?.plant?.tag ?? (replayOn ? 'MODELED' : 'SYNTHETIC')
@@ -247,6 +261,9 @@ export default function AnalysisDesk({ onClose }) {
           <div className={`station-status status-${severity.toLowerCase()}`}>
             <span className="status-dot live-pulse" />
             {replayOn ? 'REPLAY' : 'LIVE'} · {severity}
+            {['WATCH', 'IMMINENT'].includes(String(forecast.status || ''))
+              ? ' · 6H WATCH'
+              : ''}
           </div>
           {onClose && (
             <button type="button" className="brief-close" onClick={onClose}>
@@ -271,6 +288,28 @@ export default function AnalysisDesk({ onClose }) {
 
       {hudTab === 'live' && (
         <div className="desk-body">
+          <DayClock />
+          <div className="fact-strip tight split-bands">
+            <div>
+              <span>FUEL SOP</span>
+              <b>{fuelOps.band}</b>
+            </div>
+            <div>
+              <span>6H NOWCAST</span>
+              <b>{String(forecast.status || 'OFF')}</b>
+            </div>
+            <div>
+              <span>HELI</span>
+              <b>{telemetry?.lockouts?.heli || '—'}</b>
+            </div>
+            <div>
+              <span>BANNER</span>
+              <b>
+                {severity}
+                {telemetry?.risk?.driver ? ` · ${String(telemetry.risk.driver).toUpperCase()}` : ''}
+              </b>
+            </div>
+          </div>
           <div className="metric-row">
             <button
               type="button"
@@ -319,6 +358,35 @@ export default function AnalysisDesk({ onClose }) {
               </em>
             </div>
           </div>
+
+          {forecast?.model && (
+            <div className={`forecast-panel status-${String(forecast.status || 'CLEAR').toLowerCase()}`}>
+              <div className="forecast-copy">
+                <span>6 H NOWCAST · {forecast.model} · proxy {forecast.neighbor || '—'}</span>
+                <strong>
+                  peak gust <LiveValue value={forecast.gust_max_6h_kn} digits={1} suffix=" kt" />
+                  {' · '}
+                  P(≥23 kt) {((forecast.p_lockout_23 ?? 0) * 100).toFixed(0)}%
+                </strong>
+                <em>
+                  {forecast.status || 'CLEAR'}
+                  {forecast.wind_max_6h_kn != null
+                    ? ` · wind max ${Number(forecast.wind_max_6h_kn).toFixed(1)} kt`
+                    : ''}
+                  {forecast.temp_min_6h_c != null
+                    ? ` · min T ${Number(forecast.temp_min_6h_c).toFixed(1)}°C`
+                    : ''}
+                </em>
+              </div>
+              {(forecast.recommended_actions || []).length > 0 && (
+                <ul>
+                  {forecast.recommended_actions.slice(0, 3).map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <div className="chart-frame">
             <div className="chart-legend">
@@ -418,14 +486,14 @@ export default function AnalysisDesk({ onClose }) {
           <button
             type="button"
             className="sitrep-export"
-            onClick={() =>
-              exportSitrep({
+            onClick={() => {
+              void exportSitrep({
                 station: selectedStation,
                 telemetry,
                 delayDays: voyageDelayDays,
                 plantMode,
               })
-            }
+            }}
           >
             EXPORT SITREP PDF
           </button>
@@ -475,29 +543,49 @@ export default function AnalysisDesk({ onClose }) {
 
           <div className="chart-frame">
             <div className="chart-legend">
-              <span>RECONSTRUCTED YEAR</span>
-              <b>TEMP · WIND</b>
+              <span>ERA5 2022–24 vs IMD 2017–18</span>
+              <b>TEMP °C</b>
             </div>
             <div className="chart-canvas tall">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={monthly} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                <ComposedChart data={climateChart} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
                   <CartesianGrid stroke="rgba(129,175,190,0.12)" vertical={false} />
                   <XAxis dataKey="month" tick={{ fill: '#66828e', fontSize: 9 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: '#7d96a0', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
                   <Tooltip
                     contentStyle={TOOLTIP_STYLE}
                     formatter={(value, name) => [
-                      name === 'temp' ? `${value} °C` : `${value} kn`,
-                      name === 'temp' ? 'Temp' : 'Wind',
+                      `${Number(value).toFixed(1)} °C`,
+                      name === 'eraTemp' ? 'ERA5 2022–24' : 'IMD 2017–18',
                     ]}
-                    labelFormatter={(label, payload) =>
-                      payload?.[0]?.payload?.tag
-                        ? `${label} · ${payload[0].payload.tag}`
-                        : label
-                    }
                   />
-                  <Area type="monotone" dataKey="temp" stroke="#56b9d8" fill="rgba(86,185,216,0.16)" name="temp" />
-                  <Line type="monotone" dataKey="wind" stroke="#e8c48a" dot={false} strokeWidth={2} name="wind" />
+                  <Area type="monotone" dataKey="eraTemp" stroke="#56b9d8" fill="rgba(86,185,216,0.16)" name="eraTemp" />
+                  <Line type="monotone" dataKey="imdTemp" stroke="#8aa4ad" dot={false} strokeWidth={1.6} strokeDasharray="4 3" name="imdTemp" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="chart-frame">
+            <div className="chart-legend">
+              <span>WIND kn · {climateMonthly[selectedStation]?.neighbor} proxy used in nowcast</span>
+              <b>ERA5 vs IMD</b>
+            </div>
+            <div className="chart-canvas">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={climateChart} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                  <CartesianGrid stroke="rgba(129,175,190,0.12)" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: '#66828e', fontSize: 9 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: '#7d96a0', fontSize: 9 }} axisLine={false} tickLine={false} width={28} />
+                  <Tooltip
+                    contentStyle={TOOLTIP_STYLE}
+                    formatter={(value, name) => [
+                      `${Number(value).toFixed(1)} kn`,
+                      name === 'eraWind' ? 'ERA5 2022–24' : 'IMD 2017–18',
+                    ]}
+                  />
+                  <Line type="monotone" dataKey="eraWind" stroke="#e8c48a" dot={false} strokeWidth={2} name="eraWind" />
+                  <Line type="monotone" dataKey="imdWind" stroke="#8aa4ad" dot={false} strokeWidth={1.6} strokeDasharray="4 3" name="imdWind" />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
@@ -585,7 +673,10 @@ export default function AnalysisDesk({ onClose }) {
             </button>
           </div>
 
-          <div className="source-note">{source}</div>
+          <div className="source-note">
+            Open-Meteo ERA5-land 2022–2024 monthly means (solid) vs {source} (dashed).
+            Nowcast trains with {climateMonthly[selectedStation]?.neighbor} as the Russian proxy.
+          </div>
         </div>
       )}
 

@@ -47,6 +47,7 @@ export interface StationTelemetry {
     anomaly_score: number
     is_anomaly: boolean
     severity: Severity
+    driver?: 'nominal' | 'nowcast' | 'fuel' | 'thermal' | 'structural'
     prescribed_actions: string[]
   }
 }

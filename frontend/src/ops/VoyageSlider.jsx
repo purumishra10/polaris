@@ -24,7 +24,7 @@ export default function VoyageSlider({ delayDays, onChange, decision }) {
           ? 'Delayed arrival is after the sea-window close. Both stations lose that call.'
           : value
             ? `Ship is modeled ${value} days earlier on the Cape Town → Bharati → Maitri track. Heli only while the ship is in the bay.`
-            : 'One ship. Delay at Bharati is a Maitri problem. Heli exists only while the voyage is in the bay.'}
+            : 'One ship. Gold line = flown. Card shows km and days to Bharati and Maitri. Heli only in the bay.'}
       </p>
       {decision && (
         <em>
