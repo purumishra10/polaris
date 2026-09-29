@@ -20,6 +20,7 @@ import {
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
 import LiveTwinViewport from '../components/LiveTwinViewport'
+import IncidentTimeline from '../components/IncidentTimeline'
 import { usePolarisStore } from '../store/usePolarisStore'
 
 interface Props {
@@ -443,6 +444,8 @@ export default function MissionControl({
               )}
             </div>
           )}
+
+        <IncidentTimeline />
 
         <LiveTwinViewport />
 

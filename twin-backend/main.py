@@ -127,6 +127,12 @@ async def _inject(payload: ScenarioInjectRequest) -> ScenarioInjectResponse:
         "duration_seconds": payload.duration_seconds,
     }
     await _edge_post("/edge/scenario/inject", json=body)
+    history_store.record_event(
+        twin.active_station,
+        "OPERATOR",
+        "SCENARIO",
+        f"{payload.scenario_type} injected for {payload.duration_seconds}s",
+    )
     return ScenarioInjectResponse(
         scenario=payload.scenario_type or "",
         duration_seconds=payload.duration_seconds,
@@ -207,11 +213,24 @@ async def telemetry_history(station: str = "BHARATI", minutes: int = 60) -> dict
     return history_store.history_payload(key, window)
 
 
+@app.get("/api/events")
+async def incident_events(limit: int = 80) -> dict[str, Any]:
+    cap = max(1, min(int(limit), 200))
+    return {"events": history_store.recent_events(cap)}
+
+
 @app.post("/api/station/controls", response_model=ControlsAckResponse)
 async def station_controls(payload: ControlUpdateRequest) -> ControlsAckResponse:
     body = payload.model_dump(exclude_unset=True, exclude_none=True)
     if not body:
         raise HTTPException(status_code=400, detail="No control fields supplied")
+    fields = ", ".join(sorted(body.keys()))
+    history_store.record_event(
+        twin.active_station,
+        "OPERATOR",
+        "CONTROL",
+        f"Operator updated {fields}",
+    )
     data = await _edge_post("/edge/controls", json=body)
     controls = ControlsState.model_validate(data.get("controls", {}))
     return ControlsAckResponse(station_id=twin.active_station, active_controls=controls)

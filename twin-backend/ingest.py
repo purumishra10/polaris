@@ -83,6 +83,7 @@ class TwinState:
         self.last_latency_ms: Optional[int] = None
         self.consecutive_edge_failures: int = 0
         self.edge_reachable: bool = False
+        self.edge_down_logged: bool = False
         self.active_station: str = "BHARATI"
 
         self._task: Optional[asyncio.Task] = None
@@ -244,6 +245,7 @@ class TwinState:
 
         self.consecutive_edge_failures = 0
         self.edge_reachable = True
+        self.edge_down_logged = False
 
         await self.manager.broadcast(
             enriched.model_dump()
@@ -266,6 +268,13 @@ class TwinState:
             self.consecutive_edge_failures,
             exc.__class__.__name__,
         )
+
+        if not self.edge_down_logged:
+            self.edge_down_logged = True
+            try:
+                history_store.note_edge_down(self.active_station)
+            except Exception:  # noqa: BLE001
+                log.exception("Incident log write failed")
 
         if self.latest is None:
             return
