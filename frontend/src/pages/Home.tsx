@@ -15,13 +15,16 @@ import {
 } from 'lucide-react'
 import { usePolarisStore } from '../store/usePolarisStore'
 import SeverityBadge from '../components/SeverityBadge'
+import BootSequence from '../components/BootSequence'
+import ServicePulse from '../components/ServicePulse'
+import AntarcticRouteMap from '../components/AntarcticRouteMap'
 
 interface HomeProps {
-  onNavigate: (route: 'home' | 'mission-control' | 'analytics') => void
+  onNavigate: (route: 'home' | 'mission-control' | 'analytics' | 'fleet') => void
 }
 
 export default function Home({ onNavigate }: HomeProps) {
-  const { telemetry, selectedStation, setSelectedStation } = usePolarisStore()
+  const { telemetry, selectedStation, setSelectedStation, connection } = usePolarisStore()
   const [clock, setClock] = useState(new Date())
   const parallaxRef = useRef<HTMLDivElement>(null)
 
@@ -79,9 +82,17 @@ export default function Home({ onNavigate }: HomeProps) {
   }, [])
 
   const activeTelemetry = telemetry[selectedStation]
+  const awaitingLink = !connection?.last_update
+  const metric = (value: string) =>
+    awaitingLink ? (
+      <span className="mt-1 inline-block h-6 w-20 animate-pulse rounded bg-white/10" />
+    ) : (
+      value
+    )
 
   return (
     <div className="relative min-h-screen flex flex-col bg-base-950 text-white overflow-hidden">
+      <BootSequence />
       {/* Parallax Antarctic background — image tracks pointer and scroll behind the UI */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div
@@ -97,7 +108,9 @@ export default function Home({ onNavigate }: HomeProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-1 flex flex-col px-4 sm:px-8 md:px-12 py-8 max-w-7xl mx-auto w-full">
+      <div className="relative z-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
+        <ServicePulse />
+        <div className="px-4 sm:px-8 md:px-12 py-8">
         {/* Hero Header */}
         <div className="mb-10 text-center md:text-left pt-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ice-600/20 border border-ice-400/40 text-ice-300 text-xs font-mono font-semibold tracking-wider mb-4 shadow-glow">
@@ -122,7 +135,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 <Thermometer size={13} className="text-ice-400" /> HABITAT TEMP
               </span>
               <p className="text-lg font-bold text-white mt-1">
-                {activeTelemetry?.thermal?.internal_temp_c?.toFixed(1) ?? '20.5'}°C
+                {metric(`${activeTelemetry?.thermal?.internal_temp_c?.toFixed(1) ?? '20.5'}°C`)}
               </p>
             </div>
 
@@ -131,7 +144,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 <Gauge size={13} className="text-ice-400" /> FUEL AUTONOMY
               </span>
               <p className="text-lg font-bold text-white mt-1">
-                {activeTelemetry?.fuel?.days_of_autonomy?.toFixed(0) ?? '154'} DAYS
+                {metric(`${activeTelemetry?.fuel?.days_of_autonomy?.toFixed(0) ?? '154'} DAYS`)}
               </p>
             </div>
 
@@ -140,7 +153,7 @@ export default function Home({ onNavigate }: HomeProps) {
                 <Wind size={13} className="text-ice-400" /> WIND SPEED
               </span>
               <p className="text-lg font-bold text-white mt-1">
-                {activeTelemetry?.ambient?.wind_speed_knots?.toFixed(1) ?? '22.0'} kt
+                {metric(`${activeTelemetry?.ambient?.wind_speed_knots?.toFixed(1) ?? '22.0'} kt`)}
               </p>
             </div>
 
@@ -149,8 +162,38 @@ export default function Home({ onNavigate }: HomeProps) {
                 <Satellite size={13} className="text-ice-400" /> SAT LATENCY
               </span>
               <p className="text-lg font-bold text-ice-300 mt-1">
-                {activeTelemetry?.link_status?.latency_ms ?? 480} ms
+                {metric(`${activeTelemetry?.link_status?.latency_ms ?? 480} ms`)}
               </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <AntarcticRouteMap onSelect={(station: 'BHARATI' | 'MAITRI') => setSelectedStation(station)} />
+          <div className="flex flex-col justify-between rounded-2xl border border-base-700 bg-base-900/75 p-5">
+            <div>
+              <p className="text-[11px] font-mono uppercase tracking-[0.16em] text-ice-300">
+                Both stations from Goa
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                Bharati and Maitri sit about 3,100 km apart. The arc is the logistics route. Compare them without leaving the command picture.
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => onNavigate('fleet')}
+                className="rounded-lg bg-ice-600 px-3 py-2 text-xs font-semibold text-white"
+              >
+                Compare stations
+              </button>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('polaris:briefing'))}
+                className="rounded-lg border border-base-600 px-3 py-2 text-xs font-semibold text-slate-100"
+              >
+                Daily briefing
+              </button>
             </div>
           </div>
         </div>
@@ -277,9 +320,7 @@ export default function Home({ onNavigate }: HomeProps) {
             </h3>
 
             <p className="text-sm text-slate-300 leading-relaxed mb-4">
-              Comprehensive operational telemetry dashboard with embedded 3D spatial twin:
-              fuel consumption trajectory, microgrid load breakdown (Essential vs Science vs Comfort),
-              habitat thermal dissipation curves, and cryospheric weather indices.
+              Fuel, microgrid, and thermal traces with a playback scrubber and a 24-hour autonomy outlook.
             </p>
 
             <div className="flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
@@ -312,9 +353,7 @@ export default function Home({ onNavigate }: HomeProps) {
             </h3>
 
             <p className="text-sm text-slate-300 leading-relaxed mb-4">
-              Interactive 3D digital twin viewport with subsystem hotspot pins, real-time Isolation Forest
-              anomaly detection header, emergency SOP prescriptive mitigation drawer (one-click actuator execution),
-              and disaster scenario injection for hackathon demonstrations.
+              Live station twin, SOP actions tied to the regulation text, and a log of what the operator approved.
             </p>
 
             <div className="flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
@@ -337,6 +376,7 @@ export default function Home({ onNavigate }: HomeProps) {
             <span>SIH 2026</span>
           </div>
         </footer>
+        </div>
       </div>
     </div>
   )
