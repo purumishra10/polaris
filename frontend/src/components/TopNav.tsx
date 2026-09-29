@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Radio, Gauge, Activity, Snowflake, Flame, Satellite, Columns2 } from 'lucide-react'
 import { usePolarisStore } from '../store/usePolarisStore'
 import ServicePulse from './ServicePulse'
+import LinkBanner from './LinkBanner'
 
 interface TopNavProps {
   currentTab: 'home' | 'mission-control' | 'analytics' | 'fleet'
@@ -31,10 +32,13 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
   const currentTelemetry = telemetry[selectedStation]
   const latency = connection?.latency_ms || currentTelemetry?.link_status?.latency_ms || 460
   const isWsConnected = connection?.status === 'CONNECTED_WS'
+  const linkHealth = currentTelemetry?.link_status?.health
+  const offline = connection?.status === 'OFFLINE'
 
   return (
     <div className="sticky top-0 z-40">
       <ServicePulse />
+      <LinkBanner />
     <header className="border-b border-base-700 bg-base-950/90 backdrop-blur-md px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
       {/* Left: Branding & Station Switcher */}
       <div className="flex items-center gap-4 min-w-0">
@@ -164,14 +168,14 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
           className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-base-700 bg-base-900 text-xs font-mono"
           title={`Satellite Link: ${isWsConnected ? 'Active WebSocket' : 'Fallback HTTP Polling'}`}
         >
-          <Satellite size={13} className={'text-ice-400'} />
+          <Satellite size={13} className={offline || linkHealth === 'DEGRADED' ? 'text-amber-400' : 'text-ice-400'} />
           <span className="text-slate-300 hidden sm:inline">
-            C-band
+            {linkHealth === 'DEGRADED' ? 'DEGRADED' : 'C-band'}
           </span>
           <span className="text-ice-400 font-bold">{latency}ms</span>
           <span
             className={`h-2 w-2 rounded-full ${
-              isWsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+              isWsConnected && linkHealth !== 'DEGRADED' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
             }`}
           />
         </div>

@@ -188,14 +188,24 @@ async def root() -> dict[str, Any]:
 
 @app.get("/health", response_model=TwinHealthResponse)
 async def health() -> TwinHealthResponse:
+    if twin.edge_reachable:
+        link_mode = "LIVE"
+        status = "ONLINE"
+    elif twin.latest is not None:
+        link_mode = "DEGRADED"
+        status = "DEGRADED"
+    else:
+        link_mode = "STARTING"
+        status = "STARTING"
     return TwinHealthResponse(
-        status="ONLINE",
+        status=status,
         station_id=twin.active_station,
         edge_reachable=twin.edge_reachable,
         model_loaded=scorer.loaded or twin.nowcast.loaded,
         last_ingest_utc=twin.last_ingest_utc,
         connected_clients=manager.count,
         consecutive_edge_failures=twin.consecutive_edge_failures,
+        link_mode=link_mode,
         citation_source=citation_backend(),
     )
 

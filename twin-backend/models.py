@@ -292,4 +292,5 @@ class TwinHealthResponse(BaseModel):
     last_ingest_utc: Optional[str]
     connected_clients: int
     consecutive_edge_failures: int
+    link_mode: str = "STARTING"
     citation_source: str = "local"
