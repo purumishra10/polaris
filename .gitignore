@@ -4,6 +4,7 @@ __pycache__/
 *.pyc
 *.log
 infra/postgres/data/
+twin-backend/data/
 scripts/_inspect_sources.py
 
 .venv311/
