@@ -8,6 +8,7 @@ import {
 import { ToneMappingMode } from 'postprocessing'
 
 import { useSmoothedClimate } from './useSmoothedClimate'
+import { liteGraphics } from '../../lib/graphicsQuality'
 import WeatherField from './WeatherField'
 import NightSky from './NightSky'
 
@@ -18,9 +19,9 @@ function MaitriLights({ climate }) {
       <directionalLight
         position={climate.sun}
         intensity={climate.sunIntensity}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        castShadow={!liteGraphics}
+        shadow-mapSize-width={512}
+        shadow-mapSize-height={512}
         shadow-camera-near={1}
         shadow-camera-far={220}
         shadow-camera-left={-80}
@@ -66,9 +67,11 @@ export default function MaitriEnvironment() {
         mieDirectionalG={0.78}
       />
 
+      {!liteGraphics && (
       <Suspense fallback={null}>
         <Environment preset="city" />
       </Suspense>
+      )}
 
       <NightSky climate={climate} station="MAITRI" />
 
@@ -78,7 +81,7 @@ export default function MaitriEnvironment() {
         gale={climate.gale}
         cold={climate.cold}
         count={Math.floor(climate.snowCount * 0.55)}
-        maxCount={800}
+        maxCount={liteGraphics ? 140 : 320}
         extent={[90, 28, 70]}
         size={0.22}
       />
@@ -87,7 +90,7 @@ export default function MaitriEnvironment() {
           gale={climate.gale}
           cold={climate.cold}
           count={Math.floor(climate.groundSnowCount * 0.5)}
-          maxCount={400}
+          maxCount={liteGraphics ? 40 : 140}
           extent={[90, 3, 70]}
           floor={0.1}
           speed={1.9}
@@ -97,10 +100,12 @@ export default function MaitriEnvironment() {
         />
       )}
 
+      {!liteGraphics && (
       <EffectComposer multisampling={0} enableNormalPass={false}>
         <Vignette eskil={false} offset={0.2} darkness={climate.vignette} />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>
+      )}
     </>
   )
 }

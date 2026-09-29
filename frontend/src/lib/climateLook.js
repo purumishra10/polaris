@@ -1,3 +1,5 @@
+import { liteGraphics, snowCap } from './graphicsQuality'
+
 function clamp(value, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value))
 }
@@ -125,16 +127,25 @@ export function climateLook(telemetry, station = 'BHARATI', drivers = null) {
     aurora,
     stationGlow: clamp((night - 0.25) / 0.5) * (1 - gale * 0.3),
     // Precipitation
-    sparkleCount: gale > 0.15 ? 24 + Math.round(gale * 4) * 8 : 0,
+    sparkleCount: liteGraphics
+      ? 0
+      : gale > 0.15
+        ? 16 + Math.round(gale * 3) * 6
+        : 0,
     sparkleSpeed: 0.15 + gale * 2.8,
     sparkleOpacity: 0.2 + gale * 0.55,
-    // Cap flakes — CPU updates every particle in WeatherField.useFrame.
-    snowCount:
+    snowCount: snowCap(
       gale > 0.03 || cold > 0.3
         ? Math.round(80 + Math.pow(gale, 1.5) * 900 + cold * 80)
         : 0,
-    groundSnowCount:
+      160,
+      420,
+    ),
+    groundSnowCount: snowCap(
       gale > 0.35 ? Math.round(((gale - 0.35) / 0.65) * 500) : 0,
+      50,
+      160,
+    ),
   }
 }
 

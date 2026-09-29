@@ -10,6 +10,7 @@ import { ToneMappingMode } from 'postprocessing'
 import * as THREE from 'three'
 
 import { useSmoothedClimate } from './useSmoothedClimate'
+import { liteGraphics } from '../../lib/graphicsQuality'
 import WeatherField from './WeatherField'
 import NightSky from './NightSky'
 
@@ -20,9 +21,9 @@ function BharatiLights({ climate }) {
       <directionalLight
         position={climate.sun}
         intensity={climate.sunIntensity}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        castShadow={!liteGraphics}
+        shadow-mapSize-width={512}
+        shadow-mapSize-height={512}
         shadow-camera-near={2}
         shadow-camera-far={320}
         shadow-camera-left={-120}
@@ -89,15 +90,16 @@ export default function BharatiEnvironment() {
         mieDirectionalG={0.82}
       />
 
+      {!liteGraphics && (
       <Suspense fallback={null}>
         <Environment preset="sunset" />
         <Clouds material={THREE.MeshLambertMaterial}>
           <Cloud
             position={[40, 62, -50]}
             seed={2}
-            segments={18}
+            segments={12}
             bounds={[70, 10, 28]}
-            volume={28}
+            volume={22}
             color="#eef3f6"
             fade={90}
             opacity={(0.42 + climate.gale * 0.35) * climate.cloudOpacity}
@@ -105,56 +107,16 @@ export default function BharatiEnvironment() {
           <Cloud
             position={[-60, 58, 20]}
             seed={8}
-            segments={16}
+            segments={10}
             bounds={[55, 8, 24]}
-            volume={22}
+            volume={16}
             color="#f4f7f8"
             fade={80}
             opacity={(0.35 + climate.gale * 0.4) * climate.cloudOpacity}
           />
-          <Cloud
-            position={[90, 70, 40]}
-            seed={5}
-            segments={14}
-            bounds={[48, 7, 22]}
-            volume={18}
-            color="#e7eef2"
-            fade={100}
-            opacity={(0.3 + climate.gale * 0.45) * climate.cloudOpacity}
-          />
-          {/* Distant cloud banks for depth toward the horizon */}
-          <Cloud
-            position={[-320, 105, -260]}
-            seed={11}
-            segments={20}
-            bounds={[220, 16, 70]}
-            volume={70}
-            color="#eef3f7"
-            fade={400}
-            opacity={(0.32 + climate.gale * 0.4) * climate.cloudOpacity}
-          />
-          <Cloud
-            position={[300, 125, -380]}
-            seed={17}
-            segments={18}
-            bounds={[200, 18, 80]}
-            volume={64}
-            color="#f2f6f9"
-            fade={420}
-            opacity={(0.28 + climate.gale * 0.4) * climate.cloudOpacity}
-          />
-          <Cloud
-            position={[-80, 140, 420]}
-            seed={23}
-            segments={16}
-            bounds={[240, 14, 70]}
-            volume={60}
-            color="#eaf0f4"
-            fade={460}
-            opacity={(0.26 + climate.gale * 0.4) * climate.cloudOpacity}
-          />
         </Clouds>
       </Suspense>
+      )}
 
       <NightSky climate={climate} station="BHARATI" />
 
@@ -165,7 +127,7 @@ export default function BharatiEnvironment() {
         gale={climate.gale}
         cold={climate.cold}
         count={climate.snowCount}
-        maxCount={1200}
+        maxCount={liteGraphics ? 180 : 420}
         extent={[240, 52, 200]}
       />
       {/* Low, fast ground-blowing snow that only appears in a gale */}
@@ -174,7 +136,7 @@ export default function BharatiEnvironment() {
           gale={climate.gale}
           cold={climate.cold}
           count={climate.groundSnowCount}
-          maxCount={600}
+          maxCount={liteGraphics ? 60 : 180}
           extent={[240, 6, 200]}
           floor={0.15}
           speed={1.9}
@@ -195,6 +157,7 @@ export default function BharatiEnvironment() {
         />
       )}
 
+      {!liteGraphics && (
       <EffectComposer multisampling={0} enableNormalPass={false}>
         <Bloom
           luminanceThreshold={0.78}
@@ -204,6 +167,7 @@ export default function BharatiEnvironment() {
         <Vignette eskil={false} offset={0.18} darkness={climate.vignette} />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       </EffectComposer>
+      )}
     </>
   )
 }

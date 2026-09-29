@@ -14,13 +14,14 @@ import {
   surfaceNormal,
   alignToNormal,
 } from './terrainMesh'
+import { liteGraphics } from '../../lib/graphicsQuality'
 
 const INNER_SIZE = 260
 const FAR_RADIUS = 1700
 
 function OasisField() {
   const geometry = useMemo(
-    () => displacedPlane(INNER_SIZE, 200, maitriHeightAt, maitriTerrainColor),
+    () => displacedPlane(INNER_SIZE, liteGraphics ? 64 : 120, maitriHeightAt, maitriTerrainColor),
     [],
   )
   return (
@@ -37,8 +38,8 @@ function IceSheetField() {
       displacedRing(
         120,
         FAR_RADIUS,
-        160,
-        48,
+        liteGraphics ? 48 : 96,
+        liteGraphics ? 12 : 20,
         maitriHeightAt,
         maitriTerrainColor,
         (x, z) => {
