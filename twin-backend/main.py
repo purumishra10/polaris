@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import satellite
 from anomaly import AnomalyScorer
 from config import settings
+from history_store import history_store
 from ingest import ConnectionManager, TwinState
 from validation import validate_all_blizzard_events, validate_event_by_id
 from models import (
@@ -197,6 +198,13 @@ async def health() -> TwinHealthResponse:
 @app.get("/api/telemetry", response_model=StationTelemetry)
 async def get_telemetry() -> dict[str, Any]:
     return _require_snapshot()
+
+
+@app.get("/api/telemetry/history")
+async def telemetry_history(station: str = "BHARATI", minutes: int = 60) -> dict[str, Any]:
+    key = _normalise_station(station)
+    window = max(5, min(int(minutes), 180))
+    return history_store.history_payload(key, window)
 
 
 @app.post("/api/station/controls", response_model=ControlsAckResponse)

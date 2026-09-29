@@ -29,11 +29,13 @@ import {
 } from 'lucide-react'
 import TopNav from '../components/TopNav'
 import LiveTwinViewport from '../components/LiveTwinViewport'
+import FuelOutlook from '../components/FuelOutlook'
 import { usePolarisStore } from '../store/usePolarisStore'
 import SeverityBadge from '../components/SeverityBadge'
+import { fetchTelemetryHistory } from '../api/telemetry'
 
 interface Props {
-  onNavigate: (route: 'home' | 'mission-control' | 'analytics') => void
+  onNavigate: (route: 'home' | 'mission-control' | 'analytics' | 'fleet') => void
 }
 
 interface TelemetryHistoryPoint {
@@ -76,7 +78,31 @@ export default function Analytics({ onNavigate }: Props) {
 
   const t = telemetry[selectedStation]
   const [history, setHistory] = useState<TelemetryHistoryPoint[]>([])
+  const [scrub, setScrub] = useState(1)
   const tickRef = useRef(0)
+
+  useEffect(() => {
+    let stop = false
+    const load = async () => {
+      try {
+        const data = await fetchTelemetryHistory(selectedStation, 60)
+        if (stop || !data?.points?.length) return
+        setHistory((prev) => {
+          const incoming = data.points as TelemetryHistoryPoint[]
+          if (incoming.length >= prev.length) return incoming
+          return prev
+        })
+      } catch {
+        // Charts keep the in-memory trace if the twin history route is down.
+      }
+    }
+    load()
+    const id = window.setInterval(load, 20000)
+    return () => {
+      stop = true
+      window.clearInterval(id)
+    }
+  }, [selectedStation])
 
   // Accumulate live historical telemetry data points
   useEffect(() => {
@@ -125,23 +151,26 @@ export default function Analytics({ onNavigate }: Props) {
     if (prevStation.current === selectedStation) return
     prevStation.current = selectedStation
     setHistory([])
+    setScrub(1)
     tickRef.current = 0
   }, [selectedStation])
 
+  const endIndex = Math.max(2, Math.round(history.length * scrub))
+  const visibleHistory = scrub >= 0.98 ? history : history.slice(0, endIndex)
   const daysRemaining = t?.fuel?.days_of_autonomy ?? 150
   const tankCapacity = 600000 // Liters
   const tankPercent = Math.min(100, Math.max(0, ((t?.fuel?.tank_level_liters ?? 500000) / tankCapacity) * 100))
   const sourceLabel = String(t?.source || 'synthetic').replace(/_/g, ' ')
-  const burnDomain = paddedExtent(history.map((point) => point.burn_rate_lph), 18)
+  const burnDomain = paddedExtent(visibleHistory.map((point) => point.burn_rate_lph), 18)
   const loadCeiling = Math.max(
     420,
-    ...history.map((point) => point.total_load_kva),
+    ...visibleHistory.map((point) => point.total_load_kva),
     Number(t?.microgrid?.total_load_kva ?? 360),
   )
   const tempDomain = paddedExtent(
     [
-      ...history.map((point) => point.internal_temp_c),
-      ...history.map((point) => point.ambient_temp_c),
+      ...visibleHistory.map((point) => point.internal_temp_c),
+      ...visibleHistory.map((point) => point.ambient_temp_c),
       Number(t?.thermal?.internal_temp_c ?? 20),
       Number(t?.ambient?.temp_c ?? -14),
       16,
@@ -175,6 +204,23 @@ export default function Analytics({ onNavigate }: Props) {
             <span className="px-2 py-0.5 rounded bg-base-800 border border-base-700 text-ice-300">2s ODE physics clock</span>
           </div>
         </div>
+
+        {history.length > 2 && (
+          <label className="flex items-center gap-3 rounded-xl border border-base-700 bg-base-900/70 px-4 py-2 text-[11px] font-mono text-slate-400">
+            <Clock size={13} className="text-ice-400" />
+            <span>Playback</span>
+            <input
+              type="range"
+              min={0.2}
+              max={1}
+              step={0.01}
+              value={scrub}
+              onChange={(event) => setScrub(Number(event.target.value))}
+              className="h-1 flex-1 accent-sky-400"
+            />
+            <span className="text-ice-300">{scrub >= 0.98 ? 'LIVE' : visibleHistory[visibleHistory.length - 1]?.timeStr ?? '—'}</span>
+          </label>
+        )}
 
         <LiveTwinViewport />
 
@@ -229,6 +275,7 @@ export default function Analytics({ onNavigate }: Props) {
                 <span>Capacity: <strong>{tankPercent.toFixed(1)}%</strong></span>
               </div>
             </div>
+            <FuelOutlook days={daysRemaining} burnLph={t?.fuel?.burn_rate_lph ?? 0} />
           </div>
 
           {/* Real-time Fuel Burn Trajectory Chart */}
@@ -249,7 +296,7 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="burnGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#2f8fe0" stopOpacity={0.4} />
@@ -294,7 +341,7 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="essentialGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6} />
@@ -349,7 +396,7 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
                   <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
                   <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={tempDomain} />

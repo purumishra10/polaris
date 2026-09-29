@@ -18,6 +18,7 @@ from pydantic import ValidationError
 import satellite
 from anomaly import AnomalyScorer
 from config import settings
+from history_store import history_store
 from models import RawTelemetry, StationTelemetry
 from lockouts import compute_lockouts
 from sop import build_risk
@@ -234,7 +235,8 @@ class TwinState:
             datetime.now(timezone.utc).isoformat()
         )
 
-        if self.consecutive_edge_failures:
+        restored = self.consecutive_edge_failures > 0
+        if restored:
             log.info(
                 "Edge link restored after %d failures",
                 self.consecutive_edge_failures,
@@ -246,6 +248,11 @@ class TwinState:
         await self.manager.broadcast(
             enriched.model_dump()
         )
+
+        try:
+            history_store.observe(enriched, restored=restored)
+        except Exception:  # noqa: BLE001
+            log.exception("Telemetry history write failed")
 
     async def _on_failure(
         self,
