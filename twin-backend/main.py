@@ -19,6 +19,7 @@ from anomaly import AnomalyScorer
 from config import settings
 from history_store import history_store
 from ingest import ConnectionManager, TwinState
+from sop import citation_backend
 from validation import validate_all_blizzard_events, validate_event_by_id
 from models import (
     VALID_STATIONS,
@@ -195,6 +196,7 @@ async def health() -> TwinHealthResponse:
         last_ingest_utc=twin.last_ingest_utc,
         connected_clients=manager.count,
         consecutive_edge_failures=twin.consecutive_edge_failures,
+        citation_source=citation_backend(),
     )
 
 

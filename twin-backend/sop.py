@@ -12,6 +12,11 @@ from models import RawTelemetry, Risk, Severity, SOPCitation
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
+def citation_backend() -> str:
+    """supabase when credentials are configured, otherwise the local SOP cache."""
+    return "supabase" if supabase else "local"
+
+
 supabase: Client | None = None
 if SUPABASE_URL and SUPABASE_KEY:
     try:
