@@ -3,6 +3,7 @@ import './App.css'
 import Home from './pages/Home'
 import Analytics from './pages/Analytics'
 import MissionControl from './pages/MissionControl'
+import Fleet from './pages/Fleet'
 import VoiceDock from './voice/VoiceDock'
 import CriticalOverlay from './ops/CriticalOverlay'
 import { usePolarisStore } from './store/usePolarisStore'
@@ -13,6 +14,7 @@ export default function App() {
     const hash = window.location.hash.toLowerCase()
     if (hash.includes('analytics')) return 'analytics'
     if (hash.includes('mission-control')) return 'mission-control'
+    if (hash.includes('fleet')) return 'fleet'
     return 'home'
   })
 
@@ -27,6 +29,8 @@ export default function App() {
         setRoute('analytics')
       } else if (hash.includes('mission-control')) {
         setRoute('mission-control')
+      } else if (hash.includes('fleet')) {
+        setRoute('fleet')
       } else {
         setRoute('home')
       }
@@ -71,6 +75,8 @@ export default function App() {
       window.location.hash = '#/analytics'
     } else if (nextRoute === 'mission-control') {
       window.location.hash = '#/mission-control'
+    } else if (nextRoute === 'fleet') {
+      window.location.hash = '#/fleet'
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -80,6 +86,8 @@ export default function App() {
       <Analytics onNavigate={navigate} />
     ) : route === 'mission-control' ? (
       <MissionControl onNavigate={navigate} />
+    ) : route === 'fleet' ? (
+      <Fleet onNavigate={navigate} />
     ) : (
       <Home onNavigate={navigate} />
     )

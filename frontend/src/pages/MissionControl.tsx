@@ -25,7 +25,7 @@ import { usePolarisStore } from '../store/usePolarisStore'
 
 interface Props {
   onNavigate: (
-    route: 'home' | 'mission-control' | 'analytics'
+    route: 'home' | 'mission-control' | 'analytics' | 'fleet'
   ) => void
 }
 
