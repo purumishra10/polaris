@@ -27,6 +27,7 @@ _HERE = os.path.dirname(__file__)
 load_dotenv(os.path.join(_HERE, ".env"), override=True)
 load_dotenv(os.path.join(_HERE, "..", ".env"), override=False)
 
+import knowledge
 import rag
 from station_ops import handle_turn
 from speech_engines import list_stt_engines, transcribe_utterance
@@ -307,6 +308,19 @@ async def health() -> dict[str, Any]:
         "stt_engines": engines,
         "llm": bool(key),
         "rag": rag.status(),
+        "rag_index": rag.stats(),
+    }
+
+
+@app.get("/api/knowledge/search")
+async def knowledge_search(q: str, limit: int = 4) -> dict[str, Any]:
+    packed = knowledge.retrieve(q, limit=max(1, min(int(limit), 8)))
+    return {
+        "mode": packed.get("mode"),
+        "hits": [
+            {k: hit.get(k) for k in ("heading", "source", "score", "confidence", "snippet")}
+            for hit in packed.get("hits") or []
+        ],
     }
 
 

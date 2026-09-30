@@ -101,6 +101,10 @@ export async function fetchTelemetryHistory(station = 'BHARATI', minutes = 60) {
   return apiRequest(`/api/telemetry/history?${query}`)
 }
 
+export async function fetchModelCard(station = 'BHARATI') {
+  return apiRequest(`/api/models/${station}`)
+}
+
 export async function fetchIncidentLog(limit = 80) {
   return apiRequest(`/api/events?limit=${limit}`)
 }
@@ -118,6 +122,15 @@ export function connectTelemetrySocket(onTelemetry, onStatusChange) {
   let reconnectTimer = null
   let pollTimer = null
   let isClosedExplicitly = false
+  let lastStatus = null
+
+  // Packets already carry latency; only push connection changes to the store
+  // so each packet costs one store write instead of two.
+  const reportStatus = (next) => {
+    if (next.status === lastStatus) return
+    lastStatus = next.status
+    onStatusChange?.(next)
+  }
 
   const startFallbackPolling = () => {
     if (pollTimer) clearInterval(pollTimer)
@@ -126,13 +139,13 @@ export function connectTelemetrySocket(onTelemetry, onStatusChange) {
         const data = await fetchTelemetrySnapshot()
         if (data) {
           onTelemetry(data)
-          onStatusChange?.({
+          reportStatus({
             status: 'FALLBACK_POLLING',
             latency_ms: data.link_status?.latency_ms || 450,
           })
         }
       } catch (err) {
-        onStatusChange?.({ status: 'OFFLINE', error: err.message })
+        reportStatus({ status: 'OFFLINE', error: err.message })
       }
     }, 2000)
   }
@@ -145,30 +158,25 @@ export function connectTelemetrySocket(onTelemetry, onStatusChange) {
 
       socket.onopen = () => {
         if (pollTimer) clearInterval(pollTimer)
-        onStatusChange?.({ status: 'CONNECTED_WS', latency_ms: 420 })
+        reportStatus({ status: 'CONNECTED_WS', latency_ms: 420 })
       }
 
       socket.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data)
           onTelemetry(payload)
-          onStatusChange?.({
-            status: 'CONNECTED_WS',
-            latency_ms: payload.link_status?.latency_ms || 450,
-            station_id: payload.station_id,
-          })
         } catch (parseError) {
           console.error('Invalid telemetry JSON packet:', parseError)
         }
       }
 
       socket.onerror = () => {
-        onStatusChange?.({ status: 'ERROR_WS' })
+        reportStatus({ status: 'ERROR_WS' })
       }
 
       socket.onclose = () => {
         if (!isClosedExplicitly) {
-          onStatusChange?.({ status: 'RECONNECTING' })
+          reportStatus({ status: 'RECONNECTING' })
           startFallbackPolling()
           reconnectTimer = setTimeout(connect, 3000)
         }

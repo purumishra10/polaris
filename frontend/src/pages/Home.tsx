@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import {
   Radio,
   Thermometer,
@@ -11,20 +11,148 @@ import {
   Layers,
   Compass,
   Satellite,
-  CheckCircle2,
 } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { usePolarisStore } from '../store/usePolarisStore'
 import SeverityBadge from '../components/SeverityBadge'
 import BootSequence from '../components/BootSequence'
 import ServicePulse from '../components/ServicePulse'
-import AntarcticRouteMap from '../components/AntarcticRouteMap'
+import AntarcticGlobe from '../components/AntarcticGlobe'
+import { GLOBE_SITES } from '../lib/stationSites'
+
+type StationId = 'BHARATI' | 'MAITRI'
+
+function fmt(value: unknown, digits: number, unit: string) {
+  return typeof value === 'number' && Number.isFinite(value) ? `${value.toFixed(digits)}${unit}` : '—'
+}
+
+function average(telemetry: Record<string, any>, pick: (t: any) => unknown) {
+  const values = (['BHARATI', 'MAITRI'] as const)
+    .map((id) => pick(telemetry?.[id]))
+    .filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
+  return values.length ? values.reduce((a, b) => a + b, 0) / values.length : undefined
+}
+
+function StationLiveCard({
+  id,
+  data,
+  selected,
+  awaiting,
+  onSelect,
+}: {
+  id: StationId
+  data: any
+  selected: boolean
+  awaiting: boolean
+  onSelect: () => void
+}) {
+  const site = GLOBE_SITES[id]
+  const severity = data?.risk?.severity || 'NOMINAL'
+  const windKt = data?.ambient?.wind_speed_knots
+  const value = (text: string) =>
+    awaiting ? <span className="inline-block h-6 w-16 animate-pulse rounded bg-white/10" /> : text
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`station-live-card group relative w-full overflow-hidden rounded-2xl border p-4 text-left backdrop-blur transition-all duration-300 ${
+        selected ? 'bg-base-900/90' : 'border-base-700/80 bg-base-900/65 hover:bg-base-900/80'
+      }`}
+      style={{
+        borderColor: selected ? `${site.color}aa` : undefined,
+        boxShadow: selected ? `0 0 0 1px ${site.color}33, 0 10px 40px -12px ${site.color}66` : undefined,
+      }}
+    >
+      <span
+        className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-25 blur-2xl transition-opacity group-hover:opacity-40"
+        style={{ background: site.color }}
+      />
+      <div className="mb-3 flex items-center justify-between">
+        <span className="flex items-center gap-2">
+          <span className="h-2.5 w-2.5 rounded-full" style={{ background: site.color, boxShadow: `0 0 12px ${site.color}` }} />
+          <span className="text-sm font-bold tracking-wide text-white">{site.name.toUpperCase()}</span>
+          <span className="font-mono text-[10px] text-slate-500">{site.region}</span>
+        </span>
+        <SeverityBadge severity={severity} />
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <span className="block font-mono text-[9px] uppercase tracking-wider text-slate-500">Ambient</span>
+          <span className="text-2xl font-bold tabular-nums text-white">{value(fmt(data?.ambient?.temp_c, 1, '°'))}</span>
+        </div>
+        <div>
+          <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">
+            <Wind size={10} /> Wind
+          </span>
+          <span className="text-lg font-bold tabular-nums text-white">{value(fmt(windKt, 0, ' kt'))}</span>
+          {typeof windKt === 'number' && !awaiting && (
+            <span className="block font-mono text-[9px] text-slate-500">{(windKt * 0.5144).toFixed(1)} m/s</span>
+          )}
+        </div>
+        <div>
+          <span className="block font-mono text-[9px] uppercase tracking-wider text-slate-500">Anomaly</span>
+          <span className="text-lg font-bold tabular-nums" style={{ color: site.color }}>
+            {value(fmt(data?.risk?.anomaly_score, 3, ''))}
+          </span>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between border-t border-base-800 pt-2 font-mono text-[10px] text-slate-400">
+        <span>Fuel {fmt(data?.fuel?.days_of_autonomy, 0, ' d')}</span>
+        <span>Load {fmt(data?.microgrid?.total_load_kva, 0, ' kVA')}</span>
+        <span>{Math.abs(site.lat).toFixed(2)}°S {site.lon.toFixed(2)}°E</span>
+      </div>
+    </button>
+  )
+}
+
+function OverallStat({ label, value, unit, digits }: { label: string; value: number | undefined; unit: string; digits: number }) {
+  return (
+    <div>
+      <span className="block text-[9px] uppercase tracking-wider text-slate-500">{label}</span>
+      <span className="text-sm font-bold text-white">{fmt(value, digits, unit)}</span>
+    </div>
+  )
+}
+
+function PanelRow({ icon, label, value, live }: { icon: ReactNode; label: string; value: string; live: boolean }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <span className="text-ice-300">{icon}</span>
+      <div className="flex-1">
+        <p className="font-semibold text-slate-100">{label}</p>
+        <p className="font-mono text-[10px] text-slate-400">{value}</p>
+      </div>
+      <span className={`h-1.5 w-1.5 rounded-full ${live ? 'animate-pulse bg-emerald-400' : 'bg-slate-600'}`} />
+    </div>
+  )
+}
+
+function FocusStat({ icon, label, value }: { icon: ReactNode; label: string; value: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-base-700/80 bg-base-950/50 p-2.5">
+      <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-slate-500">
+        <span className="text-ice-400">{icon}</span>
+        {label}
+      </span>
+      <span className="mt-0.5 block text-base font-bold tabular-nums text-white">{value}</span>
+    </div>
+  )
+}
 
 interface HomeProps {
   onNavigate: (route: 'home' | 'mission-control' | 'analytics' | 'fleet') => void
 }
 
 export default function Home({ onNavigate }: HomeProps) {
-  const { telemetry, selectedStation, setSelectedStation, connection } = usePolarisStore()
+  const { telemetry, selectedStation, setSelectedStation, connection } = usePolarisStore(
+    useShallow((s: any) => ({
+      telemetry: s.telemetry,
+      selectedStation: s.selectedStation,
+      setSelectedStation: s.setSelectedStation,
+      connection: s.connection,
+    })),
+  )
   const [clock, setClock] = useState(new Date())
   const parallaxRef = useRef<HTMLDivElement>(null)
 
@@ -108,193 +236,141 @@ export default function Home({ onNavigate }: HomeProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-1 flex flex-col max-w-7xl mx-auto w-full">
+      <div className="relative z-10 flex-1 flex flex-col max-w-[1480px] mx-auto w-full">
         <ServicePulse />
-        <div className="px-4 sm:px-8 md:px-12 py-8">
-        {/* Hero Header */}
-        <div className="mb-10 text-center md:text-left pt-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ice-600/20 border border-ice-400/40 text-ice-300 text-xs font-mono font-semibold tracking-wider mb-4 shadow-glow">
-            <Snowflake size={14} className="animate-spin-slow text-ice-300" />
-            <span>NCPOR ANTARCTIC MISSION CONTROL</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white mb-4 leading-tight">
-            POLARIS <span className="text-transparent bg-clip-text bg-gradient-to-r from-ice-300 via-ice-400 to-neon-cyan">DIGITAL TWIN</span>
-          </h1>
-
-          <p className="text-slate-300 max-w-3xl text-base sm:text-lg leading-relaxed mb-6 font-light">
-            Next-generation autonomous twin and remote command center for Indian Antarctic Research Stations
-            (<strong className="text-white font-medium">Bharati</strong> and <strong className="text-white font-medium">Maitri</strong>). Real-time telemetry ingestion,
-            machine-learning anomaly scoring via Isolation Forest, and closed-loop satellite SOP mitigation.
-          </p>
-
-          {/* Quick Metrics Ticker */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl">
-            <div className="glass-card p-3 rounded-xl border border-ice-500/30">
-              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                <Thermometer size={13} className="text-ice-400" /> HABITAT TEMP
-              </span>
-              <p className="text-lg font-bold text-white mt-1">
-                {metric(`${activeTelemetry?.thermal?.internal_temp_c?.toFixed(1) ?? '20.5'}°C`)}
-              </p>
-            </div>
-
-            <div className="glass-card p-3 rounded-xl border border-ice-500/30">
-              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                <Gauge size={13} className="text-ice-400" /> FUEL AUTONOMY
-              </span>
-              <p className="text-lg font-bold text-white mt-1">
-                {metric(`${activeTelemetry?.fuel?.days_of_autonomy?.toFixed(0) ?? '154'} DAYS`)}
-              </p>
-            </div>
-
-            <div className="glass-card p-3 rounded-xl border border-ice-500/30">
-              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                <Wind size={13} className="text-ice-400" /> WIND SPEED
-              </span>
-              <p className="text-lg font-bold text-white mt-1">
-                {metric(`${activeTelemetry?.ambient?.wind_speed_knots?.toFixed(1) ?? '22.0'} kt`)}
-              </p>
-            </div>
-
-            <div className="glass-card p-3 rounded-xl border border-ice-500/30">
-              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                <Satellite size={13} className="text-ice-400" /> SAT LATENCY
-              </span>
-              <p className="text-lg font-bold text-ice-300 mt-1">
-                {metric(`${activeTelemetry?.link_status?.latency_ms ?? 480} ms`)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mb-8 grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-          <AntarcticRouteMap onSelect={(station: 'BHARATI' | 'MAITRI') => setSelectedStation(station)} />
-          <div className="flex flex-col justify-between rounded-2xl border border-base-700 bg-base-900/75 p-5">
+        <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <section className="mb-10 grid grid-cols-1 gap-5 pt-2 lg:grid-cols-[minmax(0,330px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,330px)_minmax(0,1fr)_minmax(0,290px)]">
+          {/* Left: title + live station cards */}
+          <div className="flex flex-col gap-4">
             <div>
-              <p className="text-[11px] font-mono uppercase tracking-[0.16em] text-ice-300">
-                Both stations from Goa
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-300">
-                Bharati and Maitri sit about 3,100 km apart. The arc is the logistics route. Compare them without leaving the command picture.
-              </p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => onNavigate('fleet')}
-                className="rounded-lg bg-ice-600 px-3 py-2 text-xs font-semibold text-white"
-              >
-                Compare stations
-              </button>
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent('polaris:briefing'))}
-                className="rounded-lg border border-base-600 px-3 py-2 text-xs font-semibold text-slate-100"
-              >
-                Daily briefing
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Station Selection Banner */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xs uppercase font-mono tracking-widest text-slate-400">
-              ACTIVE ANTARCTIC NODES (3,100 KM SEPARATION)
-            </h2>
-            <span className="text-xs font-mono text-ice-400 flex items-center gap-1">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> LIVE TELEMETRY
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Bharati Station Card */}
-            <div
-              onClick={() => setSelectedStation('BHARATI')}
-              className={`cursor-pointer rounded-2xl p-5 transition-all border ${
-                selectedStation === 'BHARATI'
-                  ? 'glass-panel-glow border-ice-400/80 bg-base-900/90'
-                  : 'glass-card border-base-700/80 hover:border-ice-600/60 bg-base-900/60'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">BHARATI STATION</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-ice-600/30 text-ice-300 border border-ice-500/40">
-                      PRIMARY
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 font-mono">Coastal Promontory · 69°24'S, 76°11'E · Larsemann Hills</p>
-                </div>
-                <SeverityBadge severity={telemetry.BHARATI?.risk?.severity || 'NOMINAL'} />
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-ice-400/40 bg-ice-600/20 px-3 py-1 font-mono text-[10px] font-semibold tracking-[0.18em] text-ice-300 shadow-glow">
+                <Snowflake size={12} className="animate-spin-slow text-ice-300" />
+                NCPOR ANTARCTIC MISSION CONTROL
               </div>
-
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-base-800 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">MICROGRID</span>
-                  <span className="text-white font-semibold">
-                    {telemetry.BHARATI?.microgrid?.total_load_kva?.toFixed(0) || '480'} kVA
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">AMBIENT</span>
-                  <span className="text-white font-semibold">
-                    {telemetry.BHARATI?.ambient?.temp_c?.toFixed(1) || '-16.4'}°C
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">ANOMALY SCORE</span>
-                  <span className="text-ice-400 font-semibold">
-                    {telemetry.BHARATI?.risk?.anomaly_score?.toFixed(3) || '+0.062'}
-                  </span>
-                </div>
-              </div>
+              <h1 className="hero-title text-4xl font-black leading-[0.95] tracking-tight sm:text-5xl">
+                <span className="block text-white">ANTARCTICA</span>
+                <span className="block bg-gradient-to-r from-ice-300 via-sky-300 to-neon-cyan bg-clip-text text-transparent">
+                  CONNECTED
+                </span>
+              </h1>
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                POLARIS digital twin for <strong className="font-medium text-white">Bharati</strong> and{' '}
+                <strong className="font-medium text-white">Maitri</strong>: live telemetry, anomaly scoring and
+                SOP-cited mitigation, commanded from Goa.
+              </p>
             </div>
 
-            {/* Maitri Station Card */}
-            <div
-              onClick={() => setSelectedStation('MAITRI')}
-              className={`cursor-pointer rounded-2xl p-5 transition-all border ${
-                selectedStation === 'MAITRI'
-                  ? 'glass-panel-glow border-ice-400/80 bg-base-900/90'
-                  : 'glass-card border-base-700/80 hover:border-ice-600/60 bg-base-900/60'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">MAITRI STATION</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                      STANDBY
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 font-mono">Inland Oasis · 70°46'S, 11°44'E · Schirmacher Oasis</p>
-                </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-mono bg-base-800 text-slate-400 border border-base-700">
-                  Default: Bharati
+            {(['MAITRI', 'BHARATI'] as const).map((id) => (
+              <StationLiveCard
+                key={id}
+                id={id}
+                data={telemetry[id]}
+                selected={selectedStation === id}
+                awaiting={awaitingLink}
+                onSelect={() => setSelectedStation(id)}
+              />
+            ))}
+
+            <div className="rounded-2xl border border-base-700/80 bg-base-900/70 p-4 backdrop-blur">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-slate-400">
+                  <Layers size={12} className="text-ice-400" /> Antarctic overall
+                </span>
+                <span className="rounded border border-ice-500/30 bg-ice-600/15 px-1.5 py-px font-mono text-[9px] text-ice-300">
+                  Twin average
                 </span>
               </div>
-
-              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-base-800 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">STATUS</span>
-                  <span className="text-amber-400 font-semibold">UNOPERATIONAL</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">LAKE</span>
-                  <span className="text-slate-300 font-semibold">Priyadarshini</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">UPLINK</span>
-                  <span className="text-slate-400 font-semibold">STANDBY LINK</span>
-                </div>
+              <div className="grid grid-cols-3 gap-2 font-mono">
+                <OverallStat label="Avg temp" value={average(telemetry, (t) => t?.ambient?.temp_c)} unit="°C" digits={1} />
+                <OverallStat label="Avg wind" value={average(telemetry, (t) => t?.ambient?.wind_speed_knots)} unit=" kt" digits={1} />
+                <OverallStat label="Fuel days" value={average(telemetry, (t) => t?.fuel?.days_of_autonomy)} unit="" digits={0} />
               </div>
             </div>
           </div>
-        </div>
+
+          {/* Center: globe */}
+          <AntarcticGlobe
+            className="min-h-[460px] lg:min-h-[640px]"
+            selected={selectedStation}
+            telemetry={telemetry}
+            onSelect={setSelectedStation}
+          />
+
+          {/* Right: twin station panel */}
+          <aside className="flex flex-col gap-4 lg:col-span-2 xl:col-span-1">
+            <div className="rounded-2xl border border-base-700/80 bg-base-900/75 p-4 backdrop-blur">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-ice-500/40 bg-ice-600/20 text-ice-300">
+                  <Compass size={18} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Twin Stations</p>
+                  <p className="text-[11px] text-slate-400">Two points. One mission.</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {(['BHARATI', 'MAITRI'] as const).map((id) => {
+                  const site = GLOBE_SITES[id]
+                  const t = telemetry[id]
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSelectedStation(id)}
+                      className={`w-full rounded-xl border px-3 py-2 text-left transition-all ${
+                        selectedStation === id
+                          ? 'border-white/25 bg-white/[0.06]'
+                          : 'border-transparent hover:border-white/10 hover:bg-white/[0.03]'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 text-sm font-semibold text-white">
+                        <span className="h-2 w-2 rounded-full" style={{ background: site.color, boxShadow: `0 0 10px ${site.color}` }} />
+                        {site.name} (India)
+                      </span>
+                      <span className="mt-0.5 block font-mono text-[10px] text-slate-400">
+                        {Math.abs(site.lat).toFixed(2)}°S, {site.lon.toFixed(2)}°E · {fmt(t?.ambient?.temp_c, 1, '°C')} ·{' '}
+                        {fmt(t?.ambient?.wind_speed_knots, 0, ' kt')}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="mt-3 space-y-2.5 border-t border-base-800 pt-3 text-xs">
+                <PanelRow icon={<Satellite size={14} />} label="Satellite link" value={awaitingLink ? 'Acquiring…' : 'Live'} live={!awaitingLink} />
+                <PanelRow icon={<Radio size={14} />} label="Data flow" value={awaitingLink ? 'Waiting for twin' : 'Active · twin engine'} live={!awaitingLink} />
+                <PanelRow icon={<ShieldAlert size={14} />} label="Global insights" value="Anomaly scoring" live />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-base-700/80 bg-base-900/75 p-4 backdrop-blur">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.16em] text-ice-300">
+                {GLOBE_SITES[selectedStation as 'BHARATI' | 'MAITRI']?.name ?? 'Station'} · focus
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <FocusStat icon={<Thermometer size={12} />} label="Habitat" value={metric(fmt(activeTelemetry?.thermal?.internal_temp_c, 1, '°C'))} />
+                <FocusStat icon={<Gauge size={12} />} label="Fuel autonomy" value={metric(fmt(activeTelemetry?.fuel?.days_of_autonomy, 0, ' d'))} />
+                <FocusStat icon={<Zap size={12} />} label="Microgrid" value={metric(fmt(activeTelemetry?.microgrid?.total_load_kva, 0, ' kVA'))} />
+                <FocusStat icon={<Satellite size={12} />} label="Sat latency" value={metric(fmt(activeTelemetry?.link_status?.latency_ms, 0, ' ms'))} />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('fleet')}
+                  className="flex-1 rounded-lg bg-gradient-to-r from-ice-600 to-sky-500 px-3 py-2 text-xs font-semibold text-white shadow-glow transition hover:brightness-110"
+                >
+                  Compare stations
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('polaris:briefing'))}
+                  className="flex-1 rounded-lg border border-base-600 px-3 py-2 text-xs font-semibold text-slate-100 transition hover:border-ice-400/60"
+                >
+                  Daily briefing
+                </button>
+              </div>
+            </div>
+          </aside>
+        </section>
 
         {/* Primary Tab Entry Cards (Telemetry Analytics & Mission Control) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">

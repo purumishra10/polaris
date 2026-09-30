@@ -16,7 +16,8 @@ const QUICK_COMMANDS = [
   ['Blizzard', 'inject blizzard'],
   ['August fifth', 'fifth of August'],
   ['SITREP', 'export sitrep'],
-  ['Briefing', 'station status briefing, fuel wind and alerts'],
+  ['Status', 'is anything critical right now'],
+  ['Maitri-II', 'tell me about the maitri-ii power plant'],
 ]
 
 export default function VoiceDock() {
@@ -63,7 +64,7 @@ export default function VoiceDock() {
             <div className="voice-rag">
               {fallback || ragMode === 'local-fallback'
                 ? 'LOCAL SOP BRIEF · LLM OFF'
-                : `RAG ${ragMode === 'pgvector' ? 'PGVECTOR' : 'KNOWLEDGE MD'}`}
+                : `RAG ${ragMode === 'pgvector' ? 'PGVECTOR' : 'BM25 + VECTOR'}`}
               {sources.length ? ` · ${sources.length} HITS` : ''}
             </div>
           )}
@@ -120,7 +121,8 @@ export default function VoiceDock() {
               {sources.map((hit) => (
                 <div key={`${hit.source}-${hit.heading}`} className="voice-cite">
                   <b>{hit.heading}</b>
-                  <span>{hit.source}</span>
+                  <span>{String(hit.source || '').replace(/^fact-card:/, 'fact · ')}</span>
+                  {hit.snippet && <em className="voice-cite-snippet">{hit.snippet}</em>}
                 </div>
               ))}
             </div>

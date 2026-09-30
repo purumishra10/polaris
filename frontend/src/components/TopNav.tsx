@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Radio, Gauge, Activity, Snowflake, Flame, Satellite, Columns2 } from 'lucide-react'
+import { useShallow } from 'zustand/react/shallow'
 import { usePolarisStore } from '../store/usePolarisStore'
 import ServicePulse from './ServicePulse'
 import LinkBanner from './LinkBanner'
@@ -14,11 +15,20 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
   const {
     selectedStation,
     setSelectedStation,
-    telemetry,
+    currentTelemetry,
     connection,
     isThermalView,
     toggleThermalView,
-  } = usePolarisStore()
+  } = usePolarisStore(
+    useShallow((s: any) => ({
+      selectedStation: s.selectedStation,
+      setSelectedStation: s.setSelectedStation,
+      currentTelemetry: s.telemetry[s.selectedStation],
+      connection: s.connection,
+      isThermalView: s.isThermalView,
+      toggleThermalView: s.toggleThermalView,
+    })),
+  )
 
   const [utcTime, setUtcTime] = useState(new Date().toUTCString().slice(17, 25))
 
@@ -29,7 +39,6 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
     return () => clearInterval(id)
   }, [])
 
-  const currentTelemetry = telemetry[selectedStation]
   const latency = connection?.latency_ms || currentTelemetry?.link_status?.latency_ms || 460
   const isWsConnected = connection?.status === 'CONNECTED_WS'
   const linkHealth = currentTelemetry?.link_status?.health

@@ -68,3 +68,59 @@ body {
   border-color: rgba(94, 184, 255, 0.5);
   box-shadow: 0 0 15px rgba(47, 143, 224, 0.2);
 }
+
+.hero-title {
+  font-family: 'Orbitron', 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  filter: drop-shadow(0 0 18px rgba(94, 184, 255, 0.45));
+}
+
+.globe-shell {
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.08),
+    0 30px 80px -30px rgba(14, 116, 204, 0.55);
+}
+
+.globe-shell canvas {
+  cursor: grab;
+}
+
+.globe-shell canvas:active {
+  cursor: grabbing;
+}
+
+.analytics-card {
+  position: relative;
+  border: 1px solid rgba(43, 63, 94, 0.7);
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(47, 143, 224, 0.08), transparent 55%),
+    linear-gradient(180deg, rgba(12, 18, 29, 0.95), rgba(7, 11, 18, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(147, 213, 255, 0.06),
+    0 20px 50px -30px rgba(0, 0, 0, 0.8);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.analytics-card:hover {
+  border-color: rgba(94, 184, 255, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(147, 213, 255, 0.1),
+    0 20px 50px -24px rgba(47, 143, 224, 0.35);
+}
+
+@keyframes critical-edge-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.55), inset 0 0 60px rgba(239, 68, 68, 0.18); }
+  50% { box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.9), inset 0 0 110px rgba(239, 68, 68, 0.32); }
+}
+.critical-edge { animation: critical-edge-pulse 2.4s ease-in-out infinite; }
+.critical-edge-strong { animation: critical-edge-pulse 1.4s ease-in-out infinite; }
+
+@keyframes critical-card-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+.critical-card-in { animation: critical-card-in 0.28s ease-out; }
+
+.animate-spin-slow {
+  animation: spin 8s linear infinite;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   AreaChart,
   Area,
@@ -30,6 +30,7 @@ import {
 import TopNav from '../components/TopNav'
 import LiveTwinViewport from '../components/LiveTwinViewport'
 import FuelOutlook from '../components/FuelOutlook'
+import ModelIntelligence from '../analysis/ModelIntelligence'
 import { usePolarisStore } from '../store/usePolarisStore'
 import SeverityBadge from '../components/SeverityBadge'
 import { fetchTelemetryHistory } from '../api/telemetry'
@@ -60,6 +61,93 @@ function formatLiveClock(at: number) {
   return new Date(at).toISOString().slice(11, 19)
 }
 
+function axisTick(value: number) {
+  if (!Number.isFinite(value)) return ''
+  const abs = Math.abs(value)
+  if (abs >= 10000) return `${(value / 1000).toFixed(0)}k`
+  if (abs >= 100) return value.toFixed(0)
+  if (abs >= 10) return value.toFixed(0)
+  return value.toFixed(1)
+}
+
+const Y_AXIS = {
+  stroke: '#334155',
+  tick: { fontSize: 10, fill: '#64748b' },
+  width: 44,
+  tickLine: false,
+  axisLine: false,
+  tickFormatter: axisTick,
+  tickCount: 5,
+  allowDecimals: false,
+} as const
+
+const X_AXIS = {
+  dataKey: 'timeStr',
+  stroke: '#334155',
+  tick: { fontSize: 10, fill: '#64748b' },
+  tickLine: false,
+  minTickGap: 32,
+} as const
+
+const TOOLTIP_STYLE = {
+  backgroundColor: 'rgba(7,11,18,0.95)',
+  borderColor: '#2b3f5e',
+  borderRadius: '10px',
+  fontSize: '11px',
+  color: '#fff',
+  boxShadow: '0 10px 30px -10px rgba(47,143,224,0.5)',
+}
+
+const CHART_MARGIN = { top: 10, right: 12, left: 0, bottom: 0 }
+
+function Sparkline({ values, color }: { values: number[]; color: string }) {
+  const nums = values.filter((v) => Number.isFinite(v))
+  if (nums.length < 2) return <div className="h-8" />
+  const lo = Math.min(...nums)
+  const hi = Math.max(...nums)
+  const span = hi - lo || 1
+  const pts = nums
+    .map((v, i) => `${(i / (nums.length - 1)) * 100},${30 - ((v - lo) / span) * 26 - 2}`)
+    .join(' ')
+  return (
+    <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="h-8 w-full">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.6" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+      <polyline points={`0,30 ${pts} 100,30`} fill={color} opacity="0.12" stroke="none" />
+    </svg>
+  )
+}
+
+function KpiTile({
+  icon,
+  label,
+  value,
+  unit,
+  color,
+  series,
+}: {
+  icon: ReactNode
+  label: string
+  value: string
+  unit: string
+  color: string
+  series: number[]
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-base-700/80 bg-base-900/80 p-3.5 transition hover:border-ice-500/50">
+      <span className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full opacity-20 blur-2xl" style={{ background: color }} />
+      <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-400">
+        <span style={{ color }}>{icon}</span>
+        {label}
+      </span>
+      <div className="mt-1 text-2xl font-bold tabular-nums text-white">
+        {value}
+        <span className="ml-1 text-xs font-normal text-slate-400">{unit}</span>
+      </div>
+      <Sparkline values={series} color={color} />
+    </div>
+  )
+}
+
 function paddedExtent(values: number[], minSpan: number, pad = 0.28): [number, number] {
   const nums = values.filter((value) => Number.isFinite(value))
   if (!nums.length) return [0, minSpan]
@@ -67,16 +155,12 @@ function paddedExtent(values: number[], minSpan: number, pad = 0.28): [number, n
   const hi = Math.max(...nums)
   const span = Math.max(minSpan, hi - lo)
   const extra = Math.max(span * pad, minSpan * 0.2)
-  return [lo - extra, hi + extra]
+  return [Math.floor(lo - extra), Math.ceil(hi + extra)]
 }
 
 export default function Analytics({ onNavigate }: Props) {
-  const {
-    selectedStation,
-    telemetry,
-  } = usePolarisStore()
-
-  const t = telemetry[selectedStation]
+  const selectedStation = usePolarisStore((s) => s.selectedStation)
+  const t = usePolarisStore((s) => s.telemetry[s.selectedStation])
   const [history, setHistory] = useState<TelemetryHistoryPoint[]>([])
   const [scrub, setScrub] = useState(1)
   const tickRef = useRef(0)
@@ -222,7 +306,18 @@ export default function Analytics({ onNavigate }: Props) {
           </label>
         )}
 
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <KpiTile icon={<Thermometer size={12} />} label="Habitat" value={t?.thermal?.internal_temp_c?.toFixed(1) ?? '—'} unit="°C" color="#34d399" series={visibleHistory.map((p) => p.internal_temp_c)} />
+          <KpiTile icon={<Thermometer size={12} />} label="Ambient" value={t?.ambient?.temp_c?.toFixed(1) ?? '—'} unit="°C" color="#38bdf8" series={visibleHistory.map((p) => p.ambient_temp_c)} />
+          <KpiTile icon={<Wind size={12} />} label="Wind" value={t?.ambient?.wind_speed_knots?.toFixed(1) ?? '—'} unit="kt" color="#93d5ff" series={visibleHistory.map((p) => p.wind_knots)} />
+          <KpiTile icon={<Zap size={12} />} label="Load" value={t?.microgrid?.total_load_kva?.toFixed(0) ?? '—'} unit="kVA" color="#a78bfa" series={visibleHistory.map((p) => p.total_load_kva)} />
+          <KpiTile icon={<Flame size={12} />} label="Burn" value={t?.fuel?.burn_rate_lph?.toFixed(1) ?? '—'} unit="L/h" color="#fbbf24" series={visibleHistory.map((p) => p.burn_rate_lph)} />
+          <KpiTile icon={<Fuel size={12} />} label="Autonomy" value={daysRemaining.toFixed(0)} unit="days" color="#5eb8ff" series={visibleHistory.map((p) => p.fuel_level_l)} />
+        </div>
+
         <LiveTwinViewport />
+
+        <ModelIntelligence />
 
         {/* Hero Countdown & Fuel Analytics Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -279,7 +374,7 @@ export default function Analytics({ onNavigate }: Props) {
           </div>
 
           {/* Real-time Fuel Burn Trajectory Chart */}
-          <div className="lg:col-span-2 rounded-2xl border border-base-700 bg-base-900 p-6 shadow-lg">
+          <div className="lg:col-span-2 analytics-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-sm font-mono font-bold tracking-wider text-slate-300 uppercase">
@@ -296,20 +391,18 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={visibleHistory} margin={CHART_MARGIN}>
                   <defs>
                     <linearGradient id="burnGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2f8fe0" stopOpacity={0.4} />
+                      <stop offset="5%" stopColor="#2f8fe0" stopOpacity={0.45} />
                       <stop offset="95%" stopColor="#2f8fe0" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={burnDomain} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
-                  />
-                  <Area type="monotone" dataKey="burn_rate_lph" stroke="#5eb8ff" strokeWidth={2} fillOpacity={1} fill="url(#burnGrad)" name="Burn Rate (L/h)" isAnimationActive={false} />
+                  <CartesianGrid strokeDasharray="3 6" stroke="#1c2330" vertical={false} />
+                  <XAxis {...X_AXIS} />
+                  <YAxis {...Y_AXIS} domain={burnDomain} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [`${Number(v).toFixed(1)} L/h`, 'Burn rate']} />
+                  <Area type="monotone" dataKey="burn_rate_lph" stroke="#5eb8ff" strokeWidth={2.2} fillOpacity={1} fill="url(#burnGrad)" name="Burn Rate (L/h)" isAnimationActive={false} activeDot={{ r: 4, fill: '#5eb8ff', stroke: '#fff' }} />
                   {burnDomain[1] >= 170 && (
                     <ReferenceLine y={180} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'High Burn Alert (180 L/h)', fill: '#ef4444', fontSize: 10 }} />
                   )}
@@ -322,7 +415,7 @@ export default function Analytics({ onNavigate }: Props) {
         {/* Microgrid Load & Cogeneration Distribution */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Microgrid Load Breakdown (Stacked Area Chart) */}
-          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-lg">
+          <div className="analytics-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2">
@@ -341,7 +434,7 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={visibleHistory} margin={CHART_MARGIN}>
                   <defs>
                     <linearGradient id="essentialGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6} />
@@ -356,12 +449,10 @@ export default function Analytics({ onNavigate }: Props) {
                       <stop offset="95%" stopColor="#818cf8" stopOpacity={0.1} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={[0, Math.ceil(loadCeiling * 1.15)]} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
-                  />
+                  <CartesianGrid strokeDasharray="3 6" stroke="#1c2330" vertical={false} />
+                  <XAxis {...X_AXIS} />
+                  <YAxis {...Y_AXIS} domain={[0, Math.ceil((loadCeiling * 1.15) / 50) * 50]} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [`${Number(v).toFixed(0)} kVA`, name]} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                   <Area type="monotone" dataKey="essential_load" stackId="1" stroke="#3b82f6" fill="url(#essentialGrad)" name="Essential (kVA)" isAnimationActive={false} />
                   <Area type="monotone" dataKey="science_load" stackId="1" stroke="#00f0ff" fill="url(#scienceGrad)" name="Science (kVA)" isAnimationActive={false} />
@@ -373,7 +464,7 @@ export default function Analytics({ onNavigate }: Props) {
           </div>
 
           {/* Thermal Balance: Internal Temp vs Ambient Dual-Line Trend */}
-          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-lg">
+          <div className="analytics-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2">
@@ -396,13 +487,11 @@ export default function Analytics({ onNavigate }: Props) {
 
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={visibleHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1c2330" />
-                  <XAxis dataKey="timeStr" stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} minTickGap={24} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10, fill: '#64748b' }} domain={tempDomain} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#0a0d12', borderColor: '#2a3344', borderRadius: '8px', fontSize: '11px', color: '#fff' }}
-                  />
+                <LineChart data={visibleHistory} margin={CHART_MARGIN}>
+                  <CartesianGrid strokeDasharray="3 6" stroke="#1c2330" vertical={false} />
+                  <XAxis {...X_AXIS} />
+                  <YAxis {...Y_AXIS} domain={tempDomain} tickFormatter={(v: number) => `${Math.round(v)}°`} />
+                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number, name: string) => [`${Number(v).toFixed(1)} °C`, name]} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
                   <Line type="monotone" dataKey="internal_temp_c" stroke="#34d399" strokeWidth={2.5} dot={false} name="Habitat Temp (°C)" isAnimationActive={false} />
                   <Line type="monotone" dataKey="ambient_temp_c" stroke="#38bdf8" strokeWidth={2} strokeDasharray="4 4" dot={false} name="Ambient Temp (°C)" isAnimationActive={false} />
@@ -415,7 +504,7 @@ export default function Analytics({ onNavigate }: Props) {
 
         {/* Weather & Cryospheric Conditions Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="rounded-xl border border-base-700 bg-base-900 p-4">
+          <div className="analytics-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                 <Wind size={15} className="text-ice-400" /> ANEMOMETER
@@ -436,7 +525,7 @@ export default function Analytics({ onNavigate }: Props) {
             </p>
           </div>
 
-          <div className="rounded-xl border border-base-700 bg-base-900 p-4">
+          <div className="analytics-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                 <Sun size={15} className="text-amber-400" /> SOLAR FLUX
@@ -453,7 +542,7 @@ export default function Analytics({ onNavigate }: Props) {
             </p>
           </div>
 
-          <div className="rounded-xl border border-base-700 bg-base-900 p-4">
+          <div className="analytics-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                 <Flame size={15} className="text-red-400" /> AUXILIARY HEATING

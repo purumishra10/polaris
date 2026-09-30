@@ -21,8 +21,17 @@ import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
 import LiveTwinViewport from '../components/LiveTwinViewport'
 import IncidentTimeline from '../components/IncidentTimeline'
+import { useShallow } from 'zustand/react/shallow'
 import { usePolarisStore } from '../store/usePolarisStore'
 import { citationForAction } from '../ops/sopCite'
+import {
+  LinkHealthPanel,
+  ProactiveSignals,
+  SOP_RULES,
+  SopRuleMatrix,
+  evaluateRule,
+  formatEta,
+} from '../ops/LiveOpsAnalysis'
 
 interface Props {
   onNavigate: (
@@ -134,7 +143,16 @@ export default function MissionControl({
     setLinkMode,
     executeMitigation,
     triggerScenario,
-  } = usePolarisStore()
+  } = usePolarisStore(
+    useShallow((s: any) => ({
+      selectedStation: s.selectedStation,
+      telemetry: s.telemetry,
+      linkMode: s.linkMode,
+      setLinkMode: s.setLinkMode,
+      executeMitigation: s.executeMitigation,
+      triggerScenario: s.triggerScenario,
+    })),
+  )
 
   const [executedActions, setExecutedActions] =
     useState<Set<string>>(new Set())
@@ -157,6 +175,13 @@ export default function MissionControl({
 
   const isAdvisory =
     severity === 'ADVISORY'
+
+  const forecastAlert =
+    proactive && proactive.status && proactive.status !== 'CLEAR'
+      ? `${proactive.hazard} ${proactive.status}`
+      : null
+
+  const watchOnly = !isCritical && !isAdvisory && Boolean(forecastAlert)
 
   const handleExecute = async (
     actionText: string
@@ -239,7 +264,9 @@ export default function MissionControl({
               ? 'bg-red-950/40 border-red-500/60 shadow-glow-red animate-pulse-red'
               : isAdvisory
               ? 'bg-amber-950/30 border-amber-500/50 shadow-glow'
-              : 'bg-base-900/80 border-base-700 shadow-md'
+              : watchOnly
+              ? 'analytics-card !border-amber-500/40'
+              : 'analytics-card !border-emerald-500/30'
           }`}
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -269,8 +296,15 @@ export default function MissionControl({
                       ? 'CRITICAL RISK PROTOCOL ENGAGED'
                       : isAdvisory
                       ? 'OPERATIONAL ADVISORY ACTIVE'
+                      : watchOnly
+                      ? 'SUBSYSTEMS NOMINAL · FORECAST WATCH'
                       : 'ALL STATION SUBSYSTEMS NOMINAL'}
                   </h2>
+                  {forecastAlert && (
+                    <span className="rounded-md border border-amber-500/50 bg-amber-500/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-amber-300">
+                      {forecastAlert}
+                    </span>
+                  )}
 
                   <SeverityBadge
                     severity={severity}
@@ -281,7 +315,10 @@ export default function MissionControl({
                 </div>
 
                 <p className="text-xs text-slate-300 font-mono mt-0.5">
-                  AI Isolation Forest Decision Function:{' '}
+                  Severity driver:{' '}
+                  <strong className="text-white uppercase">{t?.risk?.driver ?? 'nominal'}</strong>
+                  {' · '}
+                  {t?.risk?.driver === 'nowcast' ? 'P(≥23 kt)' : 'IF score'}{' '}
                   <strong
                     className={
                       isCritical
@@ -291,15 +328,21 @@ export default function MissionControl({
                         : 'text-emerald-400'
                     }
                   >
-                    {t?.risk?.anomaly_score !==
-                    undefined
-                      ? t.risk.anomaly_score.toFixed(
-                          4
-                        )
-                      : '+0.0620'}
-                  </strong>{' '}
-                  (positive ≈ inlier baseline,
-                  negative ≈ anomaly outlier)
+                    {typeof t?.risk?.anomaly_score === 'number' ? t.risk.anomaly_score.toFixed(3) : '—'}
+                  </strong>
+                  {' · '}
+                  {(() => {
+                    const rows = SOP_RULES.map((r) => evaluateRule(r, t))
+                    const tripped = rows.filter((r) => r.status === 'TRIPPED').length
+                    const near = rows.filter((r) => r.status === 'NEAR').length
+                    return `${tripped} SOP limits tripped, ${near} near`
+                  })()}
+                  {' · '}
+                  {t?.lockouts?.outdoor === 'LOCKED' ? (
+                    <span className="text-amber-300">outdoor LOCKED</span>
+                  ) : (
+                    <span className="text-emerald-400">outdoor open</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -365,84 +408,117 @@ export default function MissionControl({
         {/* Proactive Operations Intelligence */}
         {proactive &&
           proactive.status !== 'CLEAR' && (
-            <div className="proactive-alert rounded-2xl border border-ice-500/40 bg-base-900/90 p-5 shadow-xl">
-              <div className="proactive-alert__header flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xs font-mono font-bold tracking-[0.18em] text-ice-300">
-                  PROACTIVE OPERATIONS
-                </span>
-
-                <strong
-                  className={`text-xs font-mono px-2.5 py-1 rounded-md border ${
-                    proactive.status ===
-                    'ACTIVE'
-                      ? 'text-red-300 bg-red-500/20 border-red-500/40'
-                      : proactive.status ===
-                        'IMMINENT'
-                      ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
-                      : 'text-ice-300 bg-ice-500/20 border-ice-500/40'
-                  }`}
-                >
-                  {proactive.status}
-                </strong>
-              </div>
-
-              <div className="proactive-alert__hazard mt-3 text-xl font-bold tracking-wide text-white">
-                {proactive.hazard}
-              </div>
-
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-300">
-                {proactive.eta_minutes !=
-                  null && (
-                  <div className="rounded-lg border border-base-700 bg-base-950/70 p-3">
-                    <span className="block text-[10px] text-slate-500 mb-1">
-                      ESTIMATED ESCALATION
+            <div
+              className={`proactive-alert analytics-card relative overflow-hidden rounded-2xl p-5 ${
+                proactive.status === 'ACTIVE'
+                  ? '!border-red-500/50'
+                  : proactive.status === 'IMMINENT'
+                  ? '!border-amber-500/50'
+                  : '!border-ice-500/40'
+              }`}
+            >
+              <span
+                className={`pointer-events-none absolute -left-16 -top-16 h-48 w-48 rounded-full opacity-20 blur-3xl ${
+                  proactive.status === 'ACTIVE'
+                    ? 'bg-red-500'
+                    : proactive.status === 'IMMINENT'
+                    ? 'bg-amber-500'
+                    : 'bg-ice-500'
+                }`}
+              />
+              <div className="relative grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                <div className="flex flex-col">
+                  <div className="proactive-alert__header flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2 text-xs font-mono font-bold tracking-[0.18em] text-ice-300">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ice-300" />
+                      PROACTIVE OPERATIONS
                     </span>
-
-                    <strong className="text-white">
-                      {proactive.eta_minutes}{' '}
-                      min
+                    <strong
+                      className={`text-xs font-mono px-2.5 py-1 rounded-md border ${
+                        proactive.status === 'ACTIVE'
+                          ? 'text-red-300 bg-red-500/20 border-red-500/40 animate-pulse'
+                          : proactive.status === 'IMMINENT'
+                          ? 'text-amber-300 bg-amber-500/20 border-amber-500/40'
+                          : 'text-ice-300 bg-ice-500/20 border-ice-500/40'
+                      }`}
+                    >
+                      {proactive.status}
                     </strong>
                   </div>
-                )}
 
-                {proactive.confidence >
-                  0 && (
-                  <div className="rounded-lg border border-base-700 bg-base-950/70 p-3">
-                    <span className="block text-[10px] text-slate-500 mb-1">
-                      FORECAST CONFIDENCE
-                    </span>
-
-                    <strong className="text-white">
-                      {Math.round(
-                        proactive.confidence *
-                          100
-                      )}
-                      %
-                    </strong>
+                  <div className="proactive-alert__hazard mt-3 text-3xl font-black tracking-wide text-white">
+                    {proactive.hazard}
                   </div>
-                )}
-              </div>
+                  <p className="mt-1 font-mono text-[11px] text-slate-400">
+                    Source:{' '}
+                    <span className="text-slate-200">
+                      {proactive.model
+                        ? `${proactive.model} nowcast · proxy ${proactive.neighbor ?? '—'}`
+                        : 'physics trend engine (pressure + wind rate)'}
+                    </span>
+                  </p>
 
-              {proactive.recommended_actions
-                ?.length > 0 && (
-                <div className="proactive-alert__actions mt-4 rounded-xl border border-base-700 bg-base-950/70 p-4">
-                  <strong className="block text-xs font-mono tracking-wide text-ice-300 mb-2">
-                    RECOMMENDED NOW
-                  </strong>
-
-                  <div className="space-y-1.5 text-xs text-slate-300">
-                    {proactive.recommended_actions.map(
-                      (action: string) => (
-                        <div
-                          key={action}
-                        >
-                          • {action}
+                  <div className="mt-4 grid grid-cols-2 gap-3 font-mono">
+                    {proactive.eta_minutes != null && (
+                      <div className="rounded-xl border border-base-700 bg-base-950/70 p-3">
+                        <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                          Escalation in
+                        </span>
+                        <strong className="text-2xl text-white tabular-nums">
+                          {formatEta(proactive.eta_minutes)}
+                        </strong>
+                      </div>
+                    )}
+                    {proactive.confidence > 0 && (
+                      <div className="rounded-xl border border-base-700 bg-base-950/70 p-3">
+                        <span className="block text-[10px] uppercase tracking-wider text-slate-500">
+                          Confidence
+                        </span>
+                        <strong className="text-2xl text-white tabular-nums">
+                          {Math.round(proactive.confidence * 100)}%
+                        </strong>
+                        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-base-800">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-ice-500 to-neon-cyan transition-all duration-700"
+                            style={{ width: `${Math.round(proactive.confidence * 100)}%` }}
+                          />
                         </div>
-                      )
+                      </div>
                     )}
                   </div>
+
+                  <div className="mt-4">
+                    <span className="mb-2 block font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                      Trigger signals · live
+                    </span>
+                    <ProactiveSignals proactive={proactive} telemetry={t} />
+                  </div>
                 </div>
-              )}
+
+                {proactive.recommended_actions?.length > 0 && (
+                  <div className="proactive-alert__actions rounded-xl border border-base-700 bg-base-950/60 p-4">
+                    <strong className="mb-3 flex items-center justify-between text-xs font-mono tracking-wide text-ice-300">
+                      RECOMMENDED NOW
+                      <span className="text-[10px] font-normal text-slate-500">
+                        {proactive.recommended_actions.length} actions
+                      </span>
+                    </strong>
+                    <ol className="space-y-2">
+                      {proactive.recommended_actions.map((action: string, i: number) => (
+                        <li
+                          key={action}
+                          className="flex items-center gap-3 rounded-lg border border-base-800 bg-base-900/70 px-3 py-2 text-sm text-slate-200 transition hover:border-ice-500/40"
+                        >
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-ice-500/40 bg-ice-600/20 font-mono text-[11px] font-bold text-ice-300">
+                            {i + 1}
+                          </span>
+                          {action}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -453,7 +529,7 @@ export default function MissionControl({
         {/* Closed-Loop Command Grid: SOP Mitigations & Scenario Injections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* SOP Mitigation Actions Drawer */}
-          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-xl flex flex-col">
+          <div className="analytics-card rounded-2xl p-6 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
                 <ShieldAlert
@@ -467,7 +543,7 @@ export default function MissionControl({
                   </h3>
 
                   <p className="text-xs text-slate-400 font-mono">
-                    Deterministic SOP rule matrix triggered by Isolation Forest & sensor cliffs
+                    Live SOP limits · approve actions when a rule trips
                   </p>
                 </div>
               </div>
@@ -479,23 +555,12 @@ export default function MissionControl({
             </div>
 
             <div className="space-y-3 flex-1">
-              {prescribedActions.length ===
-              0 ? (
-                <div className="h-44 rounded-xl border border-dashed border-base-700 bg-base-950/40 flex flex-col items-center justify-center text-center p-6">
-                  <CheckCircle2
-                    size={32}
-                    className="text-emerald-400/70 mb-2"
-                  />
-
-                  <p className="text-sm font-semibold text-slate-300">
-                    No Emergency SOP Mitigations Required
-                  </p>
-
-                  <p className="text-xs text-slate-500 font-mono mt-1 max-w-sm">
-                    All environmental conditions and microgrid loads remain within nominal operating safety bounds.
-                  </p>
+              {prescribedActions.length === 0 && (
+                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/5 px-3 py-2 font-mono text-[11px] text-emerald-300">
+                  <CheckCircle2 size={14} /> No SOP action pending — every limit below is inside its trip point.
                 </div>
-              ) : (
+              )}
+              {prescribedActions.length > 0 && (
                 prescribedActions.map(
                   (
                     action: string,
@@ -624,6 +689,7 @@ export default function MissionControl({
                   }
                 )
               )}
+              <SopRuleMatrix telemetry={t} />
             </div>
 
             {citations.length > 0 && (
@@ -728,7 +794,7 @@ export default function MissionControl({
           </div>
 
           {/* Scenario Injection Utility Tray */}
-          <div className="rounded-2xl border border-base-700 bg-base-900 p-6 shadow-xl flex flex-col justify-between">
+          <div className="analytics-card rounded-2xl p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
@@ -748,8 +814,16 @@ export default function MissionControl({
                   </div>
                 </div>
 
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-ice-600/20 text-ice-300 border border-ice-500/30">
-                  Pitch Demo
+                <span
+                  className={`text-xs font-mono px-2 py-0.5 rounded border ${
+                    t?.scenario_id && t.scenario_id !== 'NOMINAL'
+                      ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 animate-pulse'
+                      : 'bg-base-800 text-slate-400 border-base-700'
+                  }`}
+                >
+                  {t?.scenario_id && t.scenario_id !== 'NOMINAL'
+                    ? `ACTIVE: ${String(t.scenario_id).replace(/_/g, ' ')}`
+                    : 'No injection'}
                 </span>
               </div>
 
@@ -791,36 +865,41 @@ export default function MissionControl({
             </div>
 
             {/* Ingestion & Satellite Latency Footer Notice */}
-            <div className="p-3.5 rounded-xl border border-base-800 bg-base-950/80 text-xs font-mono space-y-1">
-              <div className="flex justify-between text-slate-400 text-[11px]">
-                <span>
-                  ANTARCTICA EDGE SIMULATOR:
+            <div className="space-y-3">
+              <div className="rounded-xl border border-base-800 bg-base-950/70 p-3.5 font-mono">
+                <span className="mb-2 block text-[10px] uppercase tracking-wider text-slate-400">
+                  Ops lockouts · live
                 </span>
-
-                <span className="text-ice-300 font-semibold">
-                  PORT 8001 (ODE Engine)
-                </span>
+                <div className="grid grid-cols-3 gap-2 text-[11px]">
+                  {(
+                    [
+                      ['Outdoor', t?.lockouts?.outdoor, '23 kt'],
+                      ['Helicopter', t?.lockouts?.heli, '40 kt'],
+                      ['Convoy', t?.lockouts?.convoy, '50 kt'],
+                    ] as const
+                  ).map(([label, state, limit]) => (
+                    <div
+                      key={label}
+                      className={`rounded-lg border px-2.5 py-2 ${
+                        state === 'LOCKED'
+                          ? 'border-red-500/50 bg-red-500/10'
+                          : 'border-emerald-500/25 bg-emerald-500/5'
+                      }`}
+                    >
+                      <span className="block text-[9px] text-slate-500">
+                        {label} · {limit}
+                      </span>
+                      <strong className={state === 'LOCKED' ? 'text-red-300' : 'text-emerald-300'}>
+                        {state ?? '—'}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+                {t?.lockouts?.reasons?.length > 0 && (
+                  <p className="mt-2 text-[10px] text-slate-400">{t.lockouts.reasons.join(' · ')}</p>
+                )}
               </div>
-
-              <div className="flex justify-between text-slate-400 text-[11px]">
-                <span>
-                  POLARIS HQ DIGITAL TWIN:
-                </span>
-
-                <span className="text-ice-300 font-semibold">
-                  PORT 8000 (Scikit-Learn ML)
-                </span>
-              </div>
-
-              <div className="flex justify-between text-slate-400 text-[11px]">
-                <span>
-                  SATELLITE DELAY:
-                </span>
-
-                <span className="text-white font-semibold">
-                  400–800 ms round trip injected
-                </span>
-              </div>
+              <LinkHealthPanel telemetry={t} />
             </div>
           </div>
         </div>

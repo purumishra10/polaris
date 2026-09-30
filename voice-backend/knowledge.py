@@ -62,6 +62,62 @@ Live now / present returns to synthetic realtime.
 Stations are ~3098 km apart. Different climate and logistics regimes.
 """.strip()
 
+rag.add_document(DIGEST.replace("\n\n", "\n"), "ops-digest", "Polaris ops digest")
+
+# One headline fact per card so BM25 can pin short spoken questions to the
+# exact number. Every value is restated from DIGEST / the knowledge base.
+FACT_CARDS: list[tuple[str, str, str]] = [
+    ("Bharati containers and structure", "AL/02 · IStructE",
+     "Bharati is built from 134 ISO 20-foot shipping containers that form both structure and rooms, "
+     "wrapped in an aerodynamic insulated skin on V-columns with a 6 m overhang."),
+    ("When Bharati opened", "NCPOR · AL/02",
+     "Bharati has operated year-round since 18 March 2012. It was commissioned in 2012 in the Larsemann Hills."),
+    ("When Maitri opened", "NCPOR · AL/03",
+     "Maitri has operated year-round since 1989, replacing Dakshin Gangotri. It is past its 25-year design life; Maitri-II is planned."),
+    ("Bharati occupancy crew people", "AL/02",
+     "Bharati holds 47 people in the main building in winter; with 25 more in the emergency and summer camp the peak is 72."),
+    ("Maitri occupancy crew people", "AL/03",
+     "Maitri holds about 25 people in winter and 40 to 65 in summer. Maitri-II is planned for 40 winter and 140 summer."),
+    ("Distance between Bharati and Maitri", "43-ISEA",
+     "Bharati and Maitri are about 3098 km (1693 nautical miles) apart, in different climate and logistics regimes."),
+    ("Bharati location coordinates", "AL/02",
+     "Bharati is at 69.4068 S, 76.1953 E, about 35 m elevation on North Grovnes in the Larsemann Hills, about 200 m from Quilty Bay."),
+    ("Maitri location coordinates", "AL/03",
+     "Maitri is at 70.7668 S, 11.7308 E, about 117 m elevation in the Schirmacher Oasis, 80 to 100 km inland. Novolazarevskaya is 3.5 km away."),
+    ("Bharati climate extremes coldest hottest temperature gust", "IMD MAUSAM 73(3)",
+     "At Bharati the 2017-18 maximum was +9.9 C on 5 Jan 2018 and the minimum -29.8 C on 29 Aug 2018. The peak gust was about 80 knots on 5 Aug 2018."),
+    ("Maitri climate temperature wind design", "Maitri-II brief",
+     "Maitri's annual mean is -9.7 C with a July extreme of -44 C. Mean wind is 31.5 km/h; the design maximum is 200 km/h from the SE katabatic."),
+    ("Bharati design wind envelope", "AL/02 · IStructE",
+     "Bharati's envelope is designed for -40 C outside and +20 C inside; site winds are cited up to 270 km/h."),
+    ("Maitri-II power plant capacity generators", "Maitri-II brief",
+     "Maitri-II plans 6 CHP units of 100 to 125 kVA each, 600 to 750 kVA in total. The summer wing isolates in winter to save fuel."),
+    ("Maitri-II fuel farm storage", "Maitri-II brief",
+     "Maitri-II plans a fuel farm of about 600,000 liters of JET A-1 and a helipad sized for the Kamov 32."),
+    ("Maitri current generator and fuel", "NCPOR",
+     "The current Maitri generator kVA and tank inventory are not published; the twin labels that energy layer as synthetic."),
+    ("Bharati vehicles fleet", "AL/02",
+     "Bharati vehicles: 4 Pisten Bully, 2 snow scooters, 1 Tata Xenon-XT, 1 BE-71, 1 BD-50 and one 50 t Mantis crane. Helicopters are ship-based only."),
+    ("Maitri vehicles fleet", "AL/03",
+     "Maitri vehicles: 14 Pisten Bully, 4 snow scooters, 1 Toyota arctic truck, 1 Tata Xenon-XT, 1 BD-50 and 5 Mantis cranes of 50 t."),
+    ("Bharati communications", "AL/02",
+     "Bharati has ECIL X/S-band data reception and a C-band link to NRSC Shadnagar."),
+    ("Maitri communications", "AL/03",
+     "Maitri has satellite internet and phone only; the personal call allotment is 6 minutes a month in summer and 20 in winter."),
+    ("Wind lockout limits outdoor helicopter convoy", "twin-backend lockouts.py",
+     "Wind lockouts: outdoor work locks above 23 knots, helicopter ops lock above 40 knots, and convoys lock above 50 knots. "
+     "Heli is also locked whenever the ship is away, because the Kamov is ship-based."),
+    ("SOP thresholds critical advisory rules", "twin-backend sop.py",
+     "Wind over 60 knots is CRITICAL (hatch lockdown, stow sensors). Habitat under 16 C is CRITICAL (aux generator). "
+     "Fuel under 15 days is CRITICAL and under 30 days is ADVISORY (shed science, isolate summer wing). Outdoor lockout is 23 knots, heli 40, convoy 50."),
+    ("Nowcast models LSTM random forest", "twin-backend nowcast.py",
+     "The 6-hour nowcast blends a Random Forest (65 percent) with an LSTM (35 percent) for the chance of a 23-knot lockout. "
+     "WATCH starts at 45 percent and IMMINENT at 70 percent or a 32-knot gust."),
+]
+
+for _title, _src, _text in FACT_CARDS:
+    rag.add_document(_text, f"fact-card:{_src}", _title)
+
 
 def retrieve(query: str, limit: int = 5) -> dict[str, Any]:
     packed = rag.retrieve(query, limit=limit)

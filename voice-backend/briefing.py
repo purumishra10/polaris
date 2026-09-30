@@ -77,6 +77,12 @@ prescribed_actions: {action_line}
 controls: science={controls.get("science_instruments_online")} summer_wing_isolated={controls.get("summer_wing_isolated")} hatch_lockdown={controls.get("hatch_lockdown")} aux_gen={controls.get("aux_generator_active")}
 lockouts: outdoor={lockouts.get("outdoor")} heli={lockouts.get("heli")} convoy={lockouts.get("convoy")} field={lockouts.get("field")}
 """
+    crit = critical_conditions(snap)
+    block += (
+        "CRITICAL CONDITIONS: " + "; ".join(c["spoken"] for c in crit) + " (lead with these)\n"
+        if crit
+        else "CRITICAL CONDITIONS: none\n"
+    )
     if include_link:
         block += (
             f"link: {link.get('type')} latency={link.get('latency_ms')} ms "
@@ -255,6 +261,143 @@ def spoken_for_actions(snap: dict[str, Any] | None, actions: list[dict[str, Any]
     if "CONTAINERS" in subs or "UTILITIES" in subs:
         return weather_spoken(snap)
     return None
+
+
+def _f(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number == number else None
+
+
+def critical_conditions(snap: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """Same CRITICAL triggers the frontend SOP interrupt uses."""
+    if not snap:
+        return []
+    out: list[dict[str, Any]] = []
+    wind = _f((snap.get("ambient") or {}).get("wind_speed_knots"))
+    habitat = _f((snap.get("thermal") or {}).get("internal_temp_c"))
+    days = _f((snap.get("fuel") or {}).get("days_of_autonomy"))
+    forecast = snap.get("forecast") or {}
+    proactive = snap.get("proactive") or {}
+
+    if wind is not None and wind > 60:
+        out.append({
+            "code": "STRUCTURAL",
+            "subsystem": "STRUCTURE",
+            "spoken": f"wind is {_n(wind, 0)} knots, over the sixty-knot structural limit",
+        })
+    if habitat is not None and habitat < 16:
+        out.append({
+            "code": "THERMAL",
+            "subsystem": "THERMAL",
+            "spoken": f"habitat is down to {_n(habitat)} degrees, under the sixteen-degree floor",
+        })
+    if days is not None and days < 15:
+        out.append({
+            "code": "FUEL_CRIT",
+            "subsystem": "FUEL",
+            "spoken": f"fuel autonomy is {_n(days, 0)} days, under the fifteen-day starve floor",
+        })
+    if str(forecast.get("status") or "") == "IMMINENT":
+        p23 = _f(forecast.get("p_lockout_23"))
+        out.append({
+            "code": "NOWCAST",
+            "subsystem": "STRUCTURE",
+            "spoken": (
+                f"the six-hour nowcast says a wind lockout is imminent, "
+                f"{round((p23 or 0) * 100)} percent, gusts to {_n(forecast.get('gust_max_6h_kn'), 0)} knots"
+            ),
+        })
+    hazard = str(proactive.get("hazard") or "")
+    if str(proactive.get("status") or "") in {"IMMINENT", "ACTIVE"} and hazard and hazard != "NONE":
+        eta = _f(proactive.get("eta_minutes"))
+        eta_bit = ""
+        if eta is not None and eta < 9000:
+            eta_bit = (
+                f" in about {max(1, round(eta * 60))} seconds" if eta < 1
+                else f" in about {round(eta)} minutes" if eta < 120
+                else f" in about {round(eta / 60)} hours"
+            )
+        out.append({
+            "code": f"PRO_{hazard}",
+            "subsystem": {"RESUPPLY": "FUEL", "MICROGRID": "MICROGRID", "COMMUNICATIONS": "COMMUNICATIONS"}.get(hazard, "STRUCTURE"),
+            "spoken": f"the proactive engine has {hazard.replace('_', ' ').lower()} {str(proactive.get('status')).lower()}{eta_bit}",
+        })
+    if not out and str((snap.get("risk") or {}).get("severity") or "") == "CRITICAL":
+        out.append({"code": "RISK", "subsystem": "STRUCTURE", "spoken": "the SOP rule engine has the station at critical"})
+    return out
+
+
+def status_spoken(snap: dict[str, Any] | None) -> str:
+    if not snap:
+        return "Twin engine is not answering, so I can't give you a live status. I still have the station notes."
+    station = str(snap.get("station_id") or "the station").title()
+    ambient = snap.get("ambient") or {}
+    thermal = snap.get("thermal") or {}
+    fuel = snap.get("fuel") or {}
+    risk = snap.get("risk") or {}
+    lockouts = snap.get("lockouts") or {}
+    forecast = snap.get("forecast") or {}
+    conditions = critical_conditions(snap)
+
+    if conditions:
+        count = len(conditions)
+        head = f"{station} is critical. " + (
+            f"{conditions[0]['spoken'][0].upper()}{conditions[0]['spoken'][1:]}."
+            if count == 1
+            else f"{count} conditions: " + "; and ".join(c["spoken"] for c in conditions[:3]) + "."
+        )
+        actions = [
+            str(a).replace("ACTION:", "").strip().rstrip(".")
+            for a in (risk.get("prescribed_actions") or [])
+            if "isolation forest" not in str(a).lower()
+        ][:2]
+        sop = f" SOP says {', then '.join(actions).lower()}." if actions else ""
+        return (
+            f"{head}{sop} The critical brief is on your screen. "
+            f"Outdoor is {str(lockouts.get('outdoor') or 'open').lower()}, heli {str(lockouts.get('heli') or 'open').lower()}."
+        )
+
+    severity = str(risk.get("severity") or "nominal").lower()
+    wx = str(forecast.get("status") or "CLEAR")
+    watch = ""
+    if wx == "WATCH":
+        watch = (
+            f" There's a six-hour gust watch, peak {_n(forecast.get('gust_max_6h_kn'), 0)} knots, "
+            f"{round((_f(forecast.get('p_lockout_23')) or 0) * 100)} percent chance of a lockout."
+        )
+    return (
+        f"{station} is {severity}, nothing critical. "
+        f"Outside {_n(ambient.get('temp_c'))} degrees, wind {_n(ambient.get('wind_speed_knots'), 0)} knots; "
+        f"inside {_n(thermal.get('internal_temp_c'))}. Fuel is {_n(fuel.get('days_of_autonomy'), 0)} days."
+        f"{watch} Outdoor is {str(lockouts.get('outdoor') or 'open').lower()}."
+    )
+
+
+_TTS_MAP = {
+    "\u202f": " ", "\u00a0": " ", "\u2009": " ", "\u2007": " ",
+    "\u2212": "minus ", "\u2013": " to ", "\u2014": ", ", "\u2011": "-", "\u2010": "-",
+    "\u00b0C": " degrees", "\u00b0": " degrees", "\u2248": "about ", "\u00d7": " by ",
+    "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"', "\u2026": "...",
+    "\u2192": " to ", "\u2265": "at least ", "\u2264": "at most ",
+}
+
+
+def tts_clean(text: str) -> str:
+    """Normalize LLM typography so TTS doesn't read mojibake or skip symbols."""
+    if not text:
+        return text
+    for src, dst in _TTS_MAP.items():
+        text = text.replace(src, dst)
+    text = re.sub(r"(?<=\d)\s*kt\b", " knots", text)
+    text = re.sub(r"(?<=\d)\s*kVA\b", " kay-vah", text)
+    text = re.sub(r"(?<=\d)\s*L/h\b", " liters an hour", text)
+    text = re.sub(r"[*_#`|]", "", text)
+    text = re.sub(r"[^\x00-\x7f]", "", text)
+    text = re.sub(r"\s+([,.;:!?])", r"\1", text)
+    return re.sub(r"\s{2,}", " ", text).strip()
 
 
 def strip_link_talk(reply: str) -> str:

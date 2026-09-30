@@ -6,6 +6,7 @@ import {
   CinematicPanel,
 } from '../intelligence/CinematicBrief'
 import AnalysisDesk from '../analysis/AnalysisDesk'
+import FullscreenOpsPanel, { FullscreenKpiStrip } from './FullscreenOpsPanel'
 import { usePolarisStore } from '../store/usePolarisStore'
 import {
   BHARATI_SUBSYSTEMS,
@@ -73,39 +74,11 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
   const severity = usePolarisStore(
     (s) => s.telemetry[s.selectedStation]?.risk?.severity ?? 'NOMINAL',
   )
-  const windNow = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.ambient?.wind_speed_knots,
-  )
-  const gust6 = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.forecast?.gust_max_6h_kn,
-  )
-  const p23 = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.forecast?.p_lockout_23,
-  )
-  const forecastStatus = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.forecast?.status ?? 'CLEAR',
-  )
-  const model = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.forecast?.model,
-  )
-  const wxSource = usePolarisStore((s) => s.telemetry[s.selectedStation]?.source)
-  const habitat = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.thermal?.internal_temp_c,
-  )
-  const loadKva = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.microgrid?.total_load_kva,
-  )
-  const autonomy = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.fuel?.days_of_autonomy,
-  )
   const latencyMs = usePolarisStore(
     (s) => s.telemetry[s.selectedStation]?.link_status?.latency_ms,
   )
-  const replayOn = usePolarisStore(
-    (s) => Boolean(s.telemetry[s.selectedStation]?.replay?.active),
-  )
-  const replayClock = usePolarisStore(
-    (s) => s.telemetry[s.selectedStation]?.replay?.clock,
+  const scenarioId = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.scenario_id,
   )
 
   const [fullscreen, setFullscreen] = useState(false)
@@ -190,6 +163,7 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
             </div>
             {analysisButton}
           </div>
+          <FullscreenKpiStrip />
           <div className="topbar-right">
             <div className={`top-status status-${severity.toLowerCase()}`}>
               <span className="status-dot" />
@@ -341,52 +315,8 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
               </aside>
 
               {!selectedSubsystem && (
-                <aside className="telemetry-panel twin-live-chrome">
-                  <div className="panel-header">
-                    <span>{replayOn ? 'DAY TELEMETRY' : 'LIVE TELEMETRY'}</span>
-                    <span className={`live-badge ${replayOn ? 'held' : ''}`}>
-                      {replayOn ? (replayClock || '').slice(0, 10) || 'DATE' : 'LIVE'}
-                    </span>
-                  </div>
-                  <div className="telemetry-grid">
-                    <div className="metric">
-                      <span>WIND NOW</span>
-                      <strong>{windNow != null ? `${Number(windNow).toFixed(1)} kt` : '—'}</strong>
-                    </div>
-                    <div className="metric">
-                      <span>6H PEAK GUST</span>
-                      <strong>
-                        {gust6 != null ? `${Number(gust6).toFixed(1)} kt` : '—'}
-                      </strong>
-                    </div>
-                    <div className="metric">
-                      <span>P(≥23 KT / 6H)</span>
-                      <strong>
-                        {p23 != null ? `${Math.round(Number(p23) * 100)}%` : '—'}
-                      </strong>
-                    </div>
-                    <div className="metric">
-                      <span>NOWCAST</span>
-                      <strong>{forecastStatus}</strong>
-                    </div>
-                    <div className="metric">
-                      <span>HABITAT</span>
-                      <strong>{habitat != null ? `${Number(habitat).toFixed(1)}°C` : '—'}</strong>
-                    </div>
-                    <div className="metric">
-                      <span>LOAD · MODELED</span>
-                      <strong>{loadKva != null ? `${Number(loadKva).toFixed(0)} kVA` : '—'}</strong>
-                    </div>
-                    <div className="metric">
-                      <span>AUTONOMY · MODELED</span>
-                      <strong>{autonomy != null ? `${Number(autonomy).toFixed(0)} d` : '—'}</strong>
-                    </div>
-                  </div>
-                  <p className="source-note">
-                    {replayOn
-                      ? 'Historical clock · use Station Analysis → LIVE for date / day brief'
-                      : `weather: ${wxSource ?? 'Open-Meteo'} · nowcast: ${model ?? 'off'} · plant: modeled`}
-                  </p>
+                <aside className="telemetry-panel fs-ops-panel twin-live-chrome">
+                  <FullscreenOpsPanel />
                 </aside>
               )}
 
@@ -421,7 +351,12 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
                 <span>
                   POLARIS LIVE · <b>{selectedStation}</b> · ESC EXITS FULL SCREEN
                 </span>
-                <span>C-BAND / LEO · {latencyMs ?? 480} ms</span>
+                <span>
+                  {scenarioId && scenarioId !== 'NOMINAL' ? (
+                    <b className="text-amber-300">SCENARIO {String(scenarioId).replace(/_/g, ' ')} · </b>
+                  ) : null}
+                  C-BAND / LEO · {latencyMs ?? '—'} ms
+                </span>
               </div>
             </>
           )}

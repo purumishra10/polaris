@@ -26,9 +26,11 @@ import { applyPlantDoctrine } from '../ops/plantDoctrine'
 import { exportSitrep } from '../ops/exportSitrep'
 const CRITICAL_ACK_KEY = 'polaris:critical-ack'
 
+// Session-scoped so a fresh load always re-surfaces an active critical.
 function loadCriticalAck() {
   try {
-    return window.localStorage.getItem(CRITICAL_ACK_KEY)
+    window.localStorage.removeItem(CRITICAL_ACK_KEY)
+    return window.sessionStorage.getItem(CRITICAL_ACK_KEY)
   } catch {
     return null
   }
@@ -37,9 +39,9 @@ function loadCriticalAck() {
 function saveCriticalAck(signature) {
   try {
     if (signature) {
-      window.localStorage.setItem(CRITICAL_ACK_KEY, signature)
+      window.sessionStorage.setItem(CRITICAL_ACK_KEY, signature)
     } else {
-      window.localStorage.removeItem(CRITICAL_ACK_KEY)
+      window.sessionStorage.removeItem(CRITICAL_ACK_KEY)
     }
   } catch {
     // Ignore storage failures; in-memory acknowledgement still works.
@@ -248,6 +250,8 @@ export const usePolarisStore = create((set, get) => ({
   criticalAck: loadCriticalAck(),
   voyageDelayDays: 0,
   plantMode: 'CURRENT',
+  // LIVE ignores a historical packet still in flight; REPLAY ignores a live one.
+  feedMode: 'LIVE',
 
   connection: {
     status: 'SIMULATION',
@@ -382,57 +386,52 @@ export const usePolarisStore = create((set, get) => ({
 
     set((state) => {
       const current = state.telemetry[station]
-      if (current?.replay?.active) {
-  const replayBase = {
-    ...current,
-    ...packet,
-    timestamp: packet.timestamp || new Date().toISOString(),
-    replay: {
-      ...current.replay,
-      ...(packet.replay ?? {}),
-      active: true,
-    },
-  }
+      const replayOn = Boolean(packet.replay?.active)
+      // Drop a packet from the mode the operator just left, so LIVE is not
+      // overwritten by the historical day still in the socket.
+      if (state.feedMode === 'LIVE' && replayOn) return {}
+      if (state.feedMode === 'REPLAY' && !replayOn) return {}
 
-  const replayTelemetry = decorateStation(
-    replayBase,
-    station,
-    state.plantMode,
-    state.voyageDelayDays,
-  )
+      if (replayOn) {
+        const replayTelemetry = decorateStation(
+          {
+            ...current,
+            ...packet,
+            timestamp: packet.timestamp || new Date().toISOString(),
+            replay: packet.replay,
+          },
+          station,
+          state.plantMode,
+          state.voyageDelayDays,
+        )
 
-  return {
-    telemetry: {
-      ...state.telemetry,
-      [station]: replayTelemetry,
-    },
-    baseline: {
-      ...state.baseline,
-      [station]: replayTelemetry,
-    },
-    series: {
-      ...state.series,
-      [station]: pushSample(
-        state.series[station],
-        replayTelemetry,
-      ),
-    },
-    connection: {
-      ...state.connection,
-      latency_ms:
-        packet.link_status?.latency_ms || state.connection.latency_ms,
-      last_update:
-        packet.timestamp || new Date().toISOString(),
-    },
-  }
-}
+        return {
+          telemetry: {
+            ...state.telemetry,
+            [station]: replayTelemetry,
+          },
+          baseline: {
+            ...state.baseline,
+            [station]: replayTelemetry,
+          },
+          series: {
+            ...state.series,
+            [station]: pushSample(state.series[station], replayTelemetry),
+          },
+          connection: {
+            ...state.connection,
+            latency_ms: packet.link_status?.latency_ms || state.connection.latency_ms,
+            last_update: packet.timestamp || new Date().toISOString(),
+          },
+        }
+      }
 
       const nextBase = decorateStation(
         {
           ...(state.baseline[station] ?? current),
           ...packet,
           timestamp: packet.timestamp || new Date().toISOString(),
-          replay: current?.replay,
+          replay: packet.replay ?? current?.replay,
         },
         station,
         state.plantMode,
@@ -561,6 +560,7 @@ export const usePolarisStore = create((set, get) => ({
 
   injectScenario: async (scenario, durationSeconds = 60) => {
     if (scenario === 'NOMINAL') {
+      set({ feedMode: 'LIVE' })
       try {
         await apiLiveNow()
       } catch {
@@ -637,6 +637,7 @@ export const usePolarisStore = create((set, get) => ({
   },
 
   replayAug2018: async () => {
+    set({ feedMode: 'REPLAY' })
     try {
       await apiReplayAug2018()
     } catch {
@@ -678,6 +679,7 @@ export const usePolarisStore = create((set, get) => ({
   },
 
   setClock: async (clock) => {
+    set({ feedMode: 'REPLAY' })
     const preset = findReplayPreset(clock)
 
     try {
@@ -711,6 +713,7 @@ export const usePolarisStore = create((set, get) => ({
   },
 
   liveNow: async () => {
+    set({ feedMode: 'LIVE' })
     try {
       await apiLiveNow()
     } catch {

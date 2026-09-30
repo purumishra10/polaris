@@ -63,6 +63,9 @@ How you speak:
 - Confirm the action you took. If you opened MAP, say so. If you injected a blizzard, say the SOP is on screen.
 - Never read JSON keys.
 
+- If CRITICAL CONDITIONS is not "none", your first sentence names them with the live number and the limit, then what the SOP says to do. Never call a critical station nominal.
+- Use plain ASCII: say "minus 12 degrees", "knots", "kay-vah". No special dashes, degree signs, or unicode spaces.
+
 Numbers come from LIVE TELEMETRY. Don't invent tank liters, kVA, wind, or occupancy. Slight rounding is fine.
 
 - NEVER say Maitri-II generator count is unpublished. Maitri-II is 6 CHP units x 100-125 kVA (600-750 kVA total) and ~600,000 L JET A-1 from the NCPOR brief.
@@ -111,14 +114,37 @@ def _groq_key() -> str:
     return os.getenv("GROQ_API_KEY", "").strip()
 
 
+_CLIENT: OpenAI | None = None
+_CLIENT_KEY: str | None = None
+_DEAD_MODELS: set[str] = set()
+
+
 def _client() -> OpenAI | None:
+    """Cached client. SDK retries are off: one slow provider must not stall a
+    voice turn for 3x the timeout; _complete already falls through models."""
+    global _CLIENT, _CLIENT_KEY
     key = _groq_key()
-    if key:
-        return OpenAI(base_url="https://api.groq.com/openai/v1", api_key=key)
+    if _CLIENT is not None and _CLIENT_KEY == key:
+        return _CLIENT
     try:
-        return OpenAI(base_url="http://127.0.0.1:11434/v1", api_key="ollama")
+        if key:
+            _CLIENT = OpenAI(
+                base_url="https://api.groq.com/openai/v1",
+                api_key=key,
+                timeout=9.0,
+                max_retries=0,
+            )
+        else:
+            _CLIENT = OpenAI(
+                base_url="http://127.0.0.1:11434/v1",
+                api_key="ollama",
+                timeout=12.0,
+                max_retries=0,
+            )
+        _CLIENT_KEY = key
     except Exception:
-        return None
+        _CLIENT = None
+    return _CLIENT
 
 
 def _sanitize(text: str) -> str:
@@ -327,8 +353,6 @@ def keyword_actions(user_text: str) -> list[dict[str, Any]]:
         subsystem = "VEHICLES"
     elif re.search(r"water|melt pond|reverse osmosis|\bro\b", text):
         subsystem = "WATER"
-    elif re.search(r"risk|alert|anomaly|sop|severity|prescrib", text):
-        subsystem = "FUEL"
 
     if subsystem:
         actions.append({"type": "select_subsystem", "subsystem": subsystem})
@@ -553,15 +577,15 @@ def _complete(client: OpenAI, messages: list[dict[str, str]]) -> str:
     last_error = None
     tried: set[str] = set()
     for model in FALLBACK_MODELS:
-        if model in tried:
+        if model in tried or model in _DEAD_MODELS:
             continue
         tried.add(model)
         try:
             kwargs = {
                 "model": model,
                 "messages": messages,
-                "temperature": 0.7,
-                "max_tokens": 1200,
+                "temperature": 0.35,
+                "max_tokens": 700,
             }
             try:
                 result = client.chat.completions.create(
@@ -589,6 +613,8 @@ def _complete(client: OpenAI, messages: list[dict[str, str]]) -> str:
             return text
         except Exception as exc:
             print(f"[Ops] model {model} failed: {exc}")
+            if re.search(r"model_not_found|decommissioned|does not exist|404", str(exc), re.I):
+                _DEAD_MODELS.add(model)
             last_error = exc
             continue
     raise RuntimeError(last_error)
@@ -605,7 +631,8 @@ KNOWLEDGE_RE = re.compile(
     r"tell me about|when (?:was|did|does)|"
     r"al/?0[23]|maitri-?ii|imd|mausam|blizzard log|"
     r"polar (?:day|night)|occupancy|containers|design wind|"
-    r"paper|knowledge|dataset|dossier",
+    r"paper|knowledge|dataset|dossier|internet|phone|call allotment|vehicles?|coordinates|"
+    r"how far|distance|opened|built|established|design(?:ed)? (?:for|wind|temp)",
     re.I,
 )
 
@@ -663,7 +690,7 @@ def _pack_result(
     snap: dict[str, Any] | None = None,
     explain: bool = False,
 ) -> dict[str, Any]:
-    spoken = briefing.strip_link_talk(reply or "")
+    spoken = briefing.tts_clean(briefing.strip_link_talk(reply or ""))
     limit = 720 if explain else 420
     if len(spoken) > limit:
         spoken = spoken[: limit - 3].rsplit(" ", 1)[0] + "."
@@ -716,6 +743,91 @@ async def _ask_llm(
         return None
 
 
+STATUS_RE = re.compile(
+    r"\b(status|situation|overview|brief me|briefing|"
+    r"any (?:alerts?|warnings?|alarms?|problems?|issues?)|"
+    r"is (?:it|anything|everything|the station|bharati|maitri) (?:critical|ok|okay|fine|safe|normal)|"
+    r"what'?s (?:wrong|happening|going on|the situation)|whats (?:wrong|happening|going on)|"
+    r"how (?:are|is) (?:we|things|the station|bharati|maitri)(?: doing)?|"
+    r"critical|alerts?|alarms?|risk|severity)\b",
+    re.I,
+)
+STATUS_TOPIC_RE = re.compile(
+    r"fuel|tank|autonomy|power|kva|microgrid|generator|comm|radome|latency|\bmap\b|gis|calendar|"
+    r"replay|august|blizzard|resupply|sitrep|export|pdf|hatch|science|aux|thermal view|camera|"
+    r"maitri-?ii|container|occupancy|vehicle",
+    re.I,
+)
+
+
+def _is_status_query(text: str) -> bool:
+    return bool(STATUS_RE.search(text)) and not STATUS_TOPIC_RE.search(text) and not _is_historical(text)
+
+
+def _status_turn(user_text: str, snap: dict[str, Any] | None) -> dict[str, Any]:
+    lowered = user_text.lower()
+    named = "MAITRI" if re.search(r"\bmaitri\b", lowered) else "BHARATI" if re.search(r"\bbharati\b", lowered) else None
+    actions: list[dict[str, Any]] = []
+    if named:
+        actions.append({"type": "select_station", "station": named})
+    actions += [{"type": "show_telemetry", "enabled": True}, {"type": "set_hud_tab", "tab": "live"}]
+    current = str((snap or {}).get("station_id") or "").upper()
+    if named and current and named != current:
+        reply = (
+            f"Switching you to {named.title()}. Its live feed lands in a second; "
+            f"ask me again and I'll give you the full status."
+        )
+        return _pack_result(reply, _sort_actions(actions), snap=snap)
+    conditions = briefing.critical_conditions(snap)
+    if conditions:
+        actions.append({"type": "select_subsystem", "subsystem": conditions[0]["subsystem"]})
+    return _pack_result(briefing.status_spoken(snap), _sort_actions(_dedupe(actions)), snap=snap, explain=bool(conditions))
+
+
+def _passages(hits: list[dict[str, Any]]) -> str:
+    lines = []
+    for item in hits[:3]:
+        snippet = re.sub(r"\s+", " ", item.get("snippet") or item.get("content") or "")[:520]
+        lines.append(f"- {item.get('heading') or 'note'} (source: {_source_label(item.get('source'))}): {snippet}")
+    return (
+        "STATION KNOWLEDGE (ranked). Answer ONLY from these passages: use the first passage that "
+        "contains the fact, quote its number exactly, and end with a short spoken attribution like "
+        "\"That's from AL/02.\" (no brackets, no file names). "
+        "Do not use live telemetry numbers or outside memory for a knowledge question. "
+        "If no passage has it, say the station notes don't cover it.\n" + "\n".join(lines)
+    )
+
+
+def _numbers_grounded(reply: str, evidence: str) -> bool:
+    """Every multi-digit number the LLM speaks must appear in passages or telemetry."""
+    def nums(text: str) -> set[str]:
+        return {m.rstrip(".") for m in re.findall(r"\d[\d.]*", text.replace(",", ""))}
+
+    have = nums(evidence)
+    have |= {n.split(".")[0] for n in have}
+    return all(n in have or n.split(".")[0] in have for n in nums(reply) if len(n.split(".")[0]) >= 2)
+
+
+_DOC_NAMES = {
+    "digital_twin_knowledge_base": "the station knowledge base",
+    "papers_reading_guide": "the papers guide",
+    "antarctic_digital_twin_datasets": "the dataset catalogue",
+    "README": "the data dictionary",
+    "DEMO_SCRIPT": "the demo script",
+}
+
+
+def _source_label(source: str | None) -> str:
+    raw = str(source or "")
+    if raw == "ops-digest":
+        return "the ops digest"
+    label = raw.split(":", 1)[-1] if ":" in raw else raw or "the knowledge base"
+    if label.endswith(".md"):
+        label = label.replace("\\", "/").rsplit("/", 1)[-1][:-3]
+    label = _DOC_NAMES.get(label, label)
+    return label.replace("_", " ").replace(" · ", " and ")
+
+
 async def handle_turn(
     user_text: str,
     history: list[dict[str, str]] | None = None,
@@ -732,6 +844,12 @@ async def handle_turn(
     except twin_client.TwinUnreachable as exc:
         uplink_error = str(exc)
 
+    # Status / "is anything critical" is answered straight from telemetry.
+    if not explain and _is_status_query(user_text) and not any(
+        a.get("type") in {"inject_scenario", "set_controls", "export_sitrep", "replay_2018"} for a in routed
+    ):
+        return _status_turn(user_text, snap)
+
     # Fast orders skip the LLM unless they asked why / explain.
     if routed and not knowledge_q and not explain:
         actions = _dedupe(routed)
@@ -742,16 +860,37 @@ async def handle_turn(
 
     knowledge_extra = ""
     sources: list[dict[str, Any]] = []
+    hits: list[dict[str, Any]] = []
     rag_mode = "ops"
+    ops_like = is_ops_utterance(user_text)
+
+    if not (knowledge_q or explain or ops_like):
+        # Unrecognised phrasing: let the knowledge base decide if it's a fact question.
+        probe = knowledge.retrieve(user_text, limit=3)
+        probe_hits = probe.get("hits") or []
+        if probe_hits and float(probe_hits[0].get("confidence") or 0) >= 0.6 and float(probe_hits[0].get("score") or 0) >= 5:
+            knowledge_q = True
+            packed = probe
+        else:
+            return _pack_result(
+                "I can give you the station status, fuel, weather, power, the map, "
+                "or replay the fifth of August. What do you need?",
+                [],
+                snap=snap,
+            )
+    else:
+        packed = None
+
     if knowledge_q or explain:
-        packed = knowledge.retrieve(user_text, limit=3)
+        packed = packed or knowledge.retrieve(user_text, limit=3)
         hits = packed.get("hits") or []
-        rag_mode = packed.get("mode") or "local-md"
+        rag_mode = packed.get("mode") or "local-bm25"
         sources = [
             {
                 "heading": item.get("heading"),
                 "source": item.get("source"),
                 "score": round(float(item.get("score") or 0), 3),
+                "snippet": re.sub(r"\s+", " ", item.get("snippet") or "")[:220],
             }
             for item in hits[:3]
         ]
@@ -759,22 +898,7 @@ async def handle_turn(
             routed.append({"type": "show_telemetry", "enabled": True})
             routed.append({"type": "set_hud_tab", "tab": "dossier"})
         if hits:
-            passages = []
-            for item in hits[:3]:
-                snippet = re.sub(r"\s+", " ", item.get("content") or "")[:420]
-                passages.append(
-                    f"{item.get('heading') or 'note'} ({item.get('source') or 'kb'}): {snippet}"
-                )
-            knowledge_extra = "STATION KNOWLEDGE — explain these passages in spoken English:\n" + "\n".join(
-                passages
-            )
-
-    if not is_ops_utterance(user_text) and not explain and not knowledge_q:
-        return _pack_result(
-            "Say fuel, blizzard, map, or the fifth of August.",
-            [],
-            snap=snap,
-        )
+            knowledge_extra = _passages(hits)
 
     parsed = await _ask_llm(user_text, history, snap, uplink_error, knowledge_extra)
     reply = ""
@@ -784,13 +908,16 @@ async def handle_turn(
         llm_actions = sanitize_actions(parsed.get("actions"), user_text)
 
     actions = _merge_actions(llm_actions, routed, user_text)
+    if reply and knowledge_q and hits and not _numbers_grounded(
+        reply, knowledge_extra + "\n" + briefing.format_snapshot(snap)
+    ):
+        print(f"[Ops] ungrounded number in LLM reply, using retrieved fact: {reply[:120]!r}")
+        reply = ""
     if not reply:
-        if sources:
-            heading = sources[0].get("heading") or "the station notes"
-            source = sources[0].get("source") or "knowledge base"
-            packed_hits = knowledge.retrieve(user_text, limit=1).get("hits") or []
-            snippet = re.sub(r"\s+", " ", (packed_hits[0].get("content") if packed_hits else "") or "")
-            reply = f"{snippet[:280].rstrip(' .,;')}. That's from {heading}, in {source}."
+        if hits:
+            top = hits[0]
+            snippet = re.sub(r"\s+", " ", top.get("snippet") or top.get("content") or "")
+            reply = f"From {_source_label(top.get('source'))}: {snippet[:300].rstrip(' .,;')}."
         else:
             reply = briefing.spoken_for_actions(snap, actions) or _fallback_reply(
                 user_text, snap, actions

@@ -162,6 +162,34 @@ def _future_any(mask: np.ndarray, h: int) -> np.ndarray:
     return out
 
 
+TABULAR_FEATURES = [
+    "temp_c",
+    "wind_kn",
+    "gust_kn",
+    "pres_hpa",
+    "rh",
+    "dni",
+    "snow",
+    "wdir_sin",
+    "wdir_cos",
+    "month",
+    "hour",
+    "dP_3h",
+    "dW_3h",
+    "dG_3h",
+    "dT_3h",
+    "gust_ma6",
+    "pres_ma6",
+    "nbr_temp",
+    "nbr_wind",
+    "nbr_gust",
+    "nbr_pres",
+    "nbr_dG_3h",
+    "nbr_dP_3h",
+    "gust_minus_nbr",
+]
+
+
 def tabular_matrix(local: dict, nbr: dict) -> np.ndarray:
     wdir = np.deg2rad(local["wdir"])
     dP = _delta(local["pres"], 3)

@@ -3578,6 +3578,18 @@
   letter-spacing: 0.04em;
 }
 
+.voice-cite-snippet {
+  display: -webkit-box;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #9fb9c3;
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1.35;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
 .critical-overlay {
   position: absolute;
   inset: 0;
@@ -4588,6 +4600,22 @@
 
 .analysis-desk .day-clock {
   margin-top: 0;
+}
+
+.twin-live-fullscreen .fs-ops-panel {
+  width: 336px;
+  padding: 14px;
+  border-color: rgba(94, 184, 255, 0.22);
+  background: linear-gradient(160deg, rgba(6, 17, 23, 0.92), rgba(5, 12, 17, 0.78));
+  box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(147, 213, 255, 0.06);
+  scrollbar-width: thin;
+}
+
+.twin-live-fullscreen .topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .twin-live-fullscreen .telemetry-toggle {

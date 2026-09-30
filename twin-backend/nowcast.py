@@ -19,8 +19,12 @@ from weather_features import (
     HELI_KT,
     LOCKOUT_KT,
     SEQ_LEN,
+    TABULAR_FEATURES,
     rows_from_hourly_tail,
 )
+
+BLEND_RF = 0.65
+BLEND_LSTM = 0.35
 
 log = logging.getLogger("polaris.nowcast")
 
@@ -251,11 +255,27 @@ def reconcile(
     }
 
 
+def _head_importance(heads: dict[str, Any], top: int = 10) -> dict[str, list[dict[str, float]]]:
+    out: dict[str, list[dict[str, float]]] = {}
+    for name, model in heads.items():
+        weights = getattr(model, "feature_importances_", None)
+        if weights is None or len(weights) != len(TABULAR_FEATURES):
+            continue
+        ranked = sorted(zip(TABULAR_FEATURES, weights), key=lambda kv: kv[1], reverse=True)
+        out[name] = [{"feature": f, "importance": round(float(w), 4)} for f, w in ranked[:top]]
+    return out
+
+
+def _finite(value: float) -> float | None:
+    return round(float(value), 3) if math.isfinite(float(value)) else None
+
+
 class NowcastEngine:
     def __init__(self, artifacts: Path) -> None:
         self.artifacts = artifacts
         self._seq: dict[str, _SeqNet] = {}
         self._lock = {}
+        self._importance: dict[str, dict[str, list[dict[str, float]]]] = {}
         self._meta: dict[str, Any] = {}
         self._load()
 
@@ -290,8 +310,35 @@ class NowcastEngine:
                 heads = self.artifacts / f"nowcast_{station.lower()}_heads.joblib"
                 if heads.exists():
                     self._lock[station] = joblib.load(heads)
+                    self._importance[station] = _head_importance(self._lock[station])
         except Exception:  # noqa: BLE001
             log.exception("Failed to load nowcast RF heads")
+
+    def model_card(self, station_id: str) -> dict[str, Any]:
+        station = str(station_id).upper()
+        meta = next(
+            (s for s in self._meta.get("stations") or [] if s.get("station") == station),
+            {},
+        )
+        return {
+            "station": station,
+            "protocol": self._meta.get("protocol"),
+            "neighbor": meta.get("neighbor") or NEIGHBOR.get(station),
+            "neighbor_gust_corr": meta.get("neighbor_gust_corr"),
+            "n_train": meta.get("n_train"),
+            "n_test": meta.get("n_test"),
+            "holdout": meta.get("holdout"),
+            "horizon_h": meta.get("horizon_h"),
+            "seq_len": meta.get("seq_len"),
+            "winner": meta.get("winner"),
+            "lock23_test_rate": meta.get("lock23_test_rate"),
+            "results": meta.get("results") or [],
+            "climate": meta.get("climate") or [],
+            "rf_importance": self._importance.get(station, {}),
+            "blend": {"rf": BLEND_RF, "lstm": BLEND_LSTM},
+            "lstm_loaded": station in self._seq,
+            "rf_loaded": station in self._lock,
+        }
 
     @property
     def loaded(self) -> bool:
@@ -334,8 +381,16 @@ class NowcastEngine:
         X, S = rows_from_hourly_tail(rows, nbr_rows or None)
         seq = np.nan_to_num(S[-SEQ_LEN:], nan=0.0)
         gust_hat, wind_hat, temp_hat, p_lstm = net.predict(seq)
+        lstm_out = {
+            "gust_max_6h_kn": _finite(gust_hat),
+            "wind_max_6h_kn": _finite(wind_hat),
+            "temp_min_6h_c": _finite(temp_hat),
+            "p_lockout_23": _finite(p_lstm),
+        }
 
         p_rf = p_lstm
+        rf_out: dict[str, Any] | None = None
+        drivers: list[dict[str, Any]] = []
         heads = self._lock.get(station)
         if heads is not None:
             try:
@@ -343,11 +398,20 @@ class NowcastEngine:
                 p_rf = float(heads["lock"].predict_proba(xt)[0, 1])
                 wind_hat = float(heads["wind"].predict(xt)[0])
                 temp_hat = float(heads["temp"].predict(xt)[0])
+                rf_out = {
+                    "wind_max_6h_kn": _finite(wind_hat),
+                    "temp_min_6h_c": _finite(temp_hat),
+                    "p_lockout_23": _finite(p_rf),
+                }
+                live_row = dict(zip(TABULAR_FEATURES, xt[0].tolist()))
+                for item in (self._importance.get(station) or {}).get("lock", [])[:6]:
+                    drivers.append({**item, "value": _finite(live_row.get(item["feature"], 0.0))})
             except Exception:  # noqa: BLE001
                 log.exception("RF heads failed; using LSTM only")
 
         # Blend: LSTM owns gust; RF lock is better calibrated; never ignore LSTM p
-        p23 = 0.65 * p_rf + 0.35 * p_lstm
+        p23 = BLEND_RF * p_rf + BLEND_LSTM * p_lstm
+        p_blend_raw = p23
         om_peak, n_future = _open_meteo_next6_gust(
             rows,
             now_gust,
@@ -385,6 +449,15 @@ class NowcastEngine:
                 "neighbor": NEIGHBOR.get(station),
                 "source": "Open-Meteo hourly + proxy nowcast",
                 "valid_hours": 6,
+                "ensemble": {
+                    "lstm": lstm_out,
+                    "rf": rf_out,
+                    "weights": {"rf": BLEND_RF, "lstm": BLEND_LSTM},
+                    "p_blend_raw": _finite(p_blend_raw),
+                    "p_final": out.get("p_lockout_23"),
+                    "open_meteo_peak_kn": _finite(om_peak) if om_peak is not None else None,
+                    "drivers": drivers,
+                },
             }
         )
         return out

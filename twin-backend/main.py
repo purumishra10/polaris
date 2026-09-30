@@ -6,6 +6,7 @@ Antarctic SOP rule matrix, and streams enriched StationTelemetry to the UI.
 """
 from __future__ import annotations
 
+import json
 import logging
 from contextlib import asynccontextmanager
 from typing import Any
@@ -301,6 +302,40 @@ async def get_blizzard_validation_event(event_id: str) -> dict[str, Any]:
         ),
         "model_loaded": scorer.loaded,
         "event": result.to_dict(),
+    }
+
+
+# --------------------------------------------------------------------------- #
+# model intelligence (LSTM nowcast, RF heads, Isolation Forest)
+# --------------------------------------------------------------------------- #
+def _read_artifact(name: str) -> dict[str, Any]:
+    path = settings.isolation_forest_path.parent / name
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+@app.get("/api/models/{station_id}")
+async def get_model_card(station_id: str) -> dict[str, Any]:
+    """Hold-out metrics, RF feature importance and IF reference cases for one station."""
+    station = _normalise_station(station_id)
+    bakeoff = _read_artifact("model_bakeoff.json")
+    return {
+        "nowcast": twin.nowcast.model_card(station),
+        "isolation_forest": {
+            "loaded": scorer.loaded,
+            "training": _read_artifact("training_meta.json"),
+            "reference_cases": bakeoff.get("if_cases", {}),
+            "unsupervised_vs_gust40": bakeoff.get("unsup_vs_gust40_now", []),
+            "role": "trace-only; live severity comes from SOP rules and the nowcast",
+        },
+        "bakeoff": {
+            "split": bakeoff.get("split", {}),
+            "cls_23": bakeoff.get("cls_23", []),
+            "persist_cls": bakeoff.get("persist_cls", []),
+        },
+        "climate_2023": (bakeoff.get("climate") or {}).get(station, {}),
     }
 
 

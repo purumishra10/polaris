@@ -12,6 +12,7 @@ import MaitriStation from './stations/Maitri/MaitriStation'
 
 import { usePolarisStore } from '../store/usePolarisStore'
 import { liteGraphics } from '../lib/graphicsQuality'
+import { useCanvasActive } from '../lib/useCanvasActive'
 import OperationalState from './components/OperationalState'
 import CameraRig from './components/CameraRig'
 import WorldPins from '../intelligence/WorldPins'
@@ -19,6 +20,7 @@ import FeatureWarnings from './components/FeatureWarnings'
 
 export default function StationScene() {
   const orbitRoot = useRef(null)
+  const active = useCanvasActive(orbitRoot)
   const selectedStation = usePolarisStore(
     (state) => state.selectedStation,
   )
@@ -34,6 +36,7 @@ export default function StationScene() {
     <div ref={orbitRoot} className="orbit-layer">
       <Canvas
         key={selectedStation}
+        frameloop={active ? 'always' : 'never'}
         shadows={!liteGraphics}
         dpr={liteGraphics ? [1, 1] : [1, 1.15]}
         eventSource={orbitRoot}
