@@ -93,6 +93,18 @@ export async function updateStationControls(controls) {
   return applyControls(controls)
 }
 
+export async function fetchTelemetryHistory(station = 'BHARATI', minutes = 60) {
+  const query = new URLSearchParams({
+    station,
+    minutes: String(minutes),
+  })
+  return apiRequest(`/api/telemetry/history?${query}`)
+}
+
+export async function fetchIncidentLog(limit = 80) {
+  return apiRequest(`/api/events?limit=${limit}`)
+}
+
 export async function checkBackendHealth() {
   const response = await fetch(`${ENGINE_URL}/health`)
   if (!response.ok) {

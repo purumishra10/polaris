@@ -20,11 +20,13 @@ import {
 import TopNav from '../components/TopNav'
 import SeverityBadge from '../components/SeverityBadge'
 import LiveTwinViewport from '../components/LiveTwinViewport'
+import IncidentTimeline from '../components/IncidentTimeline'
 import { usePolarisStore } from '../store/usePolarisStore'
+import { citationForAction } from '../ops/sopCite'
 
 interface Props {
   onNavigate: (
-    route: 'home' | 'mission-control' | 'analytics'
+    route: 'home' | 'mission-control' | 'analytics' | 'fleet'
   ) => void
 }
 
@@ -444,6 +446,8 @@ export default function MissionControl({
             </div>
           )}
 
+        <IncidentTimeline />
+
         <LiveTwinViewport />
 
         {/* Closed-Loop Command Grid: SOP Mitigations & Scenario Injections */}
@@ -515,21 +519,7 @@ export default function MissionControl({
                       executingAction ===
                       action
 
-                    // Match citation from Supabase if applicable
-                    const citation = citations.find((c: any) => {
-                      if (!c) return false;
-                      const ruleKey = (c.rule_key || '').toLowerCase();
-                      const actionLower = (action || '').toLowerCase();
-                      const mandated = c.mandated_action || '';
-
-                      return (
-                        (ruleKey && actionLower.includes(ruleKey)) ||
-                        mandated === action ||
-                        (c.rule_key === 'STRUCTURAL' && actionLower.includes('hatch')) ||
-                        (c.rule_key === 'THERMAL' && actionLower.includes('auxiliary')) ||
-                        (c.rule_key === 'FUEL_CRIT' && (actionLower.includes('scientific') || actionLower.includes('summer')))
-                      );
-                    });
+                    const citation = citationForAction(action, citations)
 
                     return (
                       <div
@@ -635,6 +625,23 @@ export default function MissionControl({
                 )
               )}
             </div>
+
+            {citations.length > 0 && (
+              <div className="mt-3 rounded-lg border border-base-800 bg-base-950/50 p-3">
+                <p className="mb-1 text-[10px] font-mono uppercase tracking-wide text-slate-500">
+                  Regulation provenance
+                </p>
+                <ul className="space-y-1">
+                  {citations.map((item: any) => (
+                    <li key={item.rule_key || item.clause} className="text-[11px] leading-relaxed text-slate-300">
+                      <span className="text-amber-200">{item.clause}</span>
+                      {' · '}
+                      {item.document_title}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Actuator States Capsule */}
             <div className="mt-4 pt-4 border-t border-base-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">

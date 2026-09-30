@@ -1,6 +1,7 @@
 import LiveValue from '../analysis/LiveValue'
 import { SOP } from './decisions'
 import VoyageSlider from './VoyageSlider'
+import DelayForecast from './DelayForecast'
 
 export default function FuelDecision({ decision, onResupply, delayDays, onDelay }) {
   const days = Math.max(0, decision.days ?? 0)
@@ -8,6 +9,7 @@ export default function FuelDecision({ decision, onResupply, delayDays, onDelay 
   const pct = Math.min(100, (days / cap) * 100)
   const tone = decision.band.toLowerCase()
   const next = decision.next
+  const here = decision.forecast?.here
 
   return (
     <div className={`fuel-decision ${tone}`}>
@@ -41,15 +43,13 @@ export default function FuelDecision({ decision, onResupply, delayDays, onDelay 
           </b>
         </div>
         <div>
-          <span>DECISION</span>
+          <span>AT SHIP ETA</span>
           <b>
-            {decision.missWindow
-              ? 'Ship delay misses the sea window'
-              : decision.starve
-                ? 'Fuel shorter than the remaining window'
-                : days < SOP.FUEL_ADVISORY_DAYS
-                  ? 'Below 30-day SOP floor'
-                  : 'Above SOP floor'}
+            {here?.inBay
+              ? 'Ship in bay now'
+              : here
+                ? `${here.fuelAtEta.toFixed(0)} d left · ${here.shortageDays > 0 ? `SHORT ${here.shortageDays.toFixed(0)} d` : 'covers ETA'}`
+                : '—'}
           </b>
         </div>
       </div>
@@ -60,6 +60,7 @@ export default function FuelDecision({ decision, onResupply, delayDays, onDelay 
           decision={decision}
         />
       )}
+      <DelayForecast decision={decision} />
       {onResupply && (decision.starve || decision.band !== 'NOMINAL' || decision.missWindow) && (
         <button type="button" className="fuel-slip" onClick={onResupply}>
           INJECT RESUPPLY DELAY
@@ -69,3 +70,4 @@ export default function FuelDecision({ decision, onResupply, delayDays, onDelay 
     </div>
   )
 }
+

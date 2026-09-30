@@ -8,7 +8,9 @@ function fmt(value, digits = 0, fallback = '—') {
 }
 
 function actions(telemetry) {
-  return telemetry?.risk?.prescribed_actions ?? []
+  return (telemetry?.risk?.prescribed_actions ?? []).filter(
+    (text) => !/isolation forest/i.test(String(text)),
+  )
 }
 
 function toneFromSeverity(severity) {
@@ -26,6 +28,37 @@ function pushActionSignals(list, telemetry) {
       text,
     })
   }
+}
+
+export function forecastSignals(telemetry) {
+  const f = telemetry?.forecast
+  if (!f || (!f.model && f.status == null)) return []
+  const status = String(f.status || 'CLEAR').toUpperCase()
+  const p = Number(f.p_lockout_23)
+  const gust = Number(f.gust_max_6h_kn)
+  const peak = Number.isFinite(gust) ? `${gust.toFixed(1)} kt` : '—'
+  const chance = Number.isFinite(p) ? `${Math.round(p * 100)}%` : '—'
+  const tone =
+    status === 'ACTIVE' || status === 'IMMINENT'
+      ? 'critical'
+      : status === 'WATCH'
+        ? 'advisory'
+        : 'nominal'
+  const list = [
+    {
+      id: 'nowcast:summary',
+      tone,
+      text: `6h nowcast (${f.model || 'ML'} · ${f.neighbor || 'local'}): peak gust ${peak} · P(outdoor ≥23 kt) ${chance} · ${status}`,
+    },
+  ]
+  for (const line of f.recommended_actions ?? []) {
+    list.push({
+      id: `nowcast:${line}`,
+      tone,
+      text: line,
+    })
+  }
+  return list
 }
 
 function meter(label, value, max, unit, caption) {

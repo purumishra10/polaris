@@ -17,7 +17,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import satellite
 from anomaly import AnomalyScorer
 from config import settings
+from history_store import history_store
 from ingest import ConnectionManager, TwinState
+from sop import citation_backend
 from validation import validate_all_blizzard_events, validate_event_by_id
 from models import (
     VALID_STATIONS,
@@ -126,6 +128,12 @@ async def _inject(payload: ScenarioInjectRequest) -> ScenarioInjectResponse:
         "duration_seconds": payload.duration_seconds,
     }
     await _edge_post("/edge/scenario/inject", json=body)
+    history_store.record_event(
+        twin.active_station,
+        "OPERATOR",
+        "SCENARIO",
+        f"{payload.scenario_type} injected for {payload.duration_seconds}s",
+    )
     return ScenarioInjectResponse(
         scenario=payload.scenario_type or "",
         duration_seconds=payload.duration_seconds,
@@ -180,14 +188,25 @@ async def root() -> dict[str, Any]:
 
 @app.get("/health", response_model=TwinHealthResponse)
 async def health() -> TwinHealthResponse:
+    if twin.edge_reachable:
+        link_mode = "LIVE"
+        status = "ONLINE"
+    elif twin.latest is not None:
+        link_mode = "DEGRADED"
+        status = "DEGRADED"
+    else:
+        link_mode = "STARTING"
+        status = "STARTING"
     return TwinHealthResponse(
-        status="ONLINE",
+        status=status,
         station_id=twin.active_station,
         edge_reachable=twin.edge_reachable,
-        model_loaded=scorer.loaded,
+        model_loaded=scorer.loaded or twin.nowcast.loaded,
         last_ingest_utc=twin.last_ingest_utc,
         connected_clients=manager.count,
         consecutive_edge_failures=twin.consecutive_edge_failures,
+        link_mode=link_mode,
+        citation_source=citation_backend(),
     )
 
 
@@ -199,11 +218,31 @@ async def get_telemetry() -> dict[str, Any]:
     return _require_snapshot()
 
 
+@app.get("/api/telemetry/history")
+async def telemetry_history(station: str = "BHARATI", minutes: int = 60) -> dict[str, Any]:
+    key = _normalise_station(station)
+    window = max(5, min(int(minutes), 180))
+    return history_store.history_payload(key, window)
+
+
+@app.get("/api/events")
+async def incident_events(limit: int = 80) -> dict[str, Any]:
+    cap = max(1, min(int(limit), 200))
+    return {"events": history_store.recent_events(cap)}
+
+
 @app.post("/api/station/controls", response_model=ControlsAckResponse)
 async def station_controls(payload: ControlUpdateRequest) -> ControlsAckResponse:
     body = payload.model_dump(exclude_unset=True, exclude_none=True)
     if not body:
         raise HTTPException(status_code=400, detail="No control fields supplied")
+    fields = ", ".join(sorted(body.keys()))
+    history_store.record_event(
+        twin.active_station,
+        "OPERATOR",
+        "CONTROL",
+        f"Operator updated {fields}",
+    )
     data = await _edge_post("/edge/controls", json=body)
     controls = ControlsState.model_validate(data.get("controls", {}))
     return ControlsAckResponse(station_id=twin.active_station, active_controls=controls)

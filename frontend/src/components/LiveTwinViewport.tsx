@@ -62,22 +62,54 @@ interface LiveTwinViewportProps {
 }
 
 export default function LiveTwinViewport({ compact = false }: LiveTwinViewportProps) {
-  const {
-    selectedStation,
-    setSelectedStation,
-    selectedSubsystem,
-    setSelectedSubsystem,
-    isThermalView,
-    toggleThermalView,
-    telemetry,
-    cameraPreset,
-    setCameraPreset,
-  } = usePolarisStore()
+  const selectedStation = usePolarisStore((s) => s.selectedStation)
+  const setSelectedStation = usePolarisStore((s) => s.setSelectedStation)
+  const selectedSubsystem = usePolarisStore((s) => s.selectedSubsystem)
+  const setSelectedSubsystem = usePolarisStore((s) => s.setSelectedSubsystem)
+  const isThermalView = usePolarisStore((s) => s.isThermalView)
+  const toggleThermalView = usePolarisStore((s) => s.toggleThermalView)
+  const cameraPreset = usePolarisStore((s) => s.cameraPreset)
+  const setCameraPreset = usePolarisStore((s) => s.setCameraPreset)
+  const severity = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.risk?.severity ?? 'NOMINAL',
+  )
+  const windNow = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.ambient?.wind_speed_knots,
+  )
+  const gust6 = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.forecast?.gust_max_6h_kn,
+  )
+  const p23 = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.forecast?.p_lockout_23,
+  )
+  const forecastStatus = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.forecast?.status ?? 'CLEAR',
+  )
+  const model = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.forecast?.model,
+  )
+  const wxSource = usePolarisStore((s) => s.telemetry[s.selectedStation]?.source)
+  const habitat = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.thermal?.internal_temp_c,
+  )
+  const loadKva = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.microgrid?.total_load_kva,
+  )
+  const autonomy = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.fuel?.days_of_autonomy,
+  )
+  const latencyMs = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.link_status?.latency_ms,
+  )
+  const replayOn = usePolarisStore(
+    (s) => Boolean(s.telemetry[s.selectedStation]?.replay?.active),
+  )
+  const replayClock = usePolarisStore(
+    (s) => s.telemetry[s.selectedStation]?.replay?.clock,
+  )
 
   const [fullscreen, setFullscreen] = useState(false)
   const [analysisOpen, setAnalysisOpen] = useState(false)
-  const t = telemetry[selectedStation]
-  const severity = t?.risk?.severity ?? 'NOMINAL'
   const assets = selectedStation === 'BHARATI' ? BHARATI_SUBSYSTEMS : MAITRI_SUBSYSTEMS
   const presets =
     selectedStation === 'BHARATI' ? bharatiCameraPresets : maitriCameraPresets
@@ -182,7 +214,7 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
         }`}
       >
         {showLeftRail && (
-          <aside className="twin-left-rail">
+          <aside className={`twin-left-rail ${selectedSubsystem ? 'inspector-wide' : ''}`}>
             {selectedSubsystem ? (
               <CinematicPanel />
             ) : (
@@ -311,28 +343,50 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
               {!selectedSubsystem && (
                 <aside className="telemetry-panel twin-live-chrome">
                   <div className="panel-header">
-                    <span>LIVE TELEMETRY</span>
-                    <span className="live-badge">LIVE</span>
+                    <span>{replayOn ? 'DAY TELEMETRY' : 'LIVE TELEMETRY'}</span>
+                    <span className={`live-badge ${replayOn ? 'held' : ''}`}>
+                      {replayOn ? (replayClock || '').slice(0, 10) || 'DATE' : 'LIVE'}
+                    </span>
                   </div>
                   <div className="telemetry-grid">
                     <div className="metric">
-                      <span>WIND</span>
-                      <strong>{t?.ambient?.wind_speed_knots?.toFixed(1) ?? '—'} kt</strong>
+                      <span>WIND NOW</span>
+                      <strong>{windNow != null ? `${Number(windNow).toFixed(1)} kt` : '—'}</strong>
+                    </div>
+                    <div className="metric">
+                      <span>6H PEAK GUST</span>
+                      <strong>
+                        {gust6 != null ? `${Number(gust6).toFixed(1)} kt` : '—'}
+                      </strong>
+                    </div>
+                    <div className="metric">
+                      <span>P(≥23 KT / 6H)</span>
+                      <strong>
+                        {p23 != null ? `${Math.round(Number(p23) * 100)}%` : '—'}
+                      </strong>
+                    </div>
+                    <div className="metric">
+                      <span>NOWCAST</span>
+                      <strong>{forecastStatus}</strong>
                     </div>
                     <div className="metric">
                       <span>HABITAT</span>
-                      <strong>{t?.thermal?.internal_temp_c?.toFixed(1) ?? '—'}°C</strong>
+                      <strong>{habitat != null ? `${Number(habitat).toFixed(1)}°C` : '—'}</strong>
                     </div>
                     <div className="metric">
-                      <span>LOAD</span>
-                      <strong>{t?.microgrid?.total_load_kva?.toFixed(0) ?? '—'} kVA</strong>
+                      <span>LOAD · MODELED</span>
+                      <strong>{loadKva != null ? `${Number(loadKva).toFixed(0)} kVA` : '—'}</strong>
                     </div>
                     <div className="metric">
-                      <span>AUTONOMY</span>
-                      <strong>{t?.fuel?.days_of_autonomy?.toFixed(0) ?? '—'} d</strong>
+                      <span>AUTONOMY · MODELED</span>
+                      <strong>{autonomy != null ? `${Number(autonomy).toFixed(0)} d` : '—'}</strong>
                     </div>
                   </div>
-                  <p className="source-note">source: synthetic · confidence: modeled</p>
+                  <p className="source-note">
+                    {replayOn
+                      ? 'Historical clock · use Station Analysis → LIVE for date / day brief'
+                      : `weather: ${wxSource ?? 'Open-Meteo'} · nowcast: ${model ?? 'off'} · plant: modeled`}
+                  </p>
                 </aside>
               )}
 
@@ -367,7 +421,7 @@ export default function LiveTwinViewport({ compact = false }: LiveTwinViewportPr
                 <span>
                   POLARIS LIVE · <b>{selectedStation}</b> · ESC EXITS FULL SCREEN
                 </span>
-                <span>C-BAND / LEO · {t?.link_status?.latency_ms ?? 480} ms</span>
+                <span>C-BAND / LEO · {latencyMs ?? 480} ms</span>
               </div>
             </>
           )}

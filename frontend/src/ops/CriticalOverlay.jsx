@@ -55,8 +55,9 @@ export default function CriticalOverlay() {
 
   const severity = telemetry?.risk?.severity
 
-  const actions =
-    telemetry?.risk?.prescribed_actions ?? []
+  const actions = (telemetry?.risk?.prescribed_actions ?? []).filter(
+    (text) => !/isolation forest/i.test(String(text)),
+  )
 
   /*
    * IMPORTANT:

@@ -18,10 +18,12 @@ from pydantic import ValidationError
 import satellite
 from anomaly import AnomalyScorer
 from config import settings
+from history_store import history_store
 from models import RawTelemetry, StationTelemetry
 from lockouts import compute_lockouts
 from sop import build_risk
 from proactive import ProactiveEngine
+from nowcast import NowcastEngine, forecast_to_proactive
 
 log = logging.getLogger("polaris.ingest")
 
@@ -73,6 +75,7 @@ class TwinState:
         self.scorer = scorer
         self.manager = manager
         self.proactive = ProactiveEngine()
+        self.nowcast = NowcastEngine(settings.isolation_forest_path.parent)
         self.client: Optional[httpx.AsyncClient] = None
 
         self.latest: Optional[StationTelemetry] = None
@@ -80,6 +83,7 @@ class TwinState:
         self.last_latency_ms: Optional[int] = None
         self.consecutive_edge_failures: int = 0
         self.edge_reachable: bool = False
+        self.edge_down_logged: bool = False
         self.active_station: str = "BHARATI"
 
         self._task: Optional[asyncio.Task] = None
@@ -131,11 +135,13 @@ class TwinState:
         latency_ms: int,
     ) -> StationTelemetry:
         result = self.scorer.score(raw)
+        forecast = self.nowcast.score(raw.station_id, raw)
 
         risk = build_risk(
             raw,
             result.anomaly_score,
             result.is_outlier,
+            forecast,
         )
 
         lockouts = compute_lockouts(raw)
@@ -168,13 +174,23 @@ class TwinState:
                 health="DEGRADED",
             )
 
-        proactive = self.proactive.update(
+        plant = self.proactive.update(
             station_id=raw.station_id,
             telemetry=raw,
             link_health=link_status.health,
         )
+        wx_status = str(forecast.get("status") or "CLEAR")
+        if wx_status != "CLEAR":
+            proactive = forecast_to_proactive(forecast)
+            if plant.get("hazard") in {"RESUPPLY", "MICROGRID"} and plant.get(
+                "status"
+            ) not in {"CLEAR", None}:
+                proactive["plant"] = plant
+        else:
+            proactive = plant
 
         payload["proactive"] = proactive
+        payload["forecast"] = forecast
 
         return StationTelemetry(
             **payload,
@@ -220,7 +236,8 @@ class TwinState:
             datetime.now(timezone.utc).isoformat()
         )
 
-        if self.consecutive_edge_failures:
+        restored = self.consecutive_edge_failures > 0
+        if restored:
             log.info(
                 "Edge link restored after %d failures",
                 self.consecutive_edge_failures,
@@ -228,10 +245,16 @@ class TwinState:
 
         self.consecutive_edge_failures = 0
         self.edge_reachable = True
+        self.edge_down_logged = False
 
         await self.manager.broadcast(
             enriched.model_dump()
         )
+
+        try:
+            history_store.observe(enriched, restored=restored)
+        except Exception:  # noqa: BLE001
+            log.exception("Telemetry history write failed")
 
     async def _on_failure(
         self,
@@ -245,6 +268,13 @@ class TwinState:
             self.consecutive_edge_failures,
             exc.__class__.__name__,
         )
+
+        if not self.edge_down_logged:
+            self.edge_down_logged = True
+            try:
+                history_store.note_edge_down(self.active_station)
+            except Exception:  # noqa: BLE001
+                log.exception("Incident log write failed")
 
         if self.latest is None:
             return

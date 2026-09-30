@@ -1,0 +1,182 @@
+{
+  "BHARATI": {
+    "source": "Open-Meteo ERA5-land archive 2022\u20132024, wind kn",
+    "neighbor": "PROGRESS",
+    "monthly": [
+      {
+        "month": "Jan",
+        "month_num": 1,
+        "temp": -1.87,
+        "wind": 10.59,
+        "gust": 15.2
+      },
+      {
+        "month": "Feb",
+        "month_num": 2,
+        "temp": -4.01,
+        "wind": 12.34,
+        "gust": 17.83
+      },
+      {
+        "month": "Mar",
+        "month_num": 3,
+        "temp": -8.33,
+        "wind": 11.46,
+        "gust": 16.74
+      },
+      {
+        "month": "Apr",
+        "month_num": 4,
+        "temp": -13.25,
+        "wind": 11.06,
+        "gust": 16.04
+      },
+      {
+        "month": "May",
+        "month_num": 5,
+        "temp": -16.63,
+        "wind": 9.36,
+        "gust": 13.32
+      },
+      {
+        "month": "Jun",
+        "month_num": 6,
+        "temp": -13.38,
+        "wind": 12.14,
+        "gust": 17.55
+      },
+      {
+        "month": "Jul",
+        "month_num": 7,
+        "temp": -18.46,
+        "wind": 11.04,
+        "gust": 15.58
+      },
+      {
+        "month": "Aug",
+        "month_num": 8,
+        "temp": -16.3,
+        "wind": 10.35,
+        "gust": 14.6
+      },
+      {
+        "month": "Sep",
+        "month_num": 9,
+        "temp": -14.8,
+        "wind": 10.92,
+        "gust": 15.45
+      },
+      {
+        "month": "Oct",
+        "month_num": 10,
+        "temp": -11.8,
+        "wind": 9.92,
+        "gust": 14.12
+      },
+      {
+        "month": "Nov",
+        "month_num": 11,
+        "temp": -7.17,
+        "wind": 9.25,
+        "gust": 13.21
+      },
+      {
+        "month": "Dec",
+        "month_num": 12,
+        "temp": -1.94,
+        "wind": 8.62,
+        "gust": 12.3
+      }
+    ]
+  },
+  "MAITRI": {
+    "source": "Open-Meteo ERA5-land archive 2022\u20132024, wind kn",
+    "neighbor": "NOVOLAZAREVSKAYA",
+    "monthly": [
+      {
+        "month": "Jan",
+        "month_num": 1,
+        "temp": -3.65,
+        "wind": 11.46,
+        "gust": 20.71
+      },
+      {
+        "month": "Feb",
+        "month_num": 2,
+        "temp": -5.94,
+        "wind": 13.06,
+        "gust": 23.21
+      },
+      {
+        "month": "Mar",
+        "month_num": 3,
+        "temp": -8.59,
+        "wind": 15.17,
+        "gust": 26.92
+      },
+      {
+        "month": "Apr",
+        "month_num": 4,
+        "temp": -12.73,
+        "wind": 13.47,
+        "gust": 23.78
+      },
+      {
+        "month": "May",
+        "month_num": 5,
+        "temp": -13.54,
+        "wind": 16.29,
+        "gust": 28.92
+      },
+      {
+        "month": "Jun",
+        "month_num": 6,
+        "temp": -14.85,
+        "wind": 15.59,
+        "gust": 27.77
+      },
+      {
+        "month": "Jul",
+        "month_num": 7,
+        "temp": -16.02,
+        "wind": 15.78,
+        "gust": 27.4
+      },
+      {
+        "month": "Aug",
+        "month_num": 8,
+        "temp": -15.12,
+        "wind": 17.24,
+        "gust": 30.19
+      },
+      {
+        "month": "Sep",
+        "month_num": 9,
+        "temp": -17.41,
+        "wind": 12.94,
+        "gust": 22.56
+      },
+      {
+        "month": "Oct",
+        "month_num": 10,
+        "temp": -11.95,
+        "wind": 15.59,
+        "gust": 27.34
+      },
+      {
+        "month": "Nov",
+        "month_num": 11,
+        "temp": -7.41,
+        "wind": 12.32,
+        "gust": 21.89
+      },
+      {
+        "month": "Dec",
+        "month_num": 12,
+        "temp": -3.07,
+        "wind": 12.81,
+        "gust": 22.7
+      }
+    ]
+  }
+}

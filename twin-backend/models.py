@@ -145,6 +145,7 @@ class RawTelemetry(BaseModel):
     lockouts: LockoutsState = Field(
         default_factory=LockoutsState
     )
+    weather: dict = Field(default_factory=dict)
 
 
 # --------------------------------------------------------------------------- #
@@ -170,6 +171,7 @@ class Risk(BaseModel):
     anomaly_score: float
     is_anomaly: bool
     severity: Severity
+    driver: str = "nominal"
     prescribed_actions: list[str] = Field(
         default_factory=list
     )
@@ -184,6 +186,9 @@ class StationTelemetry(RawTelemetry):
     link_status: LinkStatus
     risk: Risk
     proactive: dict = Field(
+        default_factory=dict
+    )
+    forecast: dict = Field(
         default_factory=dict
     )
 
@@ -287,3 +292,5 @@ class TwinHealthResponse(BaseModel):
     last_ingest_utc: Optional[str]
     connected_clients: int
     consecutive_edge_failures: int
+    link_mode: str = "STARTING"
+    citation_source: str = "local"

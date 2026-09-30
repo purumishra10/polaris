@@ -16,6 +16,7 @@ import {
   surfaceNormal,
   alignToNormal,
 } from './terrainMesh'
+import { liteGraphics } from '../../lib/graphicsQuality'
 
 const INNER_SIZE = 300
 const FAR_RADIUS = 3800
@@ -23,7 +24,7 @@ const FAR_RADIUS = 3800
 /** High-detail island terrain around the station. */
 function IslandField() {
   const geometry = useMemo(
-    () => displacedPlane(INNER_SIZE, 220, heightAt, terrainColor),
+    () => displacedPlane(INNER_SIZE, liteGraphics ? 72 : 140, heightAt, terrainColor),
     [],
   )
   return (
@@ -37,7 +38,7 @@ function IslandField() {
 function FarField() {
   const geometry = useMemo(
     () =>
-      displacedRing(140, FAR_RADIUS, 160, 36, heightAt, terrainColor, () => -0.15),
+      displacedRing(140, FAR_RADIUS, liteGraphics ? 48 : 96, liteGraphics ? 16 : 24, heightAt, terrainColor, () => -0.15),
     [],
   )
   return (
@@ -55,7 +56,7 @@ function SeaSurface() {
       position={[0, SEA_LEVEL + 0.02, 0]}
       receiveShadow
     >
-      <ringGeometry args={[100, FAR_RADIUS, 128, 1]} />
+      <ringGeometry args={[100, FAR_RADIUS, liteGraphics ? 48 : 72, 1]} />
       <meshStandardMaterial
         color="#1f4453"
         roughness={0.2}

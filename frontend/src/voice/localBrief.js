@@ -73,7 +73,7 @@ export function localVoiceTurn(text, store) {
   }
   if (/fuel|autonomy|tank|jet/.test(lower)) {
     return say(
-      `${station} fuel ${n(telemetry?.fuel?.tank_level_liters, 0)} litres, burn ${n(telemetry?.fuel?.burn_rate_lph, 0)} litres an hour, ${n(fuel.days, 0)} days autonomy, SOP ${fuel.band}. Source ${telemetry?.plant?.tag ?? telemetry?.source ?? 'synthetic'}.`,
+      `${station} fuel ${n(telemetry?.fuel?.tank_level_liters, 0)} litres, burn ${n(telemetry?.fuel?.burn_rate_lph, 0)} litres an hour, ${n(fuel.days, 0)} days autonomy. Fuel SOP ${fuel.band} — tank is modeled. ${['WATCH', 'IMMINENT'].includes(String(telemetry?.forecast?.status || '')) ? `Station banner is a 6-hour gust watch, not a short tank.` : ''}`,
       [
         { type: 'select_subsystem', subsystem: 'FUEL' },
         { type: 'set_hud_tab', tab: 'live' },

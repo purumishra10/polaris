@@ -17,7 +17,12 @@ from physics import (
     StationPhysicsSimulator,
     NOMINAL_FUEL_LITERS,
 )
-from live_weather import LiveWeather, ambient_from_obs
+from live_weather import (
+    LiveWeather,
+    NEIGHBOR,
+    ambient_from_obs,
+    weather_context,
+)
 
 from scenarios import ScenarioController
 
@@ -178,6 +183,9 @@ async def physics_tick_loop() -> None:
                 else ("synthetic" if injecting else simulator.weather_source)
             )
             confidence = "forecast" if live_ok else "modeled"
+            neighbor_obs = weather.snapshot(
+                NEIGHBOR.get(simulator.station_id, "")
+            )
 
             cached_telemetry = RawTelemetryPayload(
                 station_id=simulator.station_id,
@@ -191,6 +199,7 @@ async def physics_tick_loop() -> None:
                 microgrid=microgrid,
                 fuel=fuel,
                 controls=controls,
+                weather=weather_context(obs, neighbor_obs),
 
                 replay=(
                     replay_from_snapshot(

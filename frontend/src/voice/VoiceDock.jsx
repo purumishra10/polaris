@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useVoiceAgent } from './useVoiceAgent'
 
 const STATUS_LABEL = {
@@ -9,6 +10,14 @@ const STATUS_LABEL = {
   thinking: 'THINKING',
   speaking: 'SPEAKING',
 }
+
+const QUICK_COMMANDS = [
+  ['Fuel', 'fuel status'],
+  ['Blizzard', 'inject blizzard'],
+  ['August fifth', 'fifth of August'],
+  ['SITREP', 'export sitrep'],
+  ['Briefing', 'station status briefing, fuel wind and alerts'],
+]
 
 export default function VoiceDock() {
   const {
@@ -22,6 +31,7 @@ export default function VoiceDock() {
     ragMode,
     fallback,
     micLevel,
+    micActive,
     draft,
     setDraft,
     startCall,
@@ -29,17 +39,27 @@ export default function VoiceDock() {
     sendText,
   } = useVoiceAgent()
 
+  useEffect(() => {
+    const onBrief = () => {
+      setOpen(true)
+      void sendText('station status briefing, fuel wind and alerts')
+    }
+    window.addEventListener('polaris:briefing', onBrief)
+    return () => window.removeEventListener('polaris:briefing', onBrief)
+  }, [sendText, setOpen])
+
   const label = STATUS_LABEL[status] ?? status.toUpperCase()
+  const showWave = status === 'speaking' || status === 'listening' || micActive
 
   return (
-    <div className={`voice-dock ${open ? 'open' : ''} ${connected ? 'live' : ''}`}>
+    <div className={`voice-dock ${open ? 'open' : ''} ${connected || micActive ? 'live' : ''}`}>
       {open && (
         <div className="voice-panel">
           <div className="voice-panel-head">
             <span>POLARIS AI</span>
             <strong className={`voice-status status-${status}`}>{label}</strong>
           </div>
-          {(ragMode || fallback) && (
+          {(fallback || (ragMode && ragMode !== 'ops')) && (
             <div className="voice-rag">
               {fallback || ragMode === 'local-fallback'
                 ? 'LOCAL SOP BRIEF · LLM OFF'
@@ -48,14 +68,30 @@ export default function VoiceDock() {
             </div>
           )}
 
-          {connected && (
-            <div className="voice-meter" aria-hidden>
-              <span
-                className="voice-meter-fill"
-                style={{ transform: `scaleX(${Math.min(1, micLevel * 8)})` }}
-              />
+          {showWave && (
+            <div className={`voice-wave ${status}`} aria-hidden>
+              {Array.from({ length: 12 }, (_, index) => (
+                <i
+                  key={index}
+                  style={{
+                    animationDelay: `${index * 0.07}s`,
+                    height:
+                      status === 'listening'
+                        ? `${5 + Math.min(18, micLevel * 90) * (0.35 + ((index * 3) % 5) / 5)}px`
+                        : undefined,
+                  }}
+                />
+              ))}
             </div>
           )}
+
+          <div className="voice-chips">
+            {QUICK_COMMANDS.map(([labelText, command]) => (
+              <button key={command} type="button" onClick={() => sendText(command)}>
+                {labelText}
+              </button>
+            ))}
+          </div>
 
           <div className="voice-transcript">
             {lines.length === 0 && (
@@ -64,8 +100,10 @@ export default function VoiceDock() {
                 export sitrep. If the sidecar dies I still brief from the desk.
               </p>
             )}
-            {connected && status === 'listening' && (
-              <p className="voice-hint voice-hint-live">Mic open — speak now.</p>
+            {micActive && status === 'listening' && (
+              <p className="voice-hint voice-hint-live">
+                Mic open. Say fuel, blizzard, or map.
+              </p>
             )}
             {lines.map((line, index) => (
               <div
@@ -107,7 +145,7 @@ export default function VoiceDock() {
           </form>
 
           <div className="voice-actions">
-            {connected ? (
+            {micActive ? (
               <button type="button" className="voice-end" onClick={endCall}>
                 END
               </button>
@@ -139,12 +177,11 @@ export default function VoiceDock() {
             setOpen(false)
             return
           }
-          setOpen(true)
-          startCall()
+          void startCall()
         }}
         title="Polaris station AI"
       >
-        {connected ? 'LIVE' : 'AI'}
+        {connected || micActive ? 'LIVE' : 'AI'}
       </button>
     </div>
   )

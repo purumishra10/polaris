@@ -11,6 +11,7 @@ import BharatiStation from './stations/Bharati/BharatiStation'
 import MaitriStation from './stations/Maitri/MaitriStation'
 
 import { usePolarisStore } from '../store/usePolarisStore'
+import { liteGraphics } from '../lib/graphicsQuality'
 import OperationalState from './components/OperationalState'
 import CameraRig from './components/CameraRig'
 import WorldPins from '../intelligence/WorldPins'
@@ -33,12 +34,12 @@ export default function StationScene() {
     <div ref={orbitRoot} className="orbit-layer">
       <Canvas
         key={selectedStation}
-        shadows
-        dpr={[1, 1.75]}
+        shadows={!liteGraphics}
+        dpr={liteGraphics ? [1, 1] : [1, 1.15]}
         eventSource={orbitRoot}
         eventPrefix="client"
         gl={{
-          antialias: true,
+          antialias: !liteGraphics,
           powerPreference: 'high-performance',
           logarithmicDepthBuffer: false,
         }}
@@ -69,6 +70,7 @@ export default function StationScene() {
             <MaitriEnvironment />
             <MaitriGround />
             <MaitriStation position={[0, 0, 0]} />
+            {!liteGraphics && (
             <ContactShadows
               position={[0, 0.02, 0]}
               opacity={0.35}
@@ -76,6 +78,7 @@ export default function StationScene() {
               blur={2.5}
               far={12}
             />
+            )}
           </>
         )}
 

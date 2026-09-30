@@ -20,6 +20,14 @@ const EPSILON = {
   locked: 0.005,
 }
 
+/** Only React-rerender when the look would visibly change. */
+const PUBLISH = {
+  temp: 0.4,
+  wind: 0.8,
+  solar: 4,
+  locked: 0.08,
+}
+
 function readDrivers(telemetry) {
   return {
     temp: telemetry?.ambient?.temp_c ?? -14,
@@ -30,15 +38,16 @@ function readDrivers(telemetry) {
 }
 
 /**
- * Eases the ambient telemetry that drives the look of the scene so scenario
- * injections (blizzard, polar night, reset) animate in over a few seconds
- * rather than snapping. Must be used inside the R3F <Canvas>.
+ * Eases ambient telemetry for the scene look. Must be used inside R3F Canvas.
+ * Smooths every frame in a ref; React state only updates when values move enough
+ * to change lighting / snow / fog — avoids full environment re-renders at 60 Hz.
  */
 export function useSmoothedClimate(station) {
   const telemetry = usePolarisStore((state) => state.telemetry[station])
   const goal = readDrivers(telemetry)
   const current = useRef({ ...goal })
-  const [, rerender] = useState(0)
+  const published = useRef({ ...goal })
+  const [drivers, setDrivers] = useState(() => ({ ...goal }))
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1)
@@ -58,8 +67,22 @@ export function useSmoothedClimate(station) {
       moved = true
     }
 
-    if (moved) rerender((n) => n + 1)
+    if (!moved) return
+
+    const pub = published.current
+    let publish = false
+    for (const key of Object.keys(cur)) {
+      if (Math.abs(cur[key] - pub[key]) >= PUBLISH[key]) {
+        publish = true
+        break
+      }
+    }
+    if (!publish) return
+
+    const next = { ...cur }
+    published.current = next
+    setDrivers(next)
   })
 
-  return climateLook(telemetry, station, current.current)
+  return climateLook(telemetry, station, drivers)
 }

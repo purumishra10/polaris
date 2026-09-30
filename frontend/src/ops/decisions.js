@@ -1,16 +1,53 @@
 /** Ops decision layer. Provenance is labeled; nothing here moves the 3D scene. */
 
 export const SOP = {
+  WIND_OUTDOOR_KT: 23,
+  WIND_HELI_KT: 40,
+  WIND_CONVOY_KT: 50,
   WIND_STRUCTURAL_KT: 60,
   FUEL_CRITICAL_DAYS: 15,
   FUEL_ADVISORY_DAYS: 30,
   INTERNAL_TEMP_COLLAPSE_C: 16,
+  HELI_BAY_KM: 80,
   HATCH: 'ACTION: Engage exterior hatch structural airlock sequence.',
   STOW_SENSORS: 'ACTION: Stow external weather sensors & abort outdoor sorties.',
   AUX_GEN: 'ACTION: Spin up Standby Auxiliary Generator.',
   SHED_SCIENCE: 'ACTION: Shed non-vital scientific payloads (MARA radar, ionosonde).',
   ISOLATE_DEPRESSURIZE: 'ACTION: Isolate and depressurize unoccupied summer modules.',
   ISOLATE_SUMMER: 'ACTION: Isolate unoccupied summer residential modules.',
+  DELAY_WATCH: 'ACTION: Re-score fuel vs delayed ship ETA; freeze non-vital load.',
+  MISS_SEA: 'ACTION: Missed sea call — no bulk JET A-1 until the next seasonal window.',
+  STARVE: 'ACTION: Fuel empties before the ship — shed science, isolate summer, essential-only plant.',
+  HELI_LOCK: 'ACTION: Ship-based heli locked until the vessel is inside 80 km of the bay.',
+}
+
+/** Canonical rules. If an asset had no SOP, it maps here. */
+export const SOP_RULES = [
+  { id: 'OUTDOOR', gate: 'gust ≥ 23 kt', action: 'Stow outdoor sensors / abort sorties', cite: 'lockouts.py · IMD blowing snow' },
+  { id: 'HELI_WIND', gate: 'gust ≥ 40 kt', action: 'Heli no-go (wind)', cite: 'lockouts.py WIND_HELI_KT' },
+  { id: 'CONVOY', gate: 'gust ≥ 50 kt', action: 'Hold convoy', cite: 'lockouts.py WIND_CONVOY_KT' },
+  { id: 'STRUCTURAL', gate: 'wind > 60 kt', action: 'Hatch airlock', cite: 'NCPOR 4.2.1' },
+  { id: 'THERMAL', gate: 'indoor < 16 °C', action: 'Spin aux gen', cite: 'CHP handbook 8.1' },
+  { id: 'FUEL_ADV', gate: 'autonomy < 30 d', action: 'Shed science + isolate summer', cite: 'sop.py FUEL_ADV' },
+  { id: 'FUEL_CRIT', gate: 'autonomy < 15 d', action: 'Shed science + depressurize empty modules', cite: 'sop.py FUEL_CRIT' },
+  { id: 'DELAY', gate: 'ship delay > 0 and not in bay', action: 'Re-score fuel vs ETA', cite: 'AL/02 one-ship voyage' },
+  { id: 'MISS_SEA', gate: 'ETA after sea-window close', action: 'No bulk resupply this window', cite: '43-ISEA 15 Mar / AL/02' },
+  { id: 'STARVE', gate: 'fuel days < ETA days', action: 'Essential-only until the ship or empty', cite: 'tank / (burn×24) vs voyageState' },
+  { id: 'HELI_BAY', gate: 'ship > 80 km from bay', action: 'Heli locked (no ship deck)', cite: 'Kamov is voyage-based' },
+]
+
+export const SOP_BY_ASSET = {
+  FUEL: ['FUEL_ADV', 'FUEL_CRIT', 'STARVE', 'MISS_SEA', 'DELAY'],
+  MICROGRID: ['FUEL_ADV', 'THERMAL'],
+  THERMAL: ['THERMAL', 'FUEL_CRIT'],
+  STRUCTURE: ['STRUCTURAL', 'THERMAL'],
+  ROOF: ['OUTDOOR'],
+  COMMUNICATIONS: ['OUTDOOR'],
+  SAFETY: ['OUTDOOR', 'HELI_WIND', 'HELI_BAY', 'STRUCTURAL'],
+  VEHICLES: ['CONVOY', 'HELI_WIND'],
+  CONTAINERS: ['FUEL_ADV', 'OUTDOOR'],
+  UTILITIES: ['OUTDOOR', 'THERMAL'],
+  WATER: ['OUTDOOR'],
 }
 
 export const NODES = {
@@ -203,15 +240,18 @@ export function applyVoyageOverlay(telemetry, station, date, delayDays = 0) {
     heli: nearby ? 'OPEN' : 'LOCKED',
     miss_window: missed,
   }
-  if (!impact.delayDays) {
-    return { ...telemetry, voyage }
-  }
   const reasons = [...(telemetry.lockouts?.reasons ?? [])].filter(
-    (line) => !String(line).startsWith('Voyage +'),
+    (line) =>
+      !String(line).startsWith('Voyage +') && !String(line).startsWith('Heli locked'),
   )
-  reasons.push(
-    `Voyage +${impact.delayDays} d — ship modeled ${impact.delayDays} days earlier on the Cape Town track.`,
-  )
+  if (!nearby) {
+    reasons.push('Heli locked — modeled ship is not in the bay (Kamov is voyage-based).')
+  }
+  if (impact.delayDays) {
+    reasons.push(
+      `Voyage +${impact.delayDays} d — ship modeled ${impact.delayDays} days earlier on the Cape Town track.`,
+    )
+  }
   if (missed) {
     reasons.push('Delayed arrival is after the published sea-window close.')
   }
@@ -226,99 +266,371 @@ export function applyVoyageOverlay(telemetry, station, date, delayDays = 0) {
   }
 }
 
-export function fuelDecision(telemetry, station, date, delayDays = 0) {
-  const days = Number(telemetry?.fuel?.days_of_autonomy ?? 0)
+function nNum(v, fallback = 0) {
+  const x = Number(v)
+  return Number.isFinite(x) ? x : fallback
+}
+
+function etaFor(ship, station) {
+  if (station === 'BHARATI') {
+    return {
+      days: ship.daysToBharati,
+      km: ship.kmToBharati,
+      inBay: Boolean(ship.atBharati),
+    }
+  }
+  return {
+    days: ship.daysToMaitri,
+    km: ship.kmToMaitri,
+    inBay: Boolean(ship.atMaitri),
+  }
+}
+
+function projectFuel(telemetry, etaDays) {
+  const days = nNum(telemetry?.fuel?.days_of_autonomy)
+  const burn = nNum(telemetry?.fuel?.burn_rate_lph)
+  const liters = nNum(telemetry?.fuel?.tank_level_liters)
+  const eta = etaDays == null ? 0 : etaDays
+  const fuelAtEta = days - eta
+  const shortageDays = Math.max(0, eta - days)
+  const hit30In = days > SOP.FUEL_ADVISORY_DAYS ? days - SOP.FUEL_ADVISORY_DAYS : 0
+  const hit15In = days > SOP.FUEL_CRITICAL_DAYS ? days - SOP.FUEL_CRITICAL_DAYS : 0
+  const litersAtEta = Math.max(0, liters - burn * 24 * eta)
+  return { days, burn, liters, eta, fuelAtEta, emptyIn: days, shortageDays, hit30In, hit15In, litersAtEta }
+}
+
+function stationForecast(telemetry, date, delayDays, station, ship) {
   const sea = daysUntilWindowClose(station, date, 'SEA')
   const air = daysUntilWindowClose(station, date, 'AIR')
-  const impact = voyageImpact(date, delayDays)
+  const eta = etaFor(ship, station)
+  const fuel = projectFuel(telemetry, eta.days)
+  const miss =
+    eta.days == null
+      ? Boolean(delayDays && sea && !sea.open)
+      : Boolean(sea && ((sea.open && eta.days > sea.days) || !sea.open))
+  const heli = eta.inBay || (eta.km != null && eta.km < SOP.HELI_BAY_KM)
+  const rules = []
+  if (delayDays > 0 && !eta.inBay) rules.push('DELAY')
+  if (!heli) rules.push('HELI_BAY')
+  if (miss) rules.push('MISS_SEA')
+  if (fuel.shortageDays > 0) rules.push('STARVE')
+  else if (fuel.fuelAtEta < SOP.FUEL_CRITICAL_DAYS) rules.push('FUEL_CRIT')
+  else if (fuel.fuelAtEta < SOP.FUEL_ADVISORY_DAYS) rules.push('FUEL_ADV')
   let band = 'NOMINAL'
+  if (rules.includes('STARVE') || rules.includes('FUEL_CRIT') || rules.includes('MISS_SEA')) band = 'CRITICAL'
+  else if (rules.length) band = 'ADVISORY'
+  const actions = [
+    ...new Set(rules.map((id) => SOP_RULES.find((row) => row.id === id)?.action).filter(Boolean)),
+  ]
+  return {
+    station,
+    sea,
+    air,
+    etaDays: eta.days,
+    etaKm: eta.km,
+    inBay: eta.inBay,
+    heli,
+    miss,
+    band,
+    rules,
+    actions,
+    ...fuel,
+  }
+}
+
+export function resupplyForecast(date, delayDays, fleet = {}, focus = 'BHARATI') {
+  const delay = Math.max(0, Number(delayDays) || 0)
+  const clock = voyageClock(date, delay)
+  const ship = voyageState(clock)
+  const bharatiTick = fleet.BHARATI
+  const maitriTick = fleet.MAITRI
+  const bharati = bharatiTick ? stationForecast(bharatiTick, date, delay, 'BHARATI', ship) : null
+  const maitri = maitriTick ? stationForecast(maitriTick, date, delay, 'MAITRI', ship) : null
+  const here = focus === 'MAITRI' ? maitri : bharati
+  return { delayDays: delay, ship, bharati, maitri, here }
+}
+
+export function fuelDecision(telemetry, station, date, delayDays = 0, fleet = null) {
+  const map = { ...(fleet || {}), [station]: telemetry }
+  const forecast = resupplyForecast(date, delayDays, map, station)
+  const here = forecast.here
+  const days = nNum(telemetry?.fuel?.days_of_autonomy)
+  let band = here?.band || 'NOMINAL'
   if (days < SOP.FUEL_CRITICAL_DAYS) band = 'CRITICAL'
-  else if (days < SOP.FUEL_ADVISORY_DAYS) band = 'ADVISORY'
-  const next = [sea, air]
+  else if (days < SOP.FUEL_ADVISORY_DAYS && band === 'NOMINAL') band = 'ADVISORY'
+  const next = [here?.sea, here?.air]
     .filter((item) => item && item.open)
-    .sort((a, b) => a.days - b.days)[0] ?? sea
-  const waitDays = impact.delayDays
-  const miss = station === 'MAITRI' ? impact.maitriMiss : impact.bharatiMiss
-  const starve =
-    (next && next.open && days < next.days && days < SOP.FUEL_ADVISORY_DAYS) ||
-    (waitDays > 0 && days < waitDays + SOP.FUEL_CRITICAL_DAYS) ||
-    miss
-  if (miss && band === 'NOMINAL') band = 'ADVISORY'
+    .sort((a, b) => a.days - b.days)[0] ?? here?.sea
   return {
     days,
     band,
-    sea,
-    air,
+    sea: here?.sea,
+    air: here?.air,
     next,
-    starve: Boolean(starve),
-    delayDays: waitDays,
-    missWindow: Boolean(miss),
-    otherHeli:
-      station === 'BHARATI' ? impact.maitriHeli : impact.bharatiHeli,
-    thisHeli: station === 'BHARATI' ? impact.bharatiHeli : impact.maitriHeli,
+    starve: Boolean((here?.shortageDays || 0) > 0 || here?.miss),
+    delayDays: forecast.delayDays,
+    missWindow: Boolean(here?.miss),
+    otherHeli: station === 'BHARATI' ? forecast.maitri?.heli : forecast.bharati?.heli,
+    thisHeli: Boolean(here?.heli),
+    forecast,
+    actions: here?.actions || [],
+    shortageDays: here?.shortageDays || 0,
+    fuelAtEta: here?.fuelAtEta,
+    etaDays: here?.etaDays,
     source:
-      waitDays > 0
-        ? `SOP 30/15 d · ship +${waitDays} d · AL/02 + 43-ISEA`
-        : 'SOP floors 30/15 d · windows AL/02 + 43-ISEA',
+      forecast.delayDays > 0
+        ? `SOP 30/15 · +${forecast.delayDays} d delay · fuel at ETA ${here?.fuelAtEta?.toFixed?.(0) ?? '—'} d`
+        : 'SOP 30/15 d · AL/02 + 43-ISEA',
+  }
+}
+
+/** Great-circle km. Voyage is AL/02 / 43-ISEA calendar, not AIS. */
+export function haversineKm(lat1, lon1, lat2, lon2) {
+  const p1 = (lat1 * Math.PI) / 180
+  const p2 = (lat2 * Math.PI) / 180
+  const dp = ((lat2 - lat1) * Math.PI) / 180
+  const dl = ((lon2 - lon1) * Math.PI) / 180
+  const s =
+    Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2
+  return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(s)))
+}
+
+function nodeKm(a, b) {
+  return haversineKm(NODES[a].lat, NODES[a].lon, NODES[b].lat, NODES[b].lon)
+}
+
+/** Open-ocean hinge so CT↔Prydz never clips India / Madagascar. */
+export const SEA_VIA = { name: 'Southern Ocean', lat: -56.4, lon: 44.8 }
+
+export function lerpGreatCircle(a, b, t) {
+  const clamp = Math.min(1, Math.max(0, t))
+  const lat1 = (a.lat * Math.PI) / 180
+  const lon1 = (a.lon * Math.PI) / 180
+  const lat2 = (b.lat * Math.PI) / 180
+  const lon2 = (b.lon * Math.PI) / 180
+  const d = 2 * Math.asin(
+    Math.min(
+      1,
+      Math.sqrt(
+        Math.sin((lat2 - lat1) / 2) ** 2
+          + Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon2 - lon1) / 2) ** 2,
+      ),
+    ),
+  )
+  if (d < 1e-8) return { lat: a.lat, lon: a.lon }
+  const u = Math.sin((1 - clamp) * d) / Math.sin(d)
+  const v = Math.sin(clamp * d) / Math.sin(d)
+  const x = u * Math.cos(lat1) * Math.cos(lon1) + v * Math.cos(lat2) * Math.cos(lon2)
+  const y = u * Math.cos(lat1) * Math.sin(lon1) + v * Math.cos(lat2) * Math.sin(lon2)
+  const z = u * Math.sin(lat1) + v * Math.sin(lat2)
+  return {
+    lat: (Math.atan2(z, Math.sqrt(x * x + y * y)) * 180) / Math.PI,
+    lon: (Math.atan2(y, x) * 180) / Math.PI,
+  }
+}
+
+function steamBharatiPoint(t) {
+  if (t < 0.5) return lerpGreatCircle(NODES.CPT, SEA_VIA, t * 2)
+  return lerpGreatCircle(SEA_VIA, NODES.QUILTY_BAY, (t - 0.5) * 2)
+}
+
+function steamHomePoint(t) {
+  if (t < 0.5) return lerpGreatCircle(NODES.INDIA_BAY, SEA_VIA, t * 2)
+  return lerpGreatCircle(SEA_VIA, NODES.CPT, (t - 0.5) * 2)
+}
+
+function steamMaitriPoint(t) {
+  return lerpGreatCircle(NODES.QUILTY_BAY, NODES.INDIA_BAY, t)
+}
+
+/** Days since 1 Nov of the current expedition season (Nov–Mar). */
+export function seasonDay(date) {
+  const month = date.getUTCMonth() + 1
+  const year = date.getUTCFullYear()
+  const startYear = month >= 11 ? year : year - 1
+  const start = Date.UTC(startYear, 10, 1)
+  const now = Date.UTC(year, date.getUTCMonth(), date.getUTCDate())
+  return Math.round((now - start) / 86400000)
+}
+
+/**
+ * One ship. Waypoints in days from 1 Nov.
+ * Sea times: CT–Quilty ~13 d (AL/02 10–16), Quilty–India Bay ~6 d, India Bay–CT ~10 d.
+ * Stay windows from 43-ISEA / AL/02 (Bharati Dec–Feb, Maitri Jan–15 Mar).
+ */
+export const VOYAGE_WAYPOINTS = [
+  { day: 0, node: 'CPT', name: 'Cape Town', phase: 'STEAM_BHARATI' },
+  { day: 44, node: 'QUILTY_BAY', name: 'Quilty Bay / Bharati', phase: 'AT_BHARATI' },
+  { day: 81, node: 'QUILTY_BAY', name: 'Quilty Bay (depart)', phase: 'STEAM_MAITRI' },
+  { day: 87, node: 'INDIA_BAY', name: 'India Bay / Maitri', phase: 'AT_MAITRI' },
+  { day: 121, node: 'INDIA_BAY', name: 'India Bay (depart)', phase: 'STEAM_HOME' },
+  { day: 135, node: 'CPT', name: 'Cape Town / 15 Mar exit', phase: 'LAYUP' },
+]
+
+const PHASE_LABEL = {
+  LAYUP: 'Winter layup · Cape Town',
+  STEAM_BHARATI: 'Steaming Cape Town → Bharati',
+  AT_BHARATI: 'On station · Quilty Bay / Bharati',
+  STEAM_MAITRI: 'Steaming Bharati → Maitri',
+  AT_MAITRI: 'On station · India Bay / Maitri',
+  STEAM_HOME: 'Homeward · Maitri → Cape Town',
+}
+
+function pathKmTo(fromIdx, tOnLeg, targetNode) {
+  let km = 0
+  const pts = VOYAGE_WAYPOINTS
+  const a = pts[fromIdx]
+  const b = pts[fromIdx + 1]
+  if (!b) return 0
+  const hitNow = a.node === targetNode && tOnLeg < 0.02
+  if (hitNow) return 0
+  if (b.node === targetNode) {
+    km += (1 - tOnLeg) * nodeKm(a.node, b.node)
+    return km
+  }
+  km += (1 - tOnLeg) * nodeKm(a.node, b.node)
+  for (let i = fromIdx + 1; i < pts.length - 1; i += 1) {
+    if (pts[i].node === targetNode) return km
+    km += nodeKm(pts[i].node, pts[i + 1].node)
+    if (pts[i + 1].node === targetNode) return km
+  }
+  return null
+}
+
+function pathDaysTo(fromIdx, day, targetNode) {
+  const pts = VOYAGE_WAYPOINTS
+  for (let i = fromIdx; i < pts.length; i += 1) {
+    if (pts[i].node === targetNode && pts[i].day >= day - 0.01) {
+      return Math.max(0, pts[i].day - day)
+    }
+  }
+  return null
+}
+
+export function voyageState(date) {
+  const month = date.getUTCMonth() + 1
+  const day = seasonDay(date)
+  const pts = VOYAGE_WAYPOINTS
+  const inSeason = month >= 11 || month <= 3
+  if (!inSeason || day < 0 || day >= pts[pts.length - 1].day) {
+    const bharatiKm = nodeKm('CPT', 'QUILTY_BAY')
+    const maitriKm = bharatiKm + nodeKm('QUILTY_BAY', 'INDIA_BAY')
+    const year = date.getUTCFullYear()
+    const nextSail = Date.UTC(month >= 11 ? year + 1 : year, 10, 1)
+    const now = Date.UTC(year, date.getUTCMonth(), date.getUTCDate())
+    const daysToSail = Math.max(0, Math.round((nextSail - now) / 86400000))
+    return {
+      ...SEA_VIA,
+      phase: 'LAYUP',
+      label: PHASE_LABEL.LAYUP,
+      leg: 'Cape Town layup · next track (mid-ocean)',
+      fromName: 'Cape Town',
+      toName: 'Quilty Bay',
+      t: 0.5,
+      remainingKm: bharatiKm,
+      remainingDays: daysToSail,
+      kmToBharati: bharatiKm,
+      daysToBharati: daysToSail + 44,
+      kmToMaitri: maitriKm,
+      daysToMaitri: daysToSail + 87,
+      nearby: 'NONE',
+      atBharati: false,
+      atMaitri: false,
+      parked: true,
+      source: 'AL/02 · 43-ISEA · next 1 Nov sail · great-circle km, not AIS',
+    }
+  }
+
+  let idx = 0
+  for (let i = 0; i < pts.length - 1; i += 1) {
+    if (day >= pts[i].day) idx = i
+  }
+  const from = pts[idx]
+  const to = pts[idx + 1]
+  const span = Math.max(1, to.day - from.day)
+  const t = Math.min(1, Math.max(0, (day - from.day) / span))
+  const parked = from.node === to.node
+  const phase = from.phase
+  let point
+  if (parked) {
+    point = { lat: NODES[from.node].lat, lon: NODES[from.node].lon }
+  } else if (phase === 'STEAM_BHARATI') {
+    point = steamBharatiPoint(t)
+  } else if (phase === 'STEAM_MAITRI') {
+    point = steamMaitriPoint(t)
+  } else if (phase === 'STEAM_HOME') {
+    point = steamHomePoint(t)
+  } else {
+    point = lerpGreatCircle(NODES[from.node], NODES[to.node], t)
+  }
+  const lat = point.lat
+  const lon = point.lon
+  const legKm = parked ? 0 : nodeKm(from.node, to.node)
+  const remainingKm = parked ? 0 : (1 - t) * legKm
+  const remainingDays = Math.max(0, to.day - day)
+  const atBharati = phase === 'AT_BHARATI'
+  const atMaitri = phase === 'AT_MAITRI'
+  const kmToBharati = atBharati
+    ? 0
+    : phase === 'STEAM_BHARATI'
+      ? pathKmTo(idx, t, 'QUILTY_BAY')
+      : null
+  const kmToMaitri = atMaitri
+    ? 0
+    : phase === 'STEAM_BHARATI' || phase === 'AT_BHARATI' || phase === 'STEAM_MAITRI'
+      ? pathKmTo(idx, t, 'INDIA_BAY')
+      : null
+  const daysToBharati = atBharati
+    ? 0
+    : phase === 'STEAM_BHARATI'
+      ? pathDaysTo(idx, day, 'QUILTY_BAY')
+      : null
+  const daysToMaitri = atMaitri
+    ? 0
+    : phase === 'STEAM_BHARATI' || phase === 'AT_BHARATI' || phase === 'STEAM_MAITRI'
+      ? pathDaysTo(idx, day, 'INDIA_BAY')
+      : null
+
+  return {
+    lat,
+    lon,
+    phase,
+    label: PHASE_LABEL[phase] || phase,
+    leg: parked ? from.name : `${from.name} → ${to.name}`,
+    fromName: from.name,
+    toName: to.name,
+    t,
+    remainingKm,
+    remainingDays,
+    legKm,
+    kmToBharati,
+    daysToBharati,
+    kmToMaitri,
+    daysToMaitri,
+    nearby: atBharati ? 'BHARATI' : atMaitri ? 'MAITRI' : 'NONE',
+    atBharati,
+    atMaitri,
+    parked,
+    source: 'AL/02 10–16 d CT–Quilty · 43-ISEA 15 Mar exit · great-circle km',
   }
 }
 
 export function shipNearby(station, date) {
-  const month = date.getUTCMonth() + 1
-  if (station === 'BHARATI') return month === 1 || month === 2
-  if (station === 'MAITRI') return month === 2 || month === 3
+  const v = voyageState(date)
+  if (station === 'BHARATI') return v.atBharati || (v.kmToBharati != null && v.kmToBharati < 80)
+  if (station === 'MAITRI') return v.atMaitri || (v.kmToMaitri != null && v.kmToMaitri < 80)
   return false
 }
 
 export function shipTrack(date) {
-  const month = date.getUTCMonth() + 1
-  const day = date.getUTCDate()
-  const season = month >= 11 || month <= 3
-  if (!season) {
-    return { ...NODES.CPT, leg: 'WINTER LAYUP', nearby: 'NONE', source: 'modeled from AL/02 voyage' }
-  }
-  const legs = [
-    { at: 11, d: 1, node: 'CPT', name: 'Cape Town' },
-    { at: 12, d: 15, node: 'QUILTY_BAY', name: 'Quilty Bay / Bharati' },
-    { at: 1, d: 20, node: 'QUILTY_BAY', name: 'Quilty Bay (on station)' },
-    { at: 2, d: 10, node: 'INDIA_BAY', name: 'India Bay / Maitri' },
-    { at: 3, d: 1, node: 'INDIA_BAY', name: 'India Bay (loading)' },
-    { at: 3, d: 15, node: 'CPT', name: 'Homeward / 15 Mar exit' },
-  ]
-  const stamp = month * 100 + day
-  const points = legs.map((leg) => ({ ...leg, stamp: leg.at * 100 + leg.d }))
-  let from = points[0]
-  let to = points[1]
-  for (let i = 0; i < points.length - 1; i += 1) {
-    if (stamp >= points[i].stamp || (points[i].at >= 11 && month >= 11)) {
-      from = points[i]
-      to = points[i + 1]
-    }
-  }
-  if (month <= 3) {
-    for (let i = 0; i < points.length - 1; i += 1) {
-      if (points[i].at <= 3 && stamp >= points[i].stamp) {
-        from = points[i]
-        to = points[i + 1]
-      }
-    }
-  }
-  const a = NODES[from.node]
-  const b = NODES[to.node]
-  const span = Math.max(1, to.stamp - from.stamp)
-  const t = Math.min(1, Math.max(0, (stamp - from.stamp) / span))
-  const nearby =
-    from.node === 'QUILTY_BAY' || to.node === 'QUILTY_BAY' && t < 0.5
-      ? 'BHARATI'
-      : from.node === 'INDIA_BAY' || to.node === 'INDIA_BAY'
-        ? 'MAITRI'
-        : 'NONE'
+  const v = voyageState(date)
   return {
-    lat: a.lat + (b.lat - a.lat) * t,
-    lon: a.lon + (b.lon - a.lon) * t,
-    leg: `${from.name} → ${to.name}`,
-    nearby,
-    source: 'modeled Cape Town → Bharati → Maitri → Cape Town',
+    lat: v.lat,
+    lon: v.lon,
+    leg: v.leg,
+    nearby: v.nearby,
+    source: v.source,
+    ...v,
   }
 }
 

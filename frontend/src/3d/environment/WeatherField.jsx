@@ -32,7 +32,7 @@ export default function WeatherField({
   gale = 0,
   cold = 0,
   count = 0,
-  maxCount = 5600,
+  maxCount = 1200,
   extent = [220, 48, 180],
   floor = 0.4,
   speed = 1,
@@ -56,7 +56,7 @@ export default function WeatherField({
       sd[i] = 0.55 + Math.random() * 1.7
     }
     return { positions: pos, seeds: sd }
-  }, [maxCount, extent, floor])
+  }, [maxCount, extent[0], extent[1], extent[2], floor])
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry()
@@ -83,16 +83,17 @@ export default function WeatherField({
     const gust =
       0.72 +
       0.28 * Math.sin(t * 0.85) +
-      0.18 * Math.sin(t * 2.6 + 1.3) +
-      0.1 * Math.sin(t * 6.1 + 0.4)
+      0.18 * Math.sin(t * 2.6 + 1.3)
 
     const [ex, ey, ez] = extent
     const driftX = (5 + gale * 74 * gust) * speed * dt
     const driftZ = (-2 - gale * 28 * gust) * speed * dt
     const fall = (2.4 + cold * 1.6 + gale * 6.5) * speed * dt
-    const flutter = (1 - gale) * 0.35 * dt
+    const flutter = (1 - gale) * 0.28 * dt
+    // Skip every other flake when many are active — still reads as snow.
+    const stride = active > 700 ? 2 : 1
 
-    for (let i = 0; i < active; i += 1) {
+    for (let i = 0; i < active; i += stride) {
       const seed = seeds[i]
       let x = attr.getX(i) + driftX * seed + Math.sin(t * 1.9 + i) * flutter
       let y = attr.getY(i) - fall * seed

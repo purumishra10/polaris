@@ -5,7 +5,9 @@ import { usePolarisStore } from '../store/usePolarisStore'
 import { localVoiceTurn } from './localBrief'
 
 const SAMPLE_RATE = 16000
-const SPEAKING_WATCHDOG_MS = 12000
+const PLAYBACK_SLACK_MS = 4000
+const PLAYBACK_MAX_MS = 90000
+const TTS_START_GRACE_MS = 900
 
 function voiceWsUrl() {
   const http = VOICE_URL.replace(/\/$/, '')
@@ -41,6 +43,19 @@ function floatsToPcm16(floats) {
   return pcm
 }
 
+function pcmPayload(pcm) {
+  return pcm.buffer.slice(pcm.byteOffset, pcm.byteOffset + pcm.byteLength)
+}
+
+function rmsFromPcm16(pcm) {
+  let sum = 0
+  for (let i = 0; i < pcm.length; i += 1) {
+    const sample = pcm[i] / 32768
+    sum += sample * sample
+  }
+  return Math.sqrt(sum / Math.max(1, pcm.length))
+}
+
 function rmsLevel(floats) {
   let sum = 0
   for (let i = 0; i < floats.length; i += 1) {
@@ -59,6 +74,29 @@ function pickLocalVoice() {
   )
 }
 
+function unlockContext(ctx) {
+  if (!ctx) return Promise.resolve()
+  const resume = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve()
+  try {
+    const buffer = ctx.createBuffer(1, 1, ctx.sampleRate || SAMPLE_RATE)
+    const source = ctx.createBufferSource()
+    source.buffer = buffer
+    source.connect(ctx.destination)
+    source.start(0)
+  } catch {
+    // ignore
+  }
+  return resume.catch(() => {})
+}
+
+function detectAudioMime(buffer) {
+  const bytes = new Uint8Array(buffer.slice(0, 4))
+  if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46) {
+    return 'audio/wav'
+  }
+  return 'audio/mpeg'
+}
+
 export function useVoiceAgent() {
   const [open, setOpen] = useState(false)
   const [connected, setConnected] = useState(false)
@@ -70,21 +108,34 @@ export function useVoiceAgent() {
   const [ragMode, setRagMode] = useState('')
   const [fallback, setFallback] = useState(false)
   const [micLevel, setMicLevel] = useState(0)
+  const [micActive, setMicActive] = useState(false)
 
   const wsRef = useRef(null)
   const recCtxRef = useRef(null)
-  const playCtxRef = useRef(null)
+  const workletRef = useRef(null)
   const processorRef = useRef(null)
   const inputRef = useRef(null)
   const streamRef = useRef(null)
-  const sourceRef = useRef(null)
+  const audioElRef = useRef(null)
   const historyRef = useRef([])
   const speakingRef = useRef(false)
   const watchdogRef = useRef(0)
+  const startGraceRef = useRef(0)
   const lastLevelAtRef = useRef(0)
-  const speechRecRef = useRef(null)
   const wantMicRef = useRef(false)
   const pendingLocalTtsRef = useRef('')
+  const utteranceRef = useRef(null)
+  const callGenRef = useRef(0)
+  const bargeInMsRef = useRef(0)
+  const handleMessageRef = useRef(null)
+  const runLocalTurnRef = useRef(null)
+  const ttsStreamOpenRef = useRef(false)
+  const playbackQueueRef = useRef([])
+  const playbackActiveRef = useRef(false)
+  const playNextQueuedRef = useRef(null)
+  const speechRecRef = useRef(null)
+  const startBrowserSttRef = useRef(() => false)
+  const stopBrowserSttRef = useRef(() => {})
 
   const appendLine = useCallback((speaker, text) => {
     if (!text) return
@@ -93,38 +144,38 @@ export function useVoiceAgent() {
     clean = clean.replace(/speak\s+version[\s\S]{0,200}/gi, ' ')
     clean = clean.replace(/\s+/g, ' ').trim()
     if (!clean) return
-    setLines((prev) => [...prev.slice(-8), { speaker, text: clean }])
+    setLines((prev) => {
+      const last = prev[prev.length - 1]
+      if (last && last.speaker === speaker && last.text === clean) return prev
+      return [...prev.slice(-8), { speaker, text: clean }]
+    })
     historyRef.current = [
       ...historyRef.current,
       { role: speaker === 'assistant' ? 'assistant' : 'user', content: clean },
     ].slice(-16)
   }, [])
 
-  const resumeContexts = useCallback(async () => {
-    const rec = recCtxRef.current
-    const play = playCtxRef.current
-    try {
-      if (rec && rec.state === 'suspended') await rec.resume()
-    } catch {
-      // ignore
-    }
-    try {
-      if (play && play.state === 'suspended') await play.resume()
-    } catch {
-      // ignore
-    }
-  }, [])
-
   const stopPlayback = useCallback(() => {
-    if (sourceRef.current) {
+    if (startGraceRef.current) {
+      window.clearTimeout(startGraceRef.current)
+      startGraceRef.current = 0
+    }
+    const audio = audioElRef.current
+    if (audio) {
       try {
-        sourceRef.current.onended = null
-        sourceRef.current.stop()
+        audio.onended = null
+        audio.onerror = null
+        audio.pause()
+        if (audio.src?.startsWith('blob:')) URL.revokeObjectURL(audio.src)
       } catch {
         // already stopped
       }
-      sourceRef.current = null
+      audioElRef.current = null
     }
+    utteranceRef.current = null
+    playbackQueueRef.current = []
+    playbackActiveRef.current = false
+    ttsStreamOpenRef.current = false
     try {
       window.speechSynthesis?.cancel()
     } catch {
@@ -138,23 +189,41 @@ export function useVoiceAgent() {
       window.clearTimeout(watchdogRef.current)
       watchdogRef.current = 0
     }
+    if (startGraceRef.current) {
+      window.clearTimeout(startGraceRef.current)
+      startGraceRef.current = 0
+    }
     const ws = wsRef.current
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'playback_ended' }))
     }
     setStatus('listening')
+    startBrowserSttRef.current()
   }, [])
 
-  const armSpeakingWatchdog = useCallback(() => {
-    if (watchdogRef.current) window.clearTimeout(watchdogRef.current)
-    watchdogRef.current = window.setTimeout(() => {
-      watchdogRef.current = 0
-      if (!speakingRef.current) return
-      console.warn('[Voice] speaking watchdog — returning to listen')
-      stopPlayback()
-      signalPlaybackEnded()
-    }, SPEAKING_WATCHDOG_MS)
-  }, [signalPlaybackEnded, stopPlayback])
+  const armSpeakingWatchdog = useCallback(
+    (audioSeconds) => {
+      if (watchdogRef.current) window.clearTimeout(watchdogRef.current)
+      const ms = Math.min(
+        PLAYBACK_MAX_MS,
+        Math.max(6000, (audioSeconds || 0) * 1000 + PLAYBACK_SLACK_MS),
+      )
+      watchdogRef.current = window.setTimeout(() => {
+        watchdogRef.current = 0
+        if (!speakingRef.current) return
+        console.warn('[Voice] speaking watchdog — returning to listen')
+        stopPlayback()
+        signalPlaybackEnded()
+      }, ms)
+    },
+    [signalPlaybackEnded, stopPlayback],
+  )
+
+  const enterListening = useCallback(() => {
+    speakingRef.current = false
+    setStatus('listening')
+    startBrowserSttRef.current()
+  }, [])
 
   const speakLocal = useCallback(
     (text) => {
@@ -163,6 +232,10 @@ export function useVoiceAgent() {
         signalPlaybackEnded()
         return
       }
+      speakingRef.current = true
+      setStatus('speaking')
+      stopBrowserSttRef.current()
+      armSpeakingWatchdog(spoken.split(/\s+/).length * 0.5 + 2)
       try {
         window.speechSynthesis.cancel()
         const utter = new SpeechSynthesisUtterance(spoken)
@@ -170,122 +243,128 @@ export function useVoiceAgent() {
         utter.pitch = 0.85
         const voice = pickLocalVoice()
         if (voice) utter.voice = voice
+        utter.onstart = () => {
+          if (startGraceRef.current) {
+            window.clearTimeout(startGraceRef.current)
+            startGraceRef.current = 0
+          }
+        }
         utter.onend = () => {
-          sourceRef.current = null
+          if (utteranceRef.current !== utter) return
+          utteranceRef.current = null
           signalPlaybackEnded()
         }
         utter.onerror = () => {
+          if (utteranceRef.current !== utter) return
+          utteranceRef.current = null
           signalPlaybackEnded()
         }
-        window.speechSynthesis.speak(utter)
+        utteranceRef.current = utter
+        window.setTimeout(() => {
+          try {
+            window.speechSynthesis.speak(utter)
+          } catch (err) {
+            console.error('[Voice] local TTS failed', err)
+            signalPlaybackEnded()
+          }
+        }, 40)
+        if (startGraceRef.current) window.clearTimeout(startGraceRef.current)
+        startGraceRef.current = window.setTimeout(() => {
+          startGraceRef.current = 0
+          if (!speakingRef.current) return
+          const pending = window.speechSynthesis.speaking || window.speechSynthesis.pending
+          if (pending) return
+          console.warn('[Voice] local TTS never started')
+          signalPlaybackEnded()
+        }, TTS_START_GRACE_MS)
       } catch (err) {
         console.error('[Voice] local TTS failed', err)
         signalPlaybackEnded()
       }
     },
-    [signalPlaybackEnded],
+    [armSpeakingWatchdog, signalPlaybackEnded],
   )
 
-  const playAudio = useCallback(
-    async (blob) => {
-      pendingLocalTtsRef.current = ''
-      await resumeContexts()
-      if (!playCtxRef.current) {
-        signalPlaybackEnded()
+  const playNextQueued = useCallback(async () => {
+    if (!playbackQueueRef.current.length) {
+      playbackActiveRef.current = false
+      if (ttsStreamOpenRef.current) return
+      signalPlaybackEnded()
+      return
+    }
+    playbackActiveRef.current = true
+    const blob = playbackQueueRef.current.shift()
+    const fallbackText = pendingLocalTtsRef.current
+    speakingRef.current = true
+    setStatus('speaking')
+    try {
+      const raw = blob instanceof ArrayBuffer ? blob : await blob.arrayBuffer()
+      if (!raw || raw.byteLength < 200) {
+        playNextQueuedRef.current?.()
         return
       }
-      stopPlayback()
-      try {
-        if (playCtxRef.current.state === 'suspended') {
-          await playCtxRef.current.resume()
-        }
-        const buffer = await blob.arrayBuffer()
-        const decoded = await playCtxRef.current.decodeAudioData(buffer.slice(0))
-        const source = playCtxRef.current.createBufferSource()
-        source.buffer = decoded
-        source.connect(playCtxRef.current.destination)
-        source.onended = () => {
-          sourceRef.current = null
-          speakingRef.current = false
-          signalPlaybackEnded()
-        }
-        sourceRef.current = source
-        source.start(0)
-      } catch (err) {
-        console.error('[Voice] playback failed', err)
-        const fallbackText = pendingLocalTtsRef.current
-        if (fallbackText) speakLocal(fallbackText)
-        else signalPlaybackEnded()
+      const audioBlob = new Blob([raw], { type: detectAudioMime(raw) })
+      const url = URL.createObjectURL(audioBlob)
+      const audio = new Audio(url)
+      audioElRef.current = audio
+      pendingLocalTtsRef.current = ''
+      const armFromDuration = (seconds) => {
+        const safe = Number.isFinite(seconds) && seconds > 0 ? seconds + 1.5 : 8
+        armSpeakingWatchdog(safe)
       }
+      armFromDuration(Math.max(4, audioBlob.size / 12000))
+      audio.onloadedmetadata = () => armFromDuration(audio.duration)
+      audio.onended = () => {
+        if (audioElRef.current !== audio) return
+        audioElRef.current = null
+        URL.revokeObjectURL(url)
+        playNextQueuedRef.current?.()
+      }
+      audio.onerror = () => {
+        if (audioElRef.current !== audio) return
+        audioElRef.current = null
+        URL.revokeObjectURL(url)
+        if (fallbackText && !playbackQueueRef.current.length) speakLocal(fallbackText)
+        else playNextQueuedRef.current?.()
+      }
+      await audio.play()
+    } catch (err) {
+      console.error('[Voice] playback failed', err)
+      if (fallbackText && !playbackQueueRef.current.length) speakLocal(fallbackText)
+      else playNextQueuedRef.current?.()
+    }
+  }, [armSpeakingWatchdog, signalPlaybackEnded, speakLocal])
+  playNextQueuedRef.current = playNextQueued
+
+  const playAudio = useCallback((blob) => {
+    speakingRef.current = true
+    setStatus('speaking')
+    stopBrowserSttRef.current()
+    playbackQueueRef.current.push(blob)
+    if (!playbackActiveRef.current) {
+      void playNextQueued()
+    }
+  }, [playNextQueued])
+
+  const runLocalTurn = useCallback(
+    async (text) => {
+      const value = String(text || '').trim()
+      if (!value) return
+      speakingRef.current = true
+      appendLine('user', value)
+      setStatus('thinking')
+      setFallback(true)
+      const local = localVoiceTurn(value, usePolarisStore.getState())
+      appendLine('assistant', local.reply)
+      setSources(local.sources)
+      setRagMode(local.rag)
+      await usePolarisStore.getState().applyVoiceActions(local.actions)
+      pendingLocalTtsRef.current = local.reply
+      speakLocal(local.reply)
     },
-    [resumeContexts, signalPlaybackEnded, speakLocal, stopPlayback],
+    [appendLine, speakLocal],
   )
-
-  const stopBrowserStt = useCallback(() => {
-    const rec = speechRecRef.current
-    if (!rec) return
-    rec.onresult = null
-    rec.onerror = null
-    rec.onend = null
-    try {
-      rec.stop()
-    } catch {
-      // ignore
-    }
-    speechRecRef.current = null
-  }, [])
-
-  const startBrowserStt = useCallback(() => {
-    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
-    const ws = wsRef.current
-    if (!Ctor || !ws || ws.readyState !== WebSocket.OPEN) return
-    stopBrowserStt()
-    const rec = new Ctor()
-    rec.continuous = true
-    rec.interimResults = true
-    rec.lang = 'en-US'
-    rec.maxAlternatives = 1
-    rec.onresult = (event) => {
-      if (speakingRef.current) return
-      const result = event.results[event.results.length - 1]
-      if (!result?.isFinal) return
-      const text = String(result[0]?.transcript || '').trim()
-      if (!text || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
-      wsRef.current.send(JSON.stringify({ type: 'text', text }))
-      stopBrowserStt()
-    }
-    rec.onerror = (event) => {
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        setError('Microphone blocked. Allow mic access, then open the AI dock again.')
-        rec.onend = null
-        speechRecRef.current = null
-      }
-    }
-    rec.onend = () => {
-      if (!wantMicRef.current || speakingRef.current) return
-      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
-      window.setTimeout(() => {
-        if (!wantMicRef.current || speakingRef.current) return
-        try {
-          rec.start()
-        } catch {
-          // already started
-        }
-      }, 180)
-    }
-    speechRecRef.current = rec
-    try {
-      rec.start()
-    } catch {
-      // already started
-    }
-  }, [stopBrowserStt])
-
-  const enterListening = useCallback(() => {
-    speakingRef.current = false
-    setStatus('listening')
-    if (wantMicRef.current) startBrowserStt()
-  }, [startBrowserStt])
+  runLocalTurnRef.current = runLocalTurn
 
   const handleMessage = useCallback(
     (event) => {
@@ -296,13 +375,26 @@ export function useVoiceAgent() {
         } catch {
           return
         }
+        if (data.type === 'tts_stream') {
+          if (data.phase === 'start') {
+            ttsStreamOpenRef.current = true
+            speakingRef.current = true
+            setStatus('speaking')
+          }
+          if (data.phase === 'end') {
+            ttsStreamOpenRef.current = false
+            if (!playbackActiveRef.current && !playbackQueueRef.current.length) {
+              signalPlaybackEnded()
+            }
+          }
+        }
         if (data.type === 'status') {
           const next = data.message || 'listening'
           setStatus(next)
           if (next === 'speaking') {
             speakingRef.current = true
-            stopBrowserStt()
-            armSpeakingWatchdog()
+            stopBrowserSttRef.current()
+            armSpeakingWatchdog(0)
           }
           if (next === 'listening') {
             enterListening()
@@ -315,9 +407,13 @@ export function useVoiceAgent() {
             watchdogRef.current = 0
           }
           stopPlayback()
-          enterListening()
+          signalPlaybackEnded()
+        }
+        if (data.type === 'notice' && data.message) {
+          setError(data.message)
         }
         if (data.type === 'transcript' && data.final) {
+          if (data.speaker === 'user') setError('')
           appendLine(data.speaker === 'assistant' ? 'assistant' : 'user', data.text)
           if (data.speaker === 'assistant') pendingLocalTtsRef.current = data.text
         }
@@ -341,10 +437,87 @@ export function useVoiceAgent() {
       armSpeakingWatchdog,
       enterListening,
       playAudio,
+      signalPlaybackEnded,
       speakLocal,
-      stopBrowserStt,
       stopPlayback,
     ],
+  )
+  handleMessageRef.current = handleMessage
+
+  const stopBrowserStt = useCallback(() => {
+    const rec = speechRecRef.current
+    if (!rec) return
+    rec.onresult = null
+    rec.onend = null
+    rec.onerror = null
+    try {
+      rec.abort()
+    } catch {
+      // ignore
+    }
+    speechRecRef.current = null
+  }, [])
+
+  const startBrowserStt = useCallback(() => {
+    stopBrowserStt()
+    const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!Ctor) return false
+    const rec = new Ctor()
+    rec.lang = 'en-IN'
+    rec.continuous = true
+    rec.interimResults = false
+    rec.maxAlternatives = 1
+    rec.onresult = (event) => {
+      if (speakingRef.current) return
+      const result = event.results[event.results.length - 1]
+      if (!result?.isFinal) return
+      const text = String(result[0]?.transcript || '').trim()
+      if (!text) return
+      const ws = wsRef.current
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'text', text }))
+        return
+      }
+      runLocalTurnRef.current?.(text)
+    }
+    rec.onend = () => {
+      if (!wantMicRef.current || speakingRef.current) return
+      try {
+        rec.start()
+      } catch {
+        // ignore
+      }
+    }
+    speechRecRef.current = rec
+    try {
+      rec.start()
+      return true
+    } catch {
+      speechRecRef.current = null
+      return false
+    }
+  }, [stopBrowserStt])
+  startBrowserSttRef.current = startBrowserStt
+  stopBrowserSttRef.current = stopBrowserStt
+
+  const maybeLocalBargeIn = useCallback(() => {}, [])
+
+  const sendPcm = useCallback(
+    (buffer) => {
+      const pcm = buffer instanceof Int16Array ? buffer : new Int16Array(buffer)
+      const level = rmsFromPcm16(pcm)
+      const now = performance.now()
+      if (now - lastLevelAtRef.current > 80) {
+        lastLevelAtRef.current = now
+        setMicLevel(level)
+      }
+      maybeLocalBargeIn(level)
+      if (speakingRef.current) return
+      const ws = wsRef.current
+      if (!ws || ws.readyState !== WebSocket.OPEN) return
+      ws.send(pcm.buffer.slice(pcm.byteOffset, pcm.byteOffset + pcm.byteLength))
+    },
+    [maybeLocalBargeIn],
   )
 
   const teardown = useCallback(() => {
@@ -355,8 +528,21 @@ export function useVoiceAgent() {
       window.clearTimeout(watchdogRef.current)
       watchdogRef.current = 0
     }
-    stopBrowserStt()
+    if (startGraceRef.current) {
+      window.clearTimeout(startGraceRef.current)
+      startGraceRef.current = 0
+    }
     stopPlayback()
+    stopBrowserSttRef.current()
+    if (workletRef.current) {
+      workletRef.current.port.onmessage = null
+      try {
+        workletRef.current.disconnect()
+      } catch {
+        // ignore
+      }
+      workletRef.current = null
+    }
     if (processorRef.current) {
       processorRef.current.disconnect()
       processorRef.current = null
@@ -380,31 +566,127 @@ export function useVoiceAgent() {
       recCtxRef.current.close()
       recCtxRef.current = null
     }
-    if (playCtxRef.current) {
-      playCtxRef.current.close()
-      playCtxRef.current = null
-    }
     setConnected(false)
+    setMicActive(false)
     setStatus('idle')
     setMicLevel(0)
-  }, [stopBrowserStt, stopPlayback])
+  }, [stopPlayback])
+
+  const attachLegacyMic = useCallback((stream) => {
+    const rec = recCtxRef.current
+    if (!rec) return
+    const input = rec.createMediaStreamSource(stream)
+    inputRef.current = input
+    const processor = rec.createScriptProcessor(4096, 1, 1)
+    processorRef.current = processor
+    input.connect(processor)
+    const silent = rec.createGain()
+    silent.gain.value = 0.0001
+    processor.connect(silent)
+    silent.connect(rec.destination)
+    processor.onaudioprocess = (event) => {
+      if (rec.state === 'suspended') rec.resume()
+      const floats = event.inputBuffer.getChannelData(0)
+      const now = performance.now()
+      if (now - lastLevelAtRef.current > 80) {
+        lastLevelAtRef.current = now
+        setMicLevel(rmsLevel(floats))
+      }
+      const level = rmsLevel(floats)
+      maybeLocalBargeIn(level)
+      const ws = wsRef.current
+      if (!ws || ws.readyState !== WebSocket.OPEN) return
+      const pcm =
+        Math.abs(rec.sampleRate - SAMPLE_RATE) < 1
+          ? floatsToPcm16(floats)
+          : floatsToPcm16(downsample(floats, rec.sampleRate, SAMPLE_RATE))
+      if (speakingRef.current) return
+      ws.send(pcmPayload(pcm))
+    }
+  }, [maybeLocalBargeIn])
+
+  const attachMicGraph = useCallback(
+    async (stream) => {
+      const rec = recCtxRef.current
+      if (!rec) return
+      if (inputRef.current) {
+        try {
+          inputRef.current.disconnect()
+        } catch {
+          // ignore
+        }
+      }
+      if (workletRef.current) {
+        workletRef.current.port.onmessage = null
+        try {
+          workletRef.current.disconnect()
+        } catch {
+          // ignore
+        }
+        workletRef.current = null
+      }
+      if (processorRef.current) {
+        try {
+          processorRef.current.disconnect()
+        } catch {
+          // ignore
+        }
+        processorRef.current = null
+      }
+
+      if (rec.audioWorklet) {
+        try {
+          await rec.audioWorklet.addModule(`/audio-processor.js?v=16k1`)
+          const input = rec.createMediaStreamSource(stream)
+          inputRef.current = input
+          const worklet = new AudioWorkletNode(rec, 'pcm-processor', {
+            numberOfInputs: 1,
+            numberOfOutputs: 1,
+            channelCount: 1,
+            processorOptions: { bufferSize: 2048, targetRate: SAMPLE_RATE },
+          })
+          workletRef.current = worklet
+          worklet.port.onmessage = (event) => sendPcm(event.data)
+          input.connect(worklet)
+          const silent = rec.createGain()
+          silent.gain.value = 0
+          worklet.connect(silent)
+          silent.connect(rec.destination)
+          return
+        } catch (err) {
+          console.warn('[Voice] AudioWorklet unavailable, using ScriptProcessor', err)
+        }
+      }
+      attachLegacyMic(stream)
+    },
+    [attachLegacyMic, sendPcm],
+  )
 
   const startCall = useCallback(async () => {
+    const callId = callGenRef.current + 1
+    callGenRef.current = callId
     setError('')
+    setLines([])
+    setSources([])
+    historyRef.current = []
     setOpen(true)
     setStatus('connecting')
     teardown()
+    if (callGenRef.current !== callId) return
     wantMicRef.current = true
     setStatus('connecting')
 
     const Ctor = AudioContextCtor()
     if (Ctor) {
-      recCtxRef.current = new Ctor({ sampleRate: SAMPLE_RATE })
-      playCtxRef.current = new Ctor()
+      try {
+        recCtxRef.current = new Ctor({ sampleRate: SAMPLE_RATE })
+      } catch {
+        recCtxRef.current = new Ctor()
+      }
+      await unlockContext(recCtxRef.current)
     }
 
     try {
-      await resumeContexts()
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
@@ -413,51 +695,57 @@ export function useVoiceAgent() {
           autoGainControl: true,
         },
       })
+      if (callGenRef.current !== callId) {
+        stream.getTracks().forEach((track) => track.stop())
+        return
+      }
       streamRef.current = stream
-      await resumeContexts()
+      setMicActive(true)
+      await attachMicGraph(stream)
 
       const ws = new WebSocket(voiceWsUrl())
       ws.binaryType = 'blob'
       wsRef.current = ws
 
-      ws.onopen = () => {
-        setConnected(true)
-        setFallback(false)
-        setStatus('connected')
-        const rec = recCtxRef.current
-        if (!rec) return
-        if (rec.state === 'suspended') rec.resume()
-        const input = rec.createMediaStreamSource(stream)
-        inputRef.current = input
-        const processor = rec.createScriptProcessor(4096, 1, 1)
-        processorRef.current = processor
-        input.connect(processor)
-        const silent = rec.createGain()
-        silent.gain.value = 0
-        processor.connect(silent)
-        silent.connect(rec.destination)
-        processor.onaudioprocess = (event) => {
-          if (rec.state === 'suspended') rec.resume()
-          const floats = event.inputBuffer.getChannelData(0)
-          const now = performance.now()
-          if (now - lastLevelAtRef.current > 80) {
-            lastLevelAtRef.current = now
-            setMicLevel(rmsLevel(floats))
-          }
-          if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return
-          const resampled = downsample(floats, rec.sampleRate, SAMPLE_RATE)
-          wsRef.current.send(floatsToPcm16(resampled).buffer)
-        }
-        const SpeechCtor = window.SpeechRecognition || window.webkitSpeechRecognition
-        ws.send(JSON.stringify({ type: 'browser_stt', enabled: Boolean(SpeechCtor) }))
+      const failToLocal = (reason) => {
+        if (callGenRef.current !== callId) return
+        wsRef.current = null
+        setConnected(false)
+        setFallback(true)
+        setError(reason)
+        enterListening()
       }
 
-      ws.onmessage = handleMessage
+      const connectTimer = window.setTimeout(() => {
+        if (ws.readyState === WebSocket.OPEN) return
+        try {
+          ws.close()
+        } catch {
+          // ignore
+        }
+      }, 4000)
+
+      ws.onopen = () => {
+        window.clearTimeout(connectTimer)
+        if (callGenRef.current !== callId) return
+        setConnected(true)
+        setFallback(false)
+        setError('')
+        setStatus('connected')
+        unlockContext(recCtxRef.current)
+        const Rec = window.SpeechRecognition || window.webkitSpeechRecognition
+        ws.send(JSON.stringify({ type: 'browser_stt', enabled: Boolean(Rec) }))
+      }
+
+      ws.onmessage = (event) => handleMessageRef.current?.(event)
       ws.onerror = () => {
         console.warn('[Voice] websocket error')
       }
       ws.onclose = () => {
-        teardown()
+        window.clearTimeout(connectTimer)
+        if (callGenRef.current !== callId) return
+        if (!wantMicRef.current) return
+        failToLocal('Voice sidecar dropped. Mic is still open — local brief will answer.')
       }
     } catch (err) {
       console.error('[Voice] mic failed', err)
@@ -466,9 +754,10 @@ export function useVoiceAgent() {
       setError('Microphone blocked. You can still type a query.')
       setStatus('idle')
     }
-  }, [handleMessage, resumeContexts, teardown])
+  }, [attachMicGraph, enterListening, teardown])
 
   const endCall = useCallback(() => {
+    callGenRef.current += 1
     teardown()
   }, [teardown])
 
@@ -482,54 +771,23 @@ export function useVoiceAgent() {
         ws.send(JSON.stringify({ type: 'text', text: value }))
         return
       }
-      appendLine('user', value)
-      setStatus('thinking')
-      const runLocal = async (reason) => {
-        setFallback(true)
-        setError(reason)
-        const local = localVoiceTurn(value, usePolarisStore.getState())
-        appendLine('assistant', local.reply)
-        setSources(local.sources)
-        setRagMode(local.rag)
-        await usePolarisStore.getState().applyVoiceActions(local.actions)
-        setStatus('idle')
-      }
-      try {
-        const controller = new AbortController()
-        const timer = window.setTimeout(() => controller.abort(), 4000)
-        const response = await fetch(`${VOICE_URL.replace(/\/$/, '')}/api/voice/turn`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: value,
-            history: historyRef.current,
-          }),
-          signal: controller.signal,
-        })
-        window.clearTimeout(timer)
-        if (!response.ok) {
-          throw new Error(`voice HTTP ${response.status}`)
-        }
-        const data = await response.json()
-        setFallback(false)
-        appendLine('assistant', data.reply)
-        setSources(Array.isArray(data.sources) ? data.sources : [])
-        setRagMode(data.rag || '')
-        await usePolarisStore.getState().applyVoiceActions(data.actions)
-        setStatus('idle')
-      } catch (err) {
-        console.error('[Voice] turn failed', err)
-        await runLocal(
-          'Voice sidecar timed out or is down. Local SOP brief is speaking from the desk.',
-        )
-      }
+      await runLocalTurn(value)
     },
-    [appendLine],
+    [runLocalTurn],
   )
 
   const teardownRef = useRef(teardown)
   teardownRef.current = teardown
   useEffect(() => () => teardownRef.current(), [])
+
+  useEffect(() => {
+    const synth = window.speechSynthesis
+    if (!synth?.getVoices) return undefined
+    const warm = () => synth.getVoices()
+    warm()
+    synth.addEventListener?.('voiceschanged', warm)
+    return () => synth.removeEventListener?.('voiceschanged', warm)
+  }, [])
 
   useEffect(() => {
     if (!open) return undefined
@@ -554,6 +812,7 @@ export function useVoiceAgent() {
     ragMode,
     fallback,
     micLevel,
+    micActive,
     draft,
     setDraft,
     startCall,

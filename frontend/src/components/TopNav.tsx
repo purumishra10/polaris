@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Radio, Gauge, Activity, Snowflake, Flame, Satellite } from 'lucide-react'
+import { Radio, Gauge, Activity, Snowflake, Flame, Satellite, Columns2 } from 'lucide-react'
 import { usePolarisStore } from '../store/usePolarisStore'
+import ServicePulse from './ServicePulse'
+import LinkBanner from './LinkBanner'
 
 interface TopNavProps {
-  currentTab: 'home' | 'mission-control' | 'analytics'
-  onNavigate: (route: 'home' | 'mission-control' | 'analytics') => void
+  currentTab: 'home' | 'mission-control' | 'analytics' | 'fleet'
+  onNavigate: (route: 'home' | 'mission-control' | 'analytics' | 'fleet') => void
   right?: React.ReactNode
 }
 
@@ -30,9 +32,14 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
   const currentTelemetry = telemetry[selectedStation]
   const latency = connection?.latency_ms || currentTelemetry?.link_status?.latency_ms || 460
   const isWsConnected = connection?.status === 'CONNECTED_WS'
+  const linkHealth = currentTelemetry?.link_status?.health
+  const offline = connection?.status === 'OFFLINE'
 
   return (
-    <header className="sticky top-0 z-40 border-b border-base-700 bg-base-950/90 backdrop-blur-md px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
+    <div className="sticky top-0 z-40">
+      <ServicePulse />
+      <LinkBanner />
+    <header className="border-b border-base-700 bg-base-950/90 backdrop-blur-md px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-md">
       {/* Left: Branding & Station Switcher */}
       <div className="flex items-center gap-4 min-w-0">
         <button
@@ -101,6 +108,19 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
         </button>
 
         <button
+          id="tab-btn-fleet"
+          onClick={() => onNavigate('fleet')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+            currentTab === 'fleet'
+              ? 'bg-gradient-to-r from-ice-700 to-ice-600 text-white font-semibold shadow-glow'
+              : 'text-slate-400 hover:text-white hover:bg-base-800'
+          }`}
+        >
+          <Columns2 size={14} />
+          <span>Fleet</span>
+        </button>
+
+        <button
           id="tab-btn-analytics"
           onClick={() => onNavigate('analytics')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium transition-all ${
@@ -110,7 +130,7 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
           }`}
         >
           <Gauge size={14} className={currentTab === 'analytics' ? 'text-ice-300' : ''} />
-          <span>Telemetry Analytics</span>
+          <span>Analytics</span>
         </button>
 
         <button
@@ -123,7 +143,7 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
           }`}
         >
           <Activity size={14} className={currentTab === 'mission-control' ? 'text-ice-300' : ''} />
-          <span>Mission Control</span>
+          <span>Control</span>
         </button>
       </nav>
 
@@ -148,12 +168,14 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
           className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-base-700 bg-base-900 text-xs font-mono"
           title={`Satellite Link: ${isWsConnected ? 'Active WebSocket' : 'Fallback HTTP Polling'}`}
         >
-          <Satellite size={13} className={isWsConnected ? 'text-ice-400' : 'text-amber-400'} />
-          <span className="text-slate-300 hidden sm:inline">C-band</span>
+          <Satellite size={13} className={offline || linkHealth === 'DEGRADED' ? 'text-amber-400' : 'text-ice-400'} />
+          <span className="text-slate-300 hidden sm:inline">
+            {linkHealth === 'DEGRADED' ? 'DEGRADED' : 'C-band'}
+          </span>
           <span className="text-ice-400 font-bold">{latency}ms</span>
           <span
             className={`h-2 w-2 rounded-full ${
-              isWsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+              isWsConnected && linkHealth !== 'DEGRADED' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
             }`}
           />
         </div>
@@ -167,5 +189,6 @@ export default function TopNav({ currentTab, onNavigate, right }: TopNavProps) {
         {right}
       </div>
     </header>
+    </div>
   )
 }
